@@ -1,0 +1,1 @@
+alias homelab="python dx/cli"

@@ -9,6 +9,7 @@
 # Byte-compiled / optimized / DLL files
 .idea/
 __pycache__/
+.mypy_cache/
 *.py[cod]
 
 # .env files
@@ -16,15 +17,15 @@ __pycache__/
 /**/env.sh
 /**/*.env.sh
 
+# Config json flies
+/**/*.config.json
+
 # Certificates
 /**/*.pem
 /**/*.crt
 /**/*.key
 /**/*.srl
 /**/*.csr
-
-# VSCode
-/**/.vscode
 
 # Shared Folder
 /services/**/shared

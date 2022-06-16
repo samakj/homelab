@@ -1,0 +1,6 @@
+{
+   "credentials": {
+      "a": {"ssid": "ssid1", "password": "password1"},
+      "b": {"ssid": "ssid2", "password": "password2"}
+   }
+}

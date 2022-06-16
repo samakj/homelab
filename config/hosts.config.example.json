@@ -1,0 +1,7 @@
+{
+    "cache":    "localhost",
+    "db":       "localhost",
+    "frontend": "localhost",
+    "scrapers": "localhost",
+    "services": "localhost"
+}
