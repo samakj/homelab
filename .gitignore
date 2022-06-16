@@ -1,0 +1,34 @@
+# venv files
+/**/python/**/venv
+/**/python/**/bin
+/**/python/**/include
+/**/python/**/lib
+/**/python/**/shared
+
+
+# Byte-compiled / optimized / DLL files
+.idea/
+__pycache__/
+*.py[cod]
+
+# .env files
+/**/*.env
+/**/env.sh
+/**/*.env.sh
+
+# Certificates
+/**/*.pem
+/**/*.crt
+/**/*.key
+/**/*.srl
+/**/*.csr
+
+# VSCode
+/**/.vscode
+
+# Shared Folder
+/services/**/shared
+/shared/**/shared
+
+# Data
+/data
