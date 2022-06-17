@@ -1,0 +1,119 @@
+version: "3"
+
+services:
+  ${containers.nginx}:
+    image: nginx:latest
+    container_name: ${containers.nginx}
+    depends_on:
+      - ${containers.iot_api}
+      - ${containers.utilities_api}
+      - ${containers.weather_api}
+      - ${containers.portainer}
+    volumes:
+      - "${folders.containers.nginx}/services.conf:/etc/nginx/nginx.conf"
+    ports:
+      - "${ports.http}:${ports.http}"
+      - "${ports.https}:${ports.https}"
+    
+  ${containers.postgres}:
+    image: postgres:latest
+    container_name: ${containers.postgres}
+    environment:
+      - POSTGRES_USER=${postgres.root.user}
+      - POSTGRES_PASSWORD=${postgres.root.password}
+      - POSTGRES_PORT=${ports.postgres}
+      - IOT_DB_USER=${postgres.iot.user}
+      - IOT_DB_PASS=${postgres.iot.password}
+      - IOT_DB_NAME=${postgres.iot.name}
+      - UTILITIES_DB_USER=${postgres.utilities.user}
+      - UTILITIES_DB_PASS=${postgres.utilities.password}
+      - UTILITIES_DB_NAME=${postgres.utilities.name}
+      - WEATHER_DB_USER=${postgres.weather.user}
+      - WEATHER_DB_PASS=${postgres.weather.password}
+      - WEATHER_DB_NAME=${postgres.weather.name}
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/data
+      - ${folders.services.postgres}/env.sh:/docker-entrypoint-initdb.d/1.init-env.sh
+      - ${folders.services.postgres}/init_db.sh:/docker-entrypoint-initdb.d/2.init-db.sh
+      - ${folders.services.postgres}/init_roles.sh:/docker-entrypoint-initdb.d/3.init-roles.sh
+      - ${folders.services.postgres}/iot:/migrations/iot
+      - ${folders.services.postgres}/utilities:/migrations/utilities
+      - ${folders.services.postgres}/weather:/migrations/weather
+    ports:
+      - "${ports.postgres}:${ports.postgres}"
+
+  ${containers.redis}:
+    image: redis:latest
+    container_name: ${containers.redis}
+    command: redis-server --port ${ports.redis}
+    volumes:
+      - ./redis-data:/var/lib/redis
+    ports:
+      - "${ports.redis}:${ports.redis}"
+    
+  ${containers.iot_api}:
+    image: ${containers.iot_api}
+    container_name: ${containers.iot_api}
+    depends_on:
+      - ${containers.postgres}
+      - ${containers.redis}
+    build:
+      context: "${folders.services.iot.api}"
+      args:
+        IOT_API_PORT: ${ports.iot_api}
+    env_file:
+      - ${folders.services.iot.api}/.env
+    volumes:
+      - "${folders.services.iot.api}:/app"
+    ports:
+      - "${ports.iot_api}:${ports.iot_api}"
+    restart: on-failure
+
+  ${containers.utilities_api}:
+    image: ${containers.utilities_api}
+    container_name: ${containers.utilities_api}
+    depends_on:
+      - ${containers.postgres}
+      - ${containers.redis}
+    build:
+      context: "${folders.services.utilities}/api"
+      args:
+        UTILITIES_API_PORT: ${ports.utilities_api}
+    env_file:
+      - ${folders.services.utilities.api}/.env
+    volumes:
+      - "${folders.services.utilities.api}:/app"
+    ports:
+      - "${ports.utilities_api}:${ports.utilities_api}"
+    restart: on-failure
+
+  ${containers.weather_api}:
+    image: ${containers.weather_api}
+    container_name: ${containers.weather_api}
+    depends_on:
+      - ${containers.postgres}
+      - ${containers.redis}
+    build:
+      context: "${folders.services.weather}/api"
+      args:
+        WEATHER_API_PORT: ${ports.weather_api}
+    env_file:
+      - ${folders.services.weather.api}/.env
+    volumes:
+      - "${folders.services.weather.api}:/app"
+    ports:
+      - "${ports.weather_api}:${ports.weather_api}"
+    restart: on-failure
+
+  ${containers.portainer}:
+    image: portainer/portainer-ce:latest
+    container_name: ${containers.portainer}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${folders.containers.docker_compose.services.portainer_data}:/data
+    ports:
+      - ${ports.portainer}:${ports.portainer}

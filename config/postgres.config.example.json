@@ -1,0 +1,6 @@
+{
+    "root":      {"name": "name0", "user": "user0", "password": "password0"},
+    "iot":       {"name": "name1", "user": "user1", "password": "password1"},
+    "weather":   {"name": "name2", "user": "user2", "password": "password2"},
+    "utilities": {"name": "name3", "user": "user3", "password": "password3"}
+}

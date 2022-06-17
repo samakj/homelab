@@ -12,6 +12,9 @@ from variables import (
     subdomains_config_path,
     wifi_config_path,
     nginx_folder,
+    docker_compose_folder,
+    flat_folders_config,
+    postgres_config_path,
 )
 
 
@@ -20,6 +23,7 @@ containers_config: Optional[dict[str, Any]] = None
 hosts_config: Optional[dict[str, Any]] = None
 location_config: Optional[dict[str, Any]] = None
 ports_config: Optional[dict[str, Any]] = None
+postgres_config: Optional[dict[str, Any]] = None
 subdomains_config: Optional[dict[str, Any]] = None
 wifi_config: Optional[dict[str, Any]] = None
 
@@ -52,6 +56,13 @@ def get_ports_config() -> dict[str, Any]:
     return ports_config
 
 
+def get_postgres_config() -> dict[str, Any]:
+    global postgres_config
+    if postgres_config is None:
+        postgres_config = load_json_file(path=postgres_config_path)
+    return postgres_config
+
+
 def get_subdomains_config() -> dict[str, Any]:
     global subdomains_config
     if subdomains_config is None:
@@ -78,6 +89,7 @@ def apply_config_variables(
     flat_hosts_config = flattern_dict(obj=get_hosts_config(), prefix="hosts")
     flat_location_config = flattern_dict(obj=get_location_config(), prefix="location")
     flat_ports_config = flattern_dict(obj=get_ports_config(), prefix="ports")
+    flat_postgres_config = flattern_dict(obj=get_postgres_config(), prefix="postgres")
     flat_subdomains_config = flattern_dict(
         obj=get_subdomains_config(), prefix="subdomains"
     )
@@ -87,6 +99,10 @@ def apply_config_variables(
     with open(file=input_path, mode="r") as input_file:
         output_text = input_file.read()
 
+    for key, value in flat_folders_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
     for key, value in flat_containers_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
@@ -100,6 +116,10 @@ def apply_config_variables(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
     for key, value in flat_ports_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
+    for key, value in flat_postgres_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
@@ -150,6 +170,15 @@ def print_ports() -> None:
 
 
 @configs.command()
+def print_postgres() -> None:
+    print(
+        json.dumps(
+            flattern_dict(obj=get_postgres_config(), prefix="postgres"), indent=4
+        )
+    )
+
+
+@configs.command()
 def print_subdomains() -> None:
     print(
         json.dumps(
@@ -180,6 +209,10 @@ def print_all(ctx: click.Context) -> None:
 
     print("Ports")
     print_ports.invoke(ctx=ctx)
+    print("")
+
+    print("Postgres")
+    print_postgres.invoke(ctx=ctx)
     print("")
 
     print("Subdomains")
@@ -318,6 +351,45 @@ def build_nginx_conf(ctx: click.Context) -> None:
 
 
 @configs.command()
+def build_frontend_docker_compose() -> None:
+    apply_config_variables(
+        input_path=docker_compose_folder / "frontend/docker-compose.template.yml",
+        output_path=docker_compose_folder / "frontend/docker-compose.yml",
+        template_prefix="${",
+        template_suffix="}",
+    )
+
+
+@configs.command()
+def build_scrapers_docker_compose() -> None:
+    apply_config_variables(
+        input_path=docker_compose_folder / "scrapers/docker-compose.template.yml",
+        output_path=docker_compose_folder / "scrapers/docker-compose.yml",
+        template_prefix="${",
+        template_suffix="}",
+    )
+
+
+@configs.command()
+def build_services_docker_compose() -> None:
+    apply_config_variables(
+        input_path=docker_compose_folder / "services/docker-compose.template.yml",
+        output_path=docker_compose_folder / "services/docker-compose.yml",
+        template_prefix="${",
+        template_suffix="}",
+    )
+
+
+@configs.command()
+@click.pass_context
+def build_docker_compose_files(ctx: click.Context) -> None:
+    build_frontend_docker_compose.invoke(ctx=ctx)
+    build_scrapers_docker_compose.invoke(ctx=ctx)
+    build_services_docker_compose.invoke(ctx=ctx)
+
+
+@configs.command()
 @click.pass_context
 def build_conf(ctx: click.Context) -> None:
     build_nginx_conf(ctx=ctx)
+    build_docker_compose_files(ctx=ctx)

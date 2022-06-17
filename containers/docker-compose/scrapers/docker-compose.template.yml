@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+  ${containers.nginx}:
+    image: nginx:latest
+    container_name: ${containers.nginx}
+    depends_on:
+      - ${containers.devices_scraper}
+      - ${containers.utilities_scraper}
+      - ${containers.weather_scraper}
+      - ${containers.portainer}
+    volumes:
+      - "${folders.containers.nginx}/scrapers.conf:/etc/nginx/nginx.conf"
+    ports:
+      - "${ports.http}:${ports.http}"
+      - "${ports.https}:${ports.https}"
+
+  ${containers.devices_scraper}:
+    image: ${containers.devices_scraper}
+    container_name: ${containers.devices_scraper}
+    build:
+      context: "${folders.services.iot.scraper}"
+      args:
+        DEVICES_SCRAPER_PORT: ${ports.devices_scraper}
+    env_file:
+      - ${folders.services.iot.scraper}/.env
+    volumes:
+      - "${folders.services.iot.scraper}:/app"
+    ports:
+      - "${ports.devices_scraper}:${ports.devices_scraper}"
+    restart: on-failure
+
+  ${containers.utilities_scraper}:
+    image: ${containers.utilities_scraper}
+    container_name: ${containers.utilities_scraper}
+    build:
+      context: "${folders.services.utilities.scraper}"
+      args:
+        UTILITIES_SCRAPER_PORT: ${ports.utilities_scraper}
+    env_file:
+      - ${folders.services.utilities.scraper}/.env
+    volumes:
+      - "${folders.services.utilities.scraper}:/app"
+    ports:
+      - "${ports.utilities_scraper}:${ports.utilities_scraper}"
+    restart: on-failure
+
+  ${containers.weather_scraper}:
+    image: ${containers.weather_scraper}
+    container_name: ${containers.weather_scraper}
+    build:
+      context: "${folders.services.weather.scraper}"
+      args:
+        WEATHER_SCRAPER_PORT: ${ports.weather_scraper}
+    env_file:
+      - ${folders.services.weather.scraper}/.env
+    volumes:
+      - "${folders.services.weather.scraper}:/app"
+    ports:
+      - "${ports.weather_scraper}:${ports.weather_scraper}"
+    restart: on-failure
+
+  ${containers.portainer}:
+    image: portainer/portainer-ce:latest
+    container_name: ${containers.portainer}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${folders.containers.docker_compose.scrapers.portainer_data}:/data
+    ports:
+      - ${ports.portainer}:${ports.portainer}
