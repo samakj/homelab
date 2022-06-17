@@ -1,0 +1,15 @@
+{
+    "redis":     "redis",
+    "postgres":  "postgres",
+    "portainer": "portainer",
+
+    "frontend": "frontend",
+
+    "devices_scraper":   "devices_scraper",
+    "utilities_scraper": "utilities_scraper",
+    "weather_scraper":   "weather_scraper",
+
+    "iot_api":       "iot_api",
+    "utilities_api": "utilities_api",
+    "weather_api":   "weather_api"
+}

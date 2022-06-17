@@ -7,4 +7,4 @@ def cli() -> None:
     pass
 
 
-cli.add_command(configs)
+cli.add_command(cmd=configs)

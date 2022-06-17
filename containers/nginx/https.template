@@ -1,0 +1,12 @@
+server {
+    listen ${ports.https} default_server ssl http2;
+    listen [::]:${ports.https} ssl http2;
+
+    ssl_certificate /etc/nginx/ssl/live/example.org/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/example.org/privkey.pem;
+
+    location / {
+        default_type application/json;
+        return 404 '{"status": 404, "reason": "Not Found"}';
+    }
+}

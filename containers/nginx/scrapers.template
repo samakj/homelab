@@ -1,0 +1,11 @@
+include globals.conf;
+
+
+http {
+    include http.conf;
+    include https.conf;
+    include devices_scraper.conf;
+    include utilities_scraper.conf;
+    include weather_scraper.conf;
+    include portainer.conf;
+}

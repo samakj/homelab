@@ -1,0 +1,12 @@
+server {
+    listen ${ports.http};
+    listen [::]:${ports.http};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 $schemes://$host$request_uri;
+    }
+}

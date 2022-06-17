@@ -10,9 +10,11 @@ nginx_folder = container_folder / "nginx"
 
 # Config
 config_folder = root_folder / "config"
+containers_config_path = config_folder / "containers.config.json"
 hosts_config_path = config_folder / "hosts.config.json"
 location_config_path = config_folder / "location.config.json"
 ports_config_path = config_folder / "ports.config.json"
+subdomains_config_path = config_folder / "subdomains.config.json"
 wifi_config_path = config_folder / "wifi.config.json"
 
 #  DX
