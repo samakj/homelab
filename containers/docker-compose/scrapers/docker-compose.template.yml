@@ -5,7 +5,7 @@ services:
     image: nginx:latest
     container_name: ${containers.nginx}
     depends_on:
-      - ${containers.devices_scraper}
+      - ${containers.iot_scraper}
       - ${containers.utilities_scraper}
       - ${containers.weather_scraper}
       - ${containers.portainer}
@@ -15,19 +15,19 @@ services:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
 
-  ${containers.devices_scraper}:
-    image: ${containers.devices_scraper}
-    container_name: ${containers.devices_scraper}
+  ${containers.iot_scraper}:
+    image: ${containers.iot_scraper}
+    container_name: ${containers.iot_scraper}
     build:
       context: "${folders.services.iot.scraper}"
       args:
-        DEVICES_SCRAPER_PORT: ${ports.devices_scraper}
+        iot_scraper_PORT: ${ports.iot_scraper}
     env_file:
       - ${folders.services.iot.scraper}/.env
     volumes:
       - "${folders.services.iot.scraper}:/app"
     ports:
-      - "${ports.devices_scraper}:${ports.devices_scraper}"
+      - "${ports.iot_scraper}:${ports.iot_scraper}"
     restart: on-failure
 
   ${containers.utilities_scraper}:

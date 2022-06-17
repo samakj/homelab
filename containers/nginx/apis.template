@@ -4,8 +4,8 @@ include globals.conf;
 http {
     include http.conf;
     include https.conf;
-    include iot_api.conf;
-    include utilities_api.conf;
-    include weather_api.conf;
+    include apis/iot_api.conf;
+    include apis/utilities_api.conf;
+    include apis/weather_api.conf;
     include portainer.conf;
 }

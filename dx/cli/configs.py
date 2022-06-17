@@ -225,13 +225,14 @@ def print_all(ctx: click.Context) -> None:
 
 
 @configs.command()
-def build_nginx_devices_scraper_conf() -> None:
+def build_nginx_iot_scraper_conf() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "scrapers/devices_scraper.template",
-        output_path=nginx_folder / "scrapers/devices_scraper.conf",
+        input_path=nginx_folder / "scrapers/iot_scraper.template",
+        output_path=nginx_folder / "scrapers/iot_scraper.conf",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | iot_scraper.conf built.")
 
 
 @configs.command()
@@ -242,6 +243,7 @@ def build_nginx_frontend_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | frontend.conf built.")
 
 
 @configs.command()
@@ -252,6 +254,7 @@ def build_nginx_http_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | http.conf built.")
 
 
 @configs.command()
@@ -262,16 +265,18 @@ def build_nginx_https_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | https.conf built.")
 
 
 @configs.command()
 def build_nginx_iot_api_conf() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "services/iot_api.template",
-        output_path=nginx_folder / "services/iot_api.conf",
+        input_path=nginx_folder / "apis/iot_api.template",
+        output_path=nginx_folder / "apis/iot_api.conf",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | iot_api.conf built.")
 
 
 @configs.command()
@@ -282,26 +287,29 @@ def build_nginx_portainer_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | portainer.conf built.")
 
 
 @configs.command()
-def build_nginx_services_conf() -> None:
+def build_nginx_apis_conf() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "services.template",
-        output_path=nginx_folder / "services.conf",
+        input_path=nginx_folder / "apis.template",
+        output_path=nginx_folder / "apis.conf",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | apis.conf built.")
 
 
 @configs.command()
 def build_nginx_utilities_api_conf() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "services/utilities_api.template",
-        output_path=nginx_folder / "services/utilities_api.conf",
+        input_path=nginx_folder / "apis/utilities_api.template",
+        output_path=nginx_folder / "apis/utilities_api.conf",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | utilities_api.conf built.")
 
 
 @configs.command()
@@ -312,16 +320,18 @@ def build_nginx_utilities_scraper_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | utilities_scraper.conf built.")
 
 
 @configs.command()
 def build_nginx_weather_api_conf() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "services/weather_api.template",
-        output_path=nginx_folder / "services/weather_api.conf",
+        input_path=nginx_folder / "apis/weather_api.template",
+        output_path=nginx_folder / "apis/weather_api.conf",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | weather_api.conf built.")
 
 
 @configs.command()
@@ -332,18 +342,19 @@ def build_nginx_weather_scraper_conf() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Nginx | weather_scraper.conf built.")
 
 
 @configs.command()
 @click.pass_context
 def build_nginx_conf(ctx: click.Context) -> None:
-    build_nginx_devices_scraper_conf.invoke(ctx=ctx)
+    build_nginx_iot_scraper_conf.invoke(ctx=ctx)
     build_nginx_frontend_conf.invoke(ctx=ctx)
     build_nginx_http_conf.invoke(ctx=ctx)
     build_nginx_https_conf.invoke(ctx=ctx)
     build_nginx_iot_api_conf.invoke(ctx=ctx)
     build_nginx_portainer_conf.invoke(ctx=ctx)
-    build_nginx_services_conf.invoke(ctx=ctx)
+    build_nginx_apis_conf.invoke(ctx=ctx)
     build_nginx_utilities_api_conf.invoke(ctx=ctx)
     build_nginx_utilities_scraper_conf.invoke(ctx=ctx)
     build_nginx_weather_api_conf.invoke(ctx=ctx)
@@ -358,6 +369,7 @@ def build_frontend_docker_compose() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Docker Compose | frontend file built.")
 
 
 @configs.command()
@@ -368,16 +380,18 @@ def build_scrapers_docker_compose() -> None:
         template_prefix="${",
         template_suffix="}",
     )
+    print("Docker Compose | scrapers file built.")
 
 
 @configs.command()
-def build_services_docker_compose() -> None:
+def build_apis_docker_compose() -> None:
     apply_config_variables(
-        input_path=docker_compose_folder / "services/docker-compose.template.yml",
-        output_path=docker_compose_folder / "services/docker-compose.yml",
+        input_path=docker_compose_folder / "apis/docker-compose.template.yml",
+        output_path=docker_compose_folder / "apis/docker-compose.yml",
         template_prefix="${",
         template_suffix="}",
     )
+    print("Docker Compose | apis file built.")
 
 
 @configs.command()
@@ -385,11 +399,11 @@ def build_services_docker_compose() -> None:
 def build_docker_compose_files(ctx: click.Context) -> None:
     build_frontend_docker_compose.invoke(ctx=ctx)
     build_scrapers_docker_compose.invoke(ctx=ctx)
-    build_services_docker_compose.invoke(ctx=ctx)
+    build_apis_docker_compose.invoke(ctx=ctx)
 
 
 @configs.command()
 @click.pass_context
 def build_conf(ctx: click.Context) -> None:
-    build_nginx_conf(ctx=ctx)
-    build_docker_compose_files(ctx=ctx)
+    build_nginx_conf.invoke(ctx=ctx)
+    build_docker_compose_files.invoke(ctx=ctx)

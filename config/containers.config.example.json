@@ -5,7 +5,7 @@
 
     "frontend": "frontend",
 
-    "devices_scraper":   "devices_scraper",
+    "iot_scraper":   "iot_scraper",
     "utilities_scraper": "utilities_scraper",
     "weather_scraper":   "weather_scraper",
 

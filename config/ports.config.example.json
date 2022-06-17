@@ -8,7 +8,7 @@
 
     "frontend": 0,
 
-    "devices_scraper":   0,
+    "iot_scraper":   0,
     "utilities_scraper": 0,
     "weather_scraper":   0,
 

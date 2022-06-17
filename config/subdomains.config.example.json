@@ -4,7 +4,7 @@
     "postgres":  "postgres",
     "portainer": "portainer",
 
-    "devices_scraper":   "devices",
+    "iot_scraper":   "devices",
     "utilities_scraper": "utilities",
     "weather_scraper":   "weather",
 

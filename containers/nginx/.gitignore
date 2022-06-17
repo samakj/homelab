@@ -1,10 +1,10 @@
-devices_scraper.conf
+apis.conf
+iot_scraper.conf
 frontend.conf
 http.conf
 https.conf
 iot_api.conf
 portainer.conf
-services.conf
 utilities_api.conf
 utilities_scraper.conf
 weather_api.conf

@@ -3,5 +3,5 @@
     "db":       "localhost",
     "frontend": "localhost",
     "scrapers": "localhost",
-    "services": "localhost"
+    "apis":     "localhost"
 }
