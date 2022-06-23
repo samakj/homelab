@@ -8,7 +8,8 @@
     "utilities_scraper": "utilities",
     "weather_scraper":   "weather",
 
-    "iot_api":       "iot",
-    "utilities_api": "utilities",
-    "weather_api":   "weather"
+    "authorisation_api": "authorisation",
+    "iot_api":           "iot",
+    "utilities_api":     "utilities",
+    "weather_api":       "weather"
 }

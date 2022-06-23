@@ -46,6 +46,24 @@ services:
     ports:
       - "${ports.redis}:${ports.redis}"
     
+  ${containers.authorisation_api}:
+    image: ${containers.authorisation_api}
+    container_name: ${containers.authorisation_api}
+    depends_on:
+      - ${containers.postgres}
+      - ${containers.redis}
+    build:
+      context: "${folders.services.authorisation.api}"
+      args:
+        AUTHORISATION_API_PORT: ${ports.authorisation_api}
+    env_file:
+      - ${folders.services.authorisation.api}/.env
+    volumes:
+      - "${folders.services.authorisation.api}:/app"
+    ports:
+      - "${ports.authorisation_api}:${ports.authorisation_api}"
+    restart: on-failure
+    
   ${containers.iot_api}:
     image: ${containers.iot_api}
     container_name: ${containers.iot_api}

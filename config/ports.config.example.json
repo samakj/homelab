@@ -12,7 +12,8 @@
     "utilities_scraper": 0,
     "weather_scraper":   0,
 
-    "iot_api":       0,
-    "utilities_api": 0,
-    "weather_api":   0
+    "authorisation_api": 0,
+    "iot_api":           0,
+    "utilities_api":     0,
+    "weather_api":       0
 }

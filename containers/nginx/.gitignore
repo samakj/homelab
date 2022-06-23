@@ -3,6 +3,7 @@ iot_scraper.conf
 frontend.conf
 http.conf
 https.conf
+authorisation_api.conf
 iot_api.conf
 portainer.conf
 utilities_api.conf

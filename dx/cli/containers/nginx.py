@@ -67,6 +67,17 @@ def build_iot_api() -> None:
 
 
 @nginx.command()
+def build_authorisation_api() -> None:
+    apply_config_variables(
+        input_path=nginx_folder / "apis/authorisation_api.template",
+        output_path=nginx_folder / "apis/authorisation_api.conf",
+        template_prefix="${",
+        template_suffix="}",
+    )
+    print("Nginx | authorisation_api.conf built.")
+
+
+@nginx.command()
 def build_portainer() -> None:
     apply_config_variables(
         input_path=nginx_folder / "portainer.template",
@@ -139,6 +150,7 @@ def build(ctx: click.Context) -> None:
     build_frontend.invoke(ctx=ctx)
     build_http.invoke(ctx=ctx)
     build_https.invoke(ctx=ctx)
+    build_authorisation_api.invoke(ctx=ctx)
     build_iot_api.invoke(ctx=ctx)
     build_portainer.invoke(ctx=ctx)
     build_apis.invoke(ctx=ctx)

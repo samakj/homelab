@@ -30,6 +30,7 @@ authorisation_service_folder = services_folder / "authorisation"
 frontend_service_folder = services_folder / "frontend"
 iot_service_folder = services_folder / "iot"
 postgres_service_folder = services_folder / "postgres"
+redis_service_folder = services_folder / "redis"
 utilties_service_folder = services_folder / "utilities"
 weather_service_folder = services_folder / "weather"
 
