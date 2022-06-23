@@ -25,13 +25,16 @@ def build_patch_files() -> None:
 
     for folder, _, files in os.walk(templates_folder):
         for file in files:
-            path = Path(folder) / file
+            input_path = Path(folder) / file
+            output_file = str(file).replace(".template", "")
+            output_path = patches_folder / output_file
             apply_config_variables(
-                input_path=path,
-                output_path=patches_folder / str(file).replace(".template", ""),
+                input_path=input_path,
+                output_path=output_path,
                 template_prefix="${",
                 template_suffix="}",
             )
+            print(f"Postgres | {output_file} built.")
 
 
 @postgres.command()

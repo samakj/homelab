@@ -1,5 +1,6 @@
 import click
 from configs import configs
+from containers import containers
 from services import services
 
 
@@ -10,3 +11,4 @@ def cli() -> None:
 
 cli.add_command(cmd=configs)
 cli.add_command(cmd=services)
+cli.add_command(cmd=containers)
