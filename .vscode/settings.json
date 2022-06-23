@@ -12,6 +12,9 @@
     "[python]": {
       "editor.defaultFormatter": "ms-python.black-formatter"
     },
+    "python.autoComplete.extraPaths": [
+      "${workspaceFolder}/shared/python"
+    ],
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.linting.flake8Enabled": true,
@@ -25,6 +28,8 @@
         "--line-length=100"
     ],
     "python.linting.mypyArgs": [
-      "--strict"
+      "--strict",
+      "--implicit-reexport",
+      "--ignore-missing-imports",
     ]
 }

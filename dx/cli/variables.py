@@ -34,6 +34,9 @@ redis_service_folder = services_folder / "redis"
 utilties_service_folder = services_folder / "utilities"
 weather_service_folder = services_folder / "weather"
 
+# Shared
+shared_folder = root_folder / "shared"
+
 
 # Map
 

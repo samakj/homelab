@@ -1,9 +1,16 @@
 # venv files
-/**/python/**/venv
-/**/python/**/bin
-/**/python/**/include
-/**/python/**/lib
-/**/python/**/shared
+/**/services/**/venv
+/**/services/**/bin
+/**/services/**/include
+/**/services/**/lib
+/**/services/**/lib64
+/**/services/**/shared
+
+shared/python/venv
+shared/python/bin
+shared/python/include
+shared/python/lib
+shared/python/lib64
 
 
 # Byte-compiled / optimized / DLL files
