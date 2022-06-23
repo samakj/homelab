@@ -224,6 +224,9 @@ def print_all(ctx: click.Context) -> None:
     print("")
 
 
+# NGinx
+
+
 @configs.command()
 def build_nginx_iot_scraper_conf() -> None:
     apply_config_variables(
@@ -361,6 +364,9 @@ def build_nginx_conf(ctx: click.Context) -> None:
     build_nginx_weather_scraper_conf.invoke(ctx=ctx)
 
 
+# Docker Compose
+
+
 @configs.command()
 def build_frontend_docker_compose() -> None:
     apply_config_variables(
@@ -400,6 +406,9 @@ def build_docker_compose_files(ctx: click.Context) -> None:
     build_frontend_docker_compose.invoke(ctx=ctx)
     build_scrapers_docker_compose.invoke(ctx=ctx)
     build_apis_docker_compose.invoke(ctx=ctx)
+
+
+# All
 
 
 @configs.command()

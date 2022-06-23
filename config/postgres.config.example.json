@@ -1,6 +1,7 @@
 {
-    "root":      {"name": "name0", "user": "user0", "password": "password0"},
-    "iot":       {"name": "name1", "user": "user1", "password": "password1"},
-    "weather":   {"name": "name2", "user": "user2", "password": "password2"},
-    "utilities": {"name": "name3", "user": "user3", "password": "password3"}
+    "root":          {"name": "name0", "user": "user0", "password": "password0", "tables": { "table0" : "table0"}},
+    "authorisation": {"name": "name1", "user": "user1", "password": "password1", "tables": { "table1" : "table1"}},
+    "iot":           {"name": "name2", "user": "user2", "password": "password2", "tables": { "table2" : "table2"}},
+    "weather":       {"name": "name3", "user": "user3", "password": "password3", "tables": { "table3" : "table3"}},
+    "utilities":     {"name": "name4", "user": "user4", "password": "password4", "tables": { "table4" : "table4"}}
 }

@@ -24,6 +24,16 @@ wifi_config_path = config_folder / "wifi.config.json"
 dx_folder = root_folder / "dx"
 cli_folder = dx_folder / "cli"
 
+#  Services
+services_folder = root_folder / "services"
+authorisation_service_folder = services_folder / "authorisation"
+frontend_service_folder = services_folder / "frontend"
+iot_service_folder = services_folder / "iot"
+postgres_service_folder = services_folder / "postgres"
+utilties_service_folder = services_folder / "utilities"
+weather_service_folder = services_folder / "weather"
+
+
 # Map
 
 

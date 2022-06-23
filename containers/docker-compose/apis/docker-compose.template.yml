@@ -33,12 +33,7 @@ services:
       - WEATHER_DB_NAME=${postgres.weather.name}
     volumes: 
       - ./postgres-data:/var/lib/postgresql/data
-      - ${folders.services.postgres}/env.sh:/docker-entrypoint-initdb.d/1.init-env.sh
-      - ${folders.services.postgres}/init_db.sh:/docker-entrypoint-initdb.d/2.init-db.sh
-      - ${folders.services.postgres}/init_roles.sh:/docker-entrypoint-initdb.d/3.init-roles.sh
-      - ${folders.services.postgres}/iot:/migrations/iot
-      - ${folders.services.postgres}/utilities:/migrations/utilities
-      - ${folders.services.postgres}/weather:/migrations/weather
+      - ${folders.services.postgres}/patches:/migrations
     ports:
       - "${ports.postgres}:${ports.postgres}"
 
