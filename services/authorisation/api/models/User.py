@@ -10,3 +10,6 @@ class User(BaseModel):
     scopes: List[str] = Field(
         description="The scopes that the user has access to.", default=[]
     )
+
+    class Config:
+        orm_mode = True

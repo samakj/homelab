@@ -1,4 +1,12 @@
 {
     "secret": "${auth.secret}",
-    "algorithm": "${auth.algorithm}"
+    "algorithm": "${auth.algorithm}",
+    "db": {
+        "host": "${containers.postgres}",
+        "port": "${ports.postgres}",
+        "name": "${postgres.authorisation.name}",
+        "user": "${postgres.authorisation.name}",
+        "password": "${postgres.authorisation.password}",
+        "tables": {"users": "${postgres.authorisation.tables.users}", "sessions": "${postgres.authorisation.tables.sessions}"}
+    }
 }
