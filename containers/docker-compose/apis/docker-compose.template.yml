@@ -127,6 +127,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${folders.containers.docker_compose.services.portainer_data}:/data
+      - ${folders.containers.docker_compose.apis.portainer_data}:/data
     ports:
       - ${ports.portainer}:${ports.portainer}
