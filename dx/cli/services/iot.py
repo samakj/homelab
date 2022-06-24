@@ -23,11 +23,15 @@ def build_config() -> None:
 @iot_api.command()
 def freeze_requirements() -> None:
     os.chdir(iot_service_folder / "api")
-    os.system("python3 -m venv .")
-    os.system(". bin/activate")
-    os.system("pip install -r requirements-to-freeze.txt")
-    os.system("pip freeze > requirements.txt")
-    os.system("deactivate")
+    os.system(
+        """
+python3 -m venv .;
+. bin/activate;
+pip install -r requirements-to-freeze.txt;
+pip freeze > requirements.txt;
+deactivate;
+        """
+    )
 
 
 @iot_api.command()
@@ -36,9 +40,13 @@ def start_venv_app() -> None:
     port = get_ports_config()["iot_api"]
 
     os.chdir(iot_service_folder / "api")
-    os.system("python3 -m venv .")
-    os.system(". bin/activate")
-    os.system(f"cp -r {shared_folder} ./")
-    os.system("pip install -r requirements.txt")
-    os.system(f"uvicorn main:app --reload --host={host} --port={port}")
-    os.system("deactivate")
+    os.system(
+        f"""
+python3 -m venv .;
+. bin/activate;
+cp -r {shared_folder} ./;
+pip install -r requirements.txt;
+uvicorn main:app --reload --host={host} --port={port};
+deactivate;
+        """
+    )
