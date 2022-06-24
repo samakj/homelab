@@ -5,4 +5,5 @@ click
 fastapi
 flake8
 mypy
+PyJWT
 uvicorn

@@ -1,0 +1,4 @@
+{
+    "secret": "${auth.secret}",
+    "algorithm": "${auth.algorithm}"
+}

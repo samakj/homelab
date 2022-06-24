@@ -1,13 +1,23 @@
 import click
 import os
 
-from configs import get_hosts_config, get_ports_config
+from configs import get_hosts_config, get_ports_config, apply_config_variables
 from variables import authorisation_service_folder, shared_folder
 
 
 @click.group()
 def authorisation_api() -> None:
     pass
+
+
+@authorisation_api.command()
+def build_config() -> None:
+    apply_config_variables(
+        input_path=authorisation_service_folder / "api/config.template.json",
+        output_path=authorisation_service_folder / "api/config.json",
+        template_prefix="${",
+        template_suffix="}",
+    )
 
 
 @authorisation_api.command()

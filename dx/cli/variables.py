@@ -12,6 +12,7 @@ docker_compose_folder = container_folder / "docker-compose"
 
 # Config
 config_folder = root_folder / "config"
+auth_config_path = config_folder / "auth.config.json"
 containers_config_path = config_folder / "containers.config.json"
 hosts_config_path = config_folder / "hosts.config.json"
 location_config_path = config_folder / "location.config.json"

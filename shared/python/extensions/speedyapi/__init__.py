@@ -29,6 +29,7 @@ from shared.python.extensions.speedyapi.routes.ping import PING_ROUTER
 
 class SpeedyAPI(FastAPI):
     logger: Logger
+    config: Optional[Dict[str, Any]] = None
 
     def __init__(
         self,

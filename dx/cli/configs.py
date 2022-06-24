@@ -5,6 +5,7 @@ from typing import Any, Optional, Union
 
 from utils import load_json_file, flattern_dict
 from variables import (
+    auth_config_path,
     containers_config_path,
     hosts_config_path,
     location_config_path,
@@ -17,6 +18,7 @@ from variables import (
 
 
 # Cached configs to ensure we dont waste time re-reading files
+auth_config: Optional[dict[str, Any]] = None
 containers_config: Optional[dict[str, Any]] = None
 hosts_config: Optional[dict[str, Any]] = None
 location_config: Optional[dict[str, Any]] = None
@@ -24,6 +26,13 @@ ports_config: Optional[dict[str, Any]] = None
 postgres_config: Optional[dict[str, Any]] = None
 subdomains_config: Optional[dict[str, Any]] = None
 wifi_config: Optional[dict[str, Any]] = None
+
+
+def get_auth_config() -> dict[str, Any]:
+    global auth_config
+    if auth_config is None:
+        auth_config = load_json_file(path=auth_config_path)
+    return auth_config
 
 
 def get_containers_config() -> dict[str, Any]:
@@ -81,6 +90,7 @@ def apply_config_variables(
     template_prefix: str = "",
     template_suffix: str = "",
 ) -> None:
+    flat_auth_config = flattern_dict(obj=get_auth_config(), prefix="auth")
     flat_containers_config = flattern_dict(
         obj=get_containers_config(), prefix="containers"
     )
@@ -97,6 +107,10 @@ def apply_config_variables(
     with open(file=input_path, mode="r") as input_file:
         output_text = input_file.read()
 
+    for key, value in flat_auth_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
     for key, value in flat_folders_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
@@ -137,6 +151,11 @@ def apply_config_variables(
 @click.group()
 def configs() -> None:
     pass
+
+
+@configs.command()
+def print_auth() -> None:
+    print(json.dumps(flattern_dict(obj=get_auth_config(), prefix="auth"), indent=4))
 
 
 @configs.command()
@@ -193,6 +212,10 @@ def print_wifi() -> None:
 @configs.command()
 @click.pass_context
 def print_all(ctx: click.Context) -> None:
+    print("Auth")
+    print_auth.invoke(ctx=ctx)
+    print("")
+
     print("Containers")
     print_containers.invoke(ctx=ctx)
     print("")

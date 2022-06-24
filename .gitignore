@@ -5,6 +5,7 @@
 /**/services/**/lib
 /**/services/**/lib64
 /**/services/**/shared
+/**/services/**/config.json
 
 shared/python/venv
 shared/python/bin
