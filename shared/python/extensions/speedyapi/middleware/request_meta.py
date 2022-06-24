@@ -20,8 +20,14 @@ class RequestMetaMiddleware(BaseHTTPMiddleware):
         duration = end_time - start_time
 
         response.headers["X-Request-Id"] = request_id
-        response.headers["X-Request-Start"] = str(start_time.timestamp() * 1000)
-        response.headers["X-Request-End"] = str(end_time.timestamp() * 1000)
-        response.headers["X-Request-Duration"] = str(duration.total_seconds() * 1000)
+        response.headers["X-Request-Start"] = str(
+            round(start_time.timestamp() * 1000, ndigits=3)
+        )
+        response.headers["X-Request-End"] = str(
+            round(end_time.timestamp() * 1000, ndigits=3)
+        )
+        response.headers["X-Request-Duration"] = str(
+            round(duration.total_seconds() * 1000, ndigits=3)
+        )
 
         return response

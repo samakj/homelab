@@ -9,6 +9,6 @@ class MetaResponse(BaseModel):
     timestamp: datetime
 
 
-@META_ROUTER.get("/v0/meta", response_model=MetaResponse)
+@META_ROUTER.get("/v0/meta", response_model=MetaResponse, tags=["default"])
 def meta() -> MetaResponse:
     return MetaResponse(timestamp=datetime.now())
