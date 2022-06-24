@@ -109,11 +109,11 @@ class SpeedyAPI(FastAPI):
 
         self.logger = Logger()
 
-        self.add_middleware(CORSMiddleware)
-        self.add_middleware(GZipMiddleware)
+        self.add_middleware(ExceptionMiddleware)
         self.add_middleware(RequestMetaMiddleware)
         self.add_middleware(RequestLoggerMiddleware)
-        self.add_middleware(ExceptionMiddleware)
+        self.add_middleware(GZipMiddleware)
+        self.add_middleware(CORSMiddleware)
 
         self.include_router(META_ROUTER)
         self.include_router(PING_ROUTER)

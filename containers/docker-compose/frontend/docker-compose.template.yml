@@ -9,9 +9,18 @@ services:
       - ${containers.portainer}
     volumes:
       - "${folders.containers.nginx}/frontend.conf:/etc/nginx/nginx.conf"
+      - "${folders.containers.nginx}:/etc/nginx"
+      - "${folders.containers.docker_compose.frontend.certbot_data.www}:/var/www/certbot/"
+      - "${folders.containers.docker_compose.frontend.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
+    
+  ${containers.certbot}:
+    image: certbot/certbot:latest
+    volumes:
+      - ${folders.containers.docker_compose.frontend.certbot_data.www}:/var/www/certbot/
+      - ${folders.containers.docker_compose.frontend.certbot_data.conf}:/etc/letsencrypt/
 
   ${containers.frontend}:
     image: ${containers.frontend}
@@ -20,8 +29,6 @@ services:
       context: "${folders.services.frontend}"
       args:
         FRONTEND_PORT: ${ports.frontend}
-    env_file:
-      - ${folders.services.frontend}/.env
     volumes:
       - "${folders.services.frontend}:/app"
     ports:

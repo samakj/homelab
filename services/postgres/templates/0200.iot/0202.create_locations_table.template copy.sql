@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS ${postgres.iot.name}.${postgres.iot.tables.locations} (
+\connect ${postgres.iot.name};
+CREATE TABLE IF NOT EXISTS ${postgres.iot.tables.locations} (
     id             SERIAL PRIMARY KEY,
     mac            TEXT NOT NULL UNIQUE,
     ip             TEXT NOT NULL UNIQUE,

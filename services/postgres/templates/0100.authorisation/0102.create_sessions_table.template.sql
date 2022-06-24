@@ -1,7 +1,8 @@
-CREATE TABLE IF NOT EXISTS ${postgres.authorisation.name}.${postgres.authorisation.tables.sessions} {
+\connect ${postgres.authorisation.name};
+CREATE TABLE IF NOT EXISTS ${postgres.authorisation.tables.sessions} (
     id             SERIAL PRIMARY KEY,
-    user_id        INTEGER REFERENCES ${postgres.authorisation.name}.user(id),
+    user_id        INTEGER REFERENCES ${postgres.authorisation.tables.users}(id),
     expires        TIMESTAMP NOT NULL,
     ip             TEXT NOT NULL,
     scopes         TEXT[]
-}
+);

@@ -1,1 +1,1 @@
-uvicorn main:app --reload --host=0.0.0.0 --port={port}
+uvicorn main:app --reload --host=0.0.0.0 --port=$IOT_API_PORT

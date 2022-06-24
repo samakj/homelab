@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS ${postgres.weather.name}.${postgres.weather.tables.current} (
+\connect ${postgres.weather.name};
+CREATE TABLE IF NOT EXISTS ${postgres.weather.tables.current} (
     id                      SERIAL PRIMARY KEY,
     timestamp               TIMESTAMP NOT NULL UNIQUE,
     sunrise                 TIMESTAMP NOT NULL,

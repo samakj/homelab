@@ -47,7 +47,14 @@ def generate_flat_folders_config() -> dict[str, Any]:
 
     for path, _, __ in os.walk(root_folder):
         should_ignore = False
-        for ignore in [".git", ".vscode", "__pycache__", ".mypy_cache"]:
+        for ignore in [
+            ".git",
+            ".vscode",
+            "__pycache__",
+            ".mypy_cache",
+            "lib",
+            "bin",
+        ]:
             if ignore in path:
                 should_ignore = True
                 break

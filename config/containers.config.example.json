@@ -2,6 +2,8 @@
     "redis":     "redis",
     "postgres":  "postgres",
     "portainer": "portainer",
+    "nginx":     "nginx",
+    "certbot":   "certbot",
 
     "frontend": "frontend",
 

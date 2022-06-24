@@ -1,1 +1,1 @@
-uvicorn main:app --reload --host=0.0.0.0 --port={port}
+uvicorn main:app --reload --host=0.0.0.0 --port=$UTILITIES_API_PORT

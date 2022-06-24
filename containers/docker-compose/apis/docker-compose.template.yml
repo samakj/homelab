@@ -1,3 +1,5 @@
+# TLS docs https://mindsers.blog/post/https-using-nginx-certbot-docker/
+
 version: "3"
 
 services:
@@ -5,15 +7,25 @@ services:
     image: nginx:latest
     container_name: ${containers.nginx}
     depends_on:
+      - ${containers.certbot}
       - ${containers.iot_api}
       - ${containers.utilities_api}
       - ${containers.weather_api}
       - ${containers.portainer}
     volumes:
-      - "${folders.containers.nginx}/services.conf:/etc/nginx/nginx.conf"
+      - "${folders.containers.nginx}/apis.conf:/etc/nginx/nginx.conf"
+      - "${folders.containers.nginx}:/etc/nginx"
+      - "${folders.containers.docker_compose.apis.certbot_data.www}:/var/www/certbot/"
+      - "${folders.containers.docker_compose.apis.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
+    
+  ${containers.certbot}:
+    image: certbot/certbot:latest
+    volumes:
+      - ${folders.containers.docker_compose.apis.certbot_data.www}:/var/www/certbot/
+      - ${folders.containers.docker_compose.apis.certbot_data.conf}:/etc/letsencrypt/
     
   ${containers.postgres}:
     image: postgres:latest
@@ -32,8 +44,8 @@ services:
       - WEATHER_DB_PASS=${postgres.weather.password}
       - WEATHER_DB_NAME=${postgres.weather.name}
     volumes: 
-      - ./postgres-data:/var/lib/postgresql/data
-      - ${folders.services.postgres}/patches:/migrations
+      - ${folders.containers.docker_compose.apis.postgres_data}:/var/lib/postgresql/data
+      - ${folders.services.postgres.patches}:/docker-entrypoint-initdb.d
     ports:
       - "${ports.postgres}:${ports.postgres}"
 
@@ -56,10 +68,11 @@ services:
       context: "${folders.services.authorisation.api}"
       args:
         AUTHORISATION_API_PORT: ${ports.authorisation_api}
-    env_file:
-      - ${folders.services.authorisation.api}/.env
+    environment:
+      AUTHORISATION_API_PORT: ${ports.authorisation_api}
     volumes:
       - "${folders.services.authorisation.api}:/app"
+      - "${folders.shared}:/app/shared"
     ports:
       - "${ports.authorisation_api}:${ports.authorisation_api}"
     restart: on-failure
@@ -74,10 +87,11 @@ services:
       context: "${folders.services.iot.api}"
       args:
         IOT_API_PORT: ${ports.iot_api}
-    env_file:
-      - ${folders.services.iot.api}/.env
+    environment:
+      IOT_API_PORT: ${ports.iot_api}
     volumes:
       - "${folders.services.iot.api}:/app"
+      - "${folders.shared}:/app/shared"
     ports:
       - "${ports.iot_api}:${ports.iot_api}"
     restart: on-failure
@@ -92,10 +106,11 @@ services:
       context: "${folders.services.utilities}/api"
       args:
         UTILITIES_API_PORT: ${ports.utilities_api}
-    env_file:
-      - ${folders.services.utilities.api}/.env
+    environment:
+      UTILITIES_API_PORT: ${ports.utilities_api}
     volumes:
       - "${folders.services.utilities.api}:/app"
+      - "${folders.shared}:/app/shared"
     ports:
       - "${ports.utilities_api}:${ports.utilities_api}"
     restart: on-failure
@@ -110,10 +125,11 @@ services:
       context: "${folders.services.weather}/api"
       args:
         WEATHER_API_PORT: ${ports.weather_api}
-    env_file:
-      - ${folders.services.weather.api}/.env
+    environment:
+      WEATHER_API_PORT: ${ports.weather_api}
     volumes:
       - "${folders.services.weather.api}:/app"
+      - "${folders.shared}:/app/shared"
     ports:
       - "${ports.weather_api}:${ports.weather_api}"
     restart: on-failure

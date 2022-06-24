@@ -11,9 +11,18 @@ services:
       - ${containers.portainer}
     volumes:
       - "${folders.containers.nginx}/scrapers.conf:/etc/nginx/nginx.conf"
+      - "${folders.containers.nginx}:/etc/nginx"
+      - "${folders.containers.docker_compose.scrapers.certbot_data.www}:/var/www/certbot/"
+      - "${folders.containers.docker_compose.scrapers.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
+    
+  ${containers.certbot}:
+    image: certbot/certbot:latest
+    volumes:
+      - ${folders.containers.docker_compose.scrapers.certbot_data.www}:/var/www/certbot/
+      - ${folders.containers.docker_compose.scrapers.certbot_data.conf}:/etc/letsencrypt/
 
   ${containers.iot_scraper}:
     image: ${containers.iot_scraper}
@@ -22,8 +31,6 @@ services:
       context: "${folders.services.iot.scraper}"
       args:
         iot_scraper_PORT: ${ports.iot_scraper}
-    env_file:
-      - ${folders.services.iot.scraper}/.env
     volumes:
       - "${folders.services.iot.scraper}:/app"
     ports:
@@ -37,8 +44,6 @@ services:
       context: "${folders.services.utilities.scraper}"
       args:
         UTILITIES_SCRAPER_PORT: ${ports.utilities_scraper}
-    env_file:
-      - ${folders.services.utilities.scraper}/.env
     volumes:
       - "${folders.services.utilities.scraper}:/app"
     ports:
@@ -52,8 +57,6 @@ services:
       context: "${folders.services.weather.scraper}"
       args:
         WEATHER_SCRAPER_PORT: ${ports.weather_scraper}
-    env_file:
-      - ${folders.services.weather.scraper}/.env
     volumes:
       - "${folders.services.weather.scraper}:/app"
     ports:

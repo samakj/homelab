@@ -3,7 +3,8 @@ include globals.conf;
 
 http {
     include http.conf;
-    include https.conf;
+    # include https.conf;
+    include apis/authorisation_api.conf;
     include apis/iot_api.conf;
     include apis/utilities_api.conf;
     include apis/weather_api.conf;

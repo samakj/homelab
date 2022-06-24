@@ -1,6 +1,8 @@
 server {
-    listen ${ports.https} default_server ssl http2;
-    listen [::]:${ports.https} ssl http2;
+    listen ${ports.http};
+    listen [::]:${ports.http};
+    # listen ${ports.https} ssl http2;
+    # listen [::]:${ports.https} ssl http2;
 
     server_name ~^${subdomains.weather_api}.*$;
     resolver 127.0.0.11;

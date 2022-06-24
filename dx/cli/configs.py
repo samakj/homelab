@@ -168,6 +168,11 @@ def print_containers() -> None:
 
 
 @configs.command()
+def print_folders() -> None:
+    print(json.dumps(flat_folders_config, indent=4))
+
+
+@configs.command()
 def print_hosts() -> None:
     print(json.dumps(flattern_dict(obj=get_hosts_config(), prefix="hosts"), indent=4))
 

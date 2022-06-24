@@ -6,7 +6,7 @@ server {
         root /var/www/certbot;
     }
 
-    location / {
-        return 301 $schemes://$host$request_uri;
-    }
+    # location / {
+    #     return 301 ${scheme}s://$host$request_uri;
+    # }
 }
