@@ -1,13 +1,12 @@
-from typing import Any, Dict
-
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from auth.jwt import decode_jwt
+from models.Session import Session
 
 
 class JWTAuthorizationCredentials(HTTPAuthorizationCredentials):
-    payload: Dict[str, Any]
+    sesion: Session
 
 
 class JWTBearer(HTTPBearer):
