@@ -1,4 +1,3 @@
-from typing import List
 from pydantic import BaseModel, Field
 
 
@@ -7,7 +6,7 @@ class User(BaseModel):
     username: str = Field(description="The users username.")
     password: str = Field(description="The users password.")
     name: str = Field(description="The informal name to use for users.")
-    scopes: List[str] = Field(
+    scopes: list[str] = Field(
         description="The scopes that the user has access to.", default=[]
     )
 
