@@ -2,15 +2,20 @@ from typing import Optional, Union
 
 from asyncpg import Connection
 
-from models.User import User
-from stores.queries.users import GET_USER_BY_ID, GET_USER_BY_USERNAME, GET_USERS
-from shared.python.helpers.to_filter import to_array_filter
+from models.User import User, CreateUser
+from stores.queries.users import (
+    GET_USER_BY_ID,
+    GET_USER_BY_USERNAME,
+    GET_USERS,
+    CREATE_USER,
+)
+from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
 class UsersStore:
     @staticmethod
     async def get_user(id: int, connection: Connection) -> Optional[User]:
-        response = await connection.fetchrow(GET_USER_BY_ID.format(id=id))
+        response = await connection.fetchrow(GET_USER_BY_ID.format(id=to_filter(id)))
         return User(**dict(response)) if response is not None else None
 
     @staticmethod
@@ -18,7 +23,7 @@ class UsersStore:
         username: str, connection: Connection
     ) -> Optional[User]:
         response = await connection.fetchrow(
-            GET_USER_BY_USERNAME.format(username=username)
+            GET_USER_BY_USERNAME.format(username=to_filter(username))
         )
         return User(**dict(response)) if response is not None else None
 
@@ -49,3 +54,20 @@ class UsersStore:
         )
 
         return [User(**dict(row)) for row in response]
+
+    @staticmethod
+    async def create_user(
+        user: CreateUser,
+        connection: Connection,
+    ) -> Optional[User]:
+        await connection.execute(
+            CREATE_USER.format(
+                username=to_filter(user.username),
+                password=to_filter(user.password),
+                name=to_filter(user.name),
+                scopes=to_array_filter(user.scopes),
+            )
+        )
+        return await UsersStore.get_user_by_username(
+            username=user.username, connection=connection
+        )

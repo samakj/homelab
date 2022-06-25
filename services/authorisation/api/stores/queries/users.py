@@ -15,3 +15,8 @@ SELECT id, username, password, name, scopes
 FROM users
 WHERE {where}
 """
+
+CREATE_USER = """
+INSERT INTO users(username, password, name, scopes)
+VALUES ({username}, {password}, {name}, {scopes})
+"""
