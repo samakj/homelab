@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS ${postgres.authorisation.tables.sessions} (
     user_id        INTEGER REFERENCES ${postgres.authorisation.tables.users}(id),
     expires        TIMESTAMP NOT NULL,
     ip             TEXT NOT NULL,
-    scopes         TEXT[]
+    disabled       BOOLEAN DEFAULT FALSE
 );

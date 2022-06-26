@@ -57,6 +57,7 @@ class SessionsStore:
                 user_id=to_filter(session.user_id),
                 expires=to_filter(session.expires),
                 ip=to_filter(session.ip),
+                disabled=to_filter(session.disabled),
             )
         )
         return await self.get_session(id=row["id"])
@@ -68,6 +69,7 @@ class SessionsStore:
                 user_id=to_filter(session.user_id),
                 expires=to_filter(session.expires),
                 ip=to_filter(session.ip),
+                disabled=to_filter(session.disabled),
             )
         )
         return await self.get_session(id=session.id)
