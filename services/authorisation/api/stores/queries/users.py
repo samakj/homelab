@@ -20,3 +20,14 @@ CREATE_USER = """
 INSERT INTO users(username, password, name, scopes)
 VALUES ({username}, {password}, {name}, {scopes})
 """
+
+UPDATE_USER = """
+UPDATE users
+SET username = {username}, password = {password}, name = {name}, scopes = {scopes}
+WHERE id = {id}
+"""
+
+DELETE_USER = """
+DELETE FROM users
+WHERE id = {id}
+"""

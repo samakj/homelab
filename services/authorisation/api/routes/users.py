@@ -59,3 +59,26 @@ async def create_user(
         raise HTTPException(status_code=404, detail="User not found.")
 
     return user
+
+
+@USERS_V0_ROUTER.patch("/{id:int}", response_model=User)
+async def update_user(
+    id: int,
+    user: User,
+    users_store: UsersStore = Depends(UsersStore),
+) -> User:
+    user = await users_store.update_user(user=user)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    return user
+
+
+@USERS_V0_ROUTER.delete("/{id:int}")
+async def delete_user(
+    id: int,
+    users_store: UsersStore = Depends(UsersStore),
+) -> User:
+    await users_store.delete_user(id=id)
+    return None

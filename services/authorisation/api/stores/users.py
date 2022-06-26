@@ -5,11 +5,14 @@ from fastapi import Depends
 
 from database import Database
 from models.User import User, CreateUser
+from auth.passwords import hash_password
 from stores.queries.users import (
     GET_USER_BY_ID,
     GET_USER_BY_USERNAME,
     GET_USERS,
     CREATE_USER,
+    UPDATE_USER,
+    DELETE_USER,
 )
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
@@ -63,9 +66,24 @@ class UsersStore:
         await self.connection.execute(
             CREATE_USER.format(
                 username=to_filter(user.username),
-                password=to_filter(user.password),
+                password=to_filter(hash_password(user.password)),
                 name=to_filter(user.name),
                 scopes=to_array_filter(user.scopes),
             )
         )
         return await self.get_user_by_username(username=user.username)
+
+    async def update_user(self, user: User) -> Optional[User]:
+        await self.connection.execute(
+            UPDATE_USER.format(
+                id=to_filter(user.id),
+                username=to_filter(user.username),
+                password=to_filter(hash_password(user.password)),
+                name=to_filter(user.name),
+                scopes=to_array_filter(user.scopes),
+            )
+        )
+        return await self.get_user_by_username(username=user.username)
+
+    async def delete_user(self, id: int) -> None:
+        await self.connection.execute(DELETE_USER.format(id=to_filter(id)))
