@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
 
+from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.sessions import SessionsStore
 from models.Session import Session, CreateSession
 
@@ -10,7 +11,11 @@ SESSIONS_V0_ROUTER = APIRouter(prefix="/v0/sessions", tags=["sessions"])
 
 @SESSIONS_V0_ROUTER.get("/{id:int}", response_model=Session)
 async def get_session(
-    id: int, sessions_store: SessionsStore = Depends(SessionsStore)
+    id: int,
+    sessions_store: SessionsStore = Depends(SessionsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="sessions.get")
+    ),
 ) -> Session:
     session = await sessions_store.get_session(id=id)
 
@@ -26,6 +31,9 @@ async def get_sessions(
     user_id: Optional[list[int]] = Query(None),
     ip: Optional[list[str]] = Query(None),
     sessions_store: SessionsStore = Depends(SessionsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="sessions.get")
+    ),
 ) -> Session:
     session = await sessions_store.get_sessions(id=id, user_id=user_id, ip=ip)
 
@@ -39,6 +47,9 @@ async def get_sessions(
 async def create_session(
     session: CreateSession,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="sessions.create")
+    ),
 ) -> Session:
     session = await sessions_store.create_session(session=session)
 
@@ -53,6 +64,9 @@ async def update_session(
     id: int,
     session: Session,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="sessions.update")
+    ),
 ) -> Session:
     session = await sessions_store.update_session(session=session)
 
@@ -66,6 +80,9 @@ async def update_session(
 async def delete_session(
     id: int,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="sessions.delete")
+    ),
 ) -> Session:
     await sessions_store.delete_session(id=id)
     return None
