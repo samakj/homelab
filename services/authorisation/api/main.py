@@ -3,6 +3,7 @@ from pathlib import Path
 from passlib.context import CryptContext
 
 from database import Database
+from routes.login import LOGIN_V0_ROUTER
 from routes.sessions import SESSIONS_V0_ROUTER
 from routes.users import USERS_V0_ROUTER
 from shared.python.extensions.speedyapi import SpeedyAPI
@@ -21,6 +22,7 @@ app.db = Database(
     name=app.config["db"]["name"],
 )
 
+app.include_router(LOGIN_V0_ROUTER)
 app.include_router(SESSIONS_V0_ROUTER)
 app.include_router(USERS_V0_ROUTER)
 

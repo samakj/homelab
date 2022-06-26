@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List, Union
 
-FilterTypes = Union[int, str]
+FilterTypes = Union[int, str, datetime]
 
 
 def to_filter(value: FilterTypes) -> str:
@@ -8,6 +9,8 @@ def to_filter(value: FilterTypes) -> str:
         return f"{value}"
     if isinstance(value, str):
         return f"'{value}'"
+    if isinstance(value, datetime):
+        return f"'{value.isoformat()}'"
     return value
 
 

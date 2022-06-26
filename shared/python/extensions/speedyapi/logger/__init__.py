@@ -16,3 +16,6 @@ class Logger:
 
     def error(self, *args: Any, **kwargs: Any) -> None:
         LOG.error(*args, **kwargs)
+
+    def exception(self, *args: Any, **kwargs: Any) -> None:
+        LOG.exception(*args, **kwargs)

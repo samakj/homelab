@@ -1,8 +1,12 @@
-from fastapi import HTTPException, Request
+from dataclasses import dataclass
+from fastapi import Depends, HTTPException, Request
 
 from auth.bearer_user import BearerUser, UserCredentials
+from stores.users import UsersStore
+from stores.sessions import SessionsStore
 
 
+@dataclass
 class PermissionCredentials(UserCredentials):
     route_scope: str
     matched_scope: str
@@ -11,12 +15,19 @@ class PermissionCredentials(UserCredentials):
 class BearerPermission(BearerUser):
     scope: str
 
-    def __init__(self, scope: str, auto_error: bool = True):
-        super().__init__(auto_error)
+    def __init__(self, scope: str):
+        super().__init__()
         self.scope = scope
 
-    async def __call__(self, request: Request) -> PermissionCredentials:
-        bearer_user = await super().__call__(request)
+    async def __call__(
+        self,
+        request: Request,
+        users_store: UsersStore = Depends(UsersStore),
+        sessions_store: SessionsStore = Depends(SessionsStore),
+    ) -> PermissionCredentials:
+        bearer_user = await super().__call__(
+            request=request, users_store=users_store, sessions_store=sessions_store
+        )
 
         match = None
 
@@ -32,7 +43,7 @@ class BearerPermission(BearerUser):
 
         return PermissionCredentials(
             scheme=bearer_user.scheme,
-            credentials=bearer_user.credentials,
+            token=bearer_user.token,
             session=bearer_user.session,
             user=bearer_user.user,
             route_scope=self.scope,

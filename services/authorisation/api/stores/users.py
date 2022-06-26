@@ -102,10 +102,19 @@ class UsersStore:
     async def delete_user(self, id: int) -> None:
         await self.connection.execute(DELETE_USER.format(id=to_filter(id)))
 
-    async def verify_user_password(self, username: str, password: str) -> bool:
+    async def verify_user_password(
+        self, username: str, password: str
+    ) -> Optional[User]:
         user = await self.get_user_by_username(username=username)
 
+        if user is None:
+            return None
+
+        success = False
+
         try:
-            return self.password_context.verify(secret=user.password, hash=password)  # type: ignore
+            success = self.password_context.verify(secret=password, hash=user.password)
         except Exception:
-            return False
+            pass
+
+        return user if success else None

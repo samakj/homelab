@@ -12,7 +12,7 @@ WHERE {where}
 
 CREATE_SESSION = """
 INSERT INTO sessions(user_id, expires, ip)
-VALUES ({user_id}, {expires}, {ip}, {scopes})
+VALUES ({user_id}, {expires}, {ip})
 RETURNING id
 """
 

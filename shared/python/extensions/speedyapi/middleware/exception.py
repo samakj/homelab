@@ -16,7 +16,7 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
                 status_code=error.status_code,
             )
         except Exception as error:
-            request.app.logger.error(error)
+            request.app.logger.exception(error)
             return JSONResponse(
                 content={"status_code": 500, "detail": str(error)},
                 status_code=500,
