@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 
 from database import Database
 from models.User import User, CreateUser
-from auth.passwords import hash_password
 from stores.queries.users import (
     GET_USER_BY_ID,
     GET_USER_BY_USERNAME,
@@ -70,9 +69,7 @@ class UsersStore:
         row = await self.connection.fetchrow(
             CREATE_USER.format(
                 username=to_filter(user.username),
-                password=to_filter(
-                    hash_password(user.password, context=self.password_context)
-                ),
+                password=to_filter(self.password_context.hash(user.password)),
                 name=to_filter(user.name),
                 scopes=to_array_filter(user.scopes),
             )
@@ -95,9 +92,7 @@ class UsersStore:
             UPDATE_USER.format(
                 id=to_filter(user.id),
                 username=to_filter(user.username),
-                password=to_filter(
-                    hash_password(user.password, context=self.password_context)
-                ),
+                password=to_filter(self.password_context.hash(user.password)),
                 name=to_filter(user.name),
                 scopes=to_array_filter(user.scopes),
             )
@@ -106,3 +101,11 @@ class UsersStore:
 
     async def delete_user(self, id: int) -> None:
         await self.connection.execute(DELETE_USER.format(id=to_filter(id)))
+
+    async def verify_user_password(self, username: str, password: str) -> bool:
+        user = await self.get_user_by_username(username=username)
+
+        try:
+            return self.password_context.verify(secret=user.password, hash=password)  # type: ignore
+        except Exception:
+            return False
