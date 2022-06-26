@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
 
-from auth.bearer_permission import BearerPermission
+from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.users import UsersStore
 from models.User import User, CreateUser, UserNoPassword
 
@@ -13,9 +13,22 @@ USERS_V0_ROUTER = APIRouter(prefix="/v0/users", tags=["users"])
 async def get_user(
     id: int,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.get")),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="users.get")),
 ) -> UserNoPassword:
     user = await users_store.get_user(id=id)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    return UserNoPassword.parse_obj(dict(user))
+
+
+@USERS_V0_ROUTER.get("/self", response_model=UserNoPassword)
+async def get_self(
+    users_store: UsersStore = Depends(UsersStore),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="users.self")),
+) -> UserNoPassword:
+    user = await users_store.get_user(id=permissions.user.id)
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
@@ -27,7 +40,7 @@ async def get_user(
 async def get_user_by_username(
     username: str,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.get")),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="users.get")),
 ) -> UserNoPassword:
     user = await users_store.get_user_by_username(username=username)
 
@@ -44,7 +57,7 @@ async def get_users(
     name: Optional[list[str]] = Query(None),
     scopes: Optional[list[str]] = Query(None),
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.get")),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="users.get")),
 ) -> UserNoPassword:
     users = await users_store.get_users(
         id=id, username=username, name=name, scopes=scopes
@@ -57,7 +70,9 @@ async def get_users(
 async def create_user(
     user: CreateUser,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.create")),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="users.create")
+    ),
 ) -> UserNoPassword:
     user = await users_store.create_user(user=user)
 
@@ -72,7 +87,9 @@ async def update_user(
     id: int,
     user: UserNoPassword,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.update")),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="users.update")
+    ),
 ) -> UserNoPassword:
     user = await users_store.update_user(user=user)
 
@@ -87,7 +104,9 @@ async def update_user_password(
     id: int,
     user: User,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.update")),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="users.update")
+    ),
 ) -> UserNoPassword:
     user = await users_store.update_user_password(user=user)
 
@@ -101,7 +120,9 @@ async def update_user_password(
 async def delete_user(
     id: int,
     users_store: UsersStore = Depends(UsersStore),
-    permissions: BearerPermission = Depends(BearerPermission(scope="users.delete")),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="users.delete")
+    ),
 ) -> None:
     await users_store.delete_user(id=id)
     return None
