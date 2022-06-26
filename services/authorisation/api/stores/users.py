@@ -1,7 +1,8 @@
 from typing import Optional, Union
 
 from asyncpg import Connection
-from fastapi import Depends
+from fastapi import Depends, Request
+from passlib.context import CryptContext
 
 from database import Database
 from models.User import User, CreateUser
@@ -19,9 +20,15 @@ from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 class UsersStore:
     connection: Connection
+    request: Request
+    password_context: CryptContext
 
-    def __init__(self, connection: Connection = Depends(Database.transaction)) -> None:
+    def __init__(
+        self, request: Request, connection: Connection = Depends(Database.transaction)
+    ) -> None:
         self.connection = connection
+        self.request = request
+        self.password_context = request.app.password_context
 
     async def get_user(self, id: int) -> Optional[User]:
         response = await self.connection.fetchrow(
@@ -59,14 +66,13 @@ class UsersStore:
 
         return [User(**dict(row)) for row in response]
 
-    async def create_user(
-        self,
-        user: CreateUser,
-    ) -> Optional[User]:
+    async def create_user(self, user: CreateUser) -> Optional[User]:
         row = await self.connection.fetchrow(
             CREATE_USER.format(
                 username=to_filter(user.username),
-                password=to_filter(hash_password(user.password)),
+                password=to_filter(
+                    hash_password(user.password, context=self.password_context)
+                ),
                 name=to_filter(user.name),
                 scopes=to_array_filter(user.scopes),
             )
@@ -78,7 +84,20 @@ class UsersStore:
             UPDATE_USER.format(
                 id=to_filter(user.id),
                 username=to_filter(user.username),
-                password=to_filter(hash_password(user.password)),
+                name=to_filter(user.name),
+                scopes=to_array_filter(user.scopes),
+            )
+        )
+        return await self.get_user(id=user.id)
+
+    async def update_user_password(self, user: User) -> Optional[User]:
+        await self.connection.execute(
+            UPDATE_USER.format(
+                id=to_filter(user.id),
+                username=to_filter(user.username),
+                password=to_filter(
+                    hash_password(user.password, context=self.password_context)
+                ),
                 name=to_filter(user.name),
                 scopes=to_array_filter(user.scopes),
             )
