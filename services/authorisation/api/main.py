@@ -4,7 +4,6 @@ from passlib.context import CryptContext
 
 from database import Database
 from routes.users import USERS_V0_ROUTER
-from stores.users import UsersStore
 from shared.python.extensions.speedyapi import SpeedyAPI
 from shared.python.helpers.load_json_file import load_json_file
 
@@ -20,8 +19,6 @@ app.db = Database(
     password=app.config["db"]["password"],
     name=app.config["db"]["name"],
 )
-
-app.users_store = UsersStore()
 
 app.include_router(USERS_V0_ROUTER)
 
