@@ -19,6 +19,7 @@ WHERE {where}
 CREATE_USER = """
 INSERT INTO users(username, password, name, scopes)
 VALUES ({username}, {password}, {name}, {scopes})
+RETURNING id
 """
 
 UPDATE_USER = """

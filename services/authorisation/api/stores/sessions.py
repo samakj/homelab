@@ -1,0 +1,76 @@
+from typing import Optional, Union
+
+from asyncpg import Connection
+from fastapi import Depends
+
+from database import Database
+from models.Session import Session, CreateSession
+from stores.queries.sessions import (
+    GET_SESSION_BY_ID,
+    GET_SESSIONS,
+    CREATE_SESSION,
+    UPDATE_SESSION,
+    DELETE_SESSION,
+)
+from shared.python.helpers.to_filter import to_filter, to_array_filter
+
+
+class SessionsStore:
+    connection: Connection
+
+    def __init__(self, connection: Connection = Depends(Database.transaction)) -> None:
+        self.connection = connection
+
+    async def get_session(self, id: int) -> Optional[Session]:
+        response = await self.connection.fetchrow(
+            GET_SESSION_BY_ID.format(id=to_filter(id))
+        )
+        return Session(**dict(response)) if response is not None else None
+
+    async def get_sessions(
+        self,
+        id: Optional[Union[int, list[int]]] = None,
+        user_id: Optional[Union[int, list[int]]] = None,
+        ip: Optional[Union[str, list[str]]] = None,
+    ) -> Optional[Session]:
+        where = []
+
+        if id is not None:
+            where.append(f"id IN {to_array_filter(id)}")
+        if user_id is not None:
+            where.append(f"user_id IN {to_array_filter(user_id)}")
+        if ip is not None:
+            where.append(f"ip IN {to_array_filter(ip)}")
+
+        response = await self.connection.fetch(
+            GET_SESSIONS.format(where=" AND ".join(where) if where else "TRUE")
+        )
+
+        return [Session(**dict(row)) for row in response]
+
+    async def create_session(
+        self,
+        session: CreateSession,
+    ) -> Optional[Session]:
+        row = await self.connection.fetchrow(
+            CREATE_SESSION.format(
+                user_id=to_filter(session.user_id),
+                expires=to_filter(session.expires),
+                ip=to_filter(session.ip),
+            )
+        )
+        return await self.get_session(id=row["id"])
+
+    async def update_session(self, session: Session) -> Optional[Session]:
+        await self.connection.execute(
+            UPDATE_SESSION.format(
+                id=to_filter(session.id),
+                user_id=to_filter(session.user_id),
+                expires=to_filter(session.expires),
+                ip=to_filter(session.ip),
+            )
+        )
+        return await self.get_session(id=session.id)
+
+    async def delete_session(self, id: int) -> None:
+        await self.connection.execute(DELETE_SESSION.format(id=to_filter(id)))

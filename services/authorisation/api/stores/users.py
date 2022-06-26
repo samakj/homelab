@@ -45,13 +45,13 @@ class UsersStore:
         where = []
 
         if id is not None:
-            where.append(f"id IN {to_array_filter(id)}")  # make parser
+            where.append(f"id IN {to_array_filter(id)}")
         if username is not None:
-            where.append(f"username IN {to_array_filter(username)}")  # make parser
+            where.append(f"username IN {to_array_filter(username)}")
         if name is not None:
-            where.append(f"name IN {to_array_filter(name)}")  # make parser
+            where.append(f"name IN {to_array_filter(name)}")
         if scopes is not None:
-            where.append(f"scopes @> {to_array_filter(name)}")  # make parser
+            where.append(f"scopes @> {to_array_filter(name)}")
 
         response = await self.connection.fetch(
             GET_USERS.format(where=" AND ".join(where) if where else "TRUE")
@@ -63,7 +63,7 @@ class UsersStore:
         self,
         user: CreateUser,
     ) -> Optional[User]:
-        await self.connection.execute(
+        row = await self.connection.fetchrow(
             CREATE_USER.format(
                 username=to_filter(user.username),
                 password=to_filter(hash_password(user.password)),
@@ -71,7 +71,7 @@ class UsersStore:
                 scopes=to_array_filter(user.scopes),
             )
         )
-        return await self.get_user_by_username(username=user.username)
+        return await self.get_user(id=row["id"])
 
     async def update_user(self, user: User) -> Optional[User]:
         await self.connection.execute(
@@ -83,7 +83,7 @@ class UsersStore:
                 scopes=to_array_filter(user.scopes),
             )
         )
-        return await self.get_user_by_username(username=user.username)
+        return await self.get_user(id=user.id)
 
     async def delete_user(self, id: int) -> None:
         await self.connection.execute(DELETE_USER.format(id=to_filter(id)))
