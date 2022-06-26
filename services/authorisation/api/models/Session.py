@@ -6,6 +6,9 @@ class CreateSession(BaseModel):
     user_id: int = Field(description="The id of the user the session is for.")
     ip: str = Field(description="The ip attatched to the session.")
 
+    class Config:
+        orm_mode = True
+
 
 class Session(BaseModel):
     id: int = Field(description="The session id.")
@@ -17,3 +20,6 @@ class Session(BaseModel):
         description="Whether the session has been manually disabled or not.",
         default=False,
     )
+
+    class Config:
+        orm_mode = True

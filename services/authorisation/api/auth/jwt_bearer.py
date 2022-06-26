@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 from datetime import datetime
 from fastapi import Depends, Request, HTTPException
+from pydantic import BaseModel
 
 from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME
 from auth.jwt import decode_jwt
@@ -8,11 +8,13 @@ from models.Session import Session
 from stores.sessions import SessionsStore
 
 
-@dataclass
-class JWTAuthorizationCredentials:
+class JWTAuthorizationCredentials(BaseModel):
     scheme: str
     token: str
     session: Session
+
+    class Config:
+        orm_mode = True
 
 
 class JWTBearer:

@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from fastapi import Depends, HTTPException, Request
 
 from auth.jwt_bearer import JWTBearer, JWTAuthorizationCredentials
@@ -7,7 +6,6 @@ from stores.sessions import SessionsStore
 from models.User import User
 
 
-@dataclass
 class UserCredentials(JWTAuthorizationCredentials):
     user: User
 

@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME
 from auth.jwt import sign_jwt
+from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from models.User import UserNoPassword
+from models.User import User, UserNoPassword
 from models.Session import CreateSession, Session
 
 
@@ -67,3 +68,21 @@ async def login(
         httponly=True,
     )
     return UserNoPassword.parse_obj(dict(user))
+
+
+@LOGIN_V0_ROUTER.get("/token", response_model=UserCredentials)
+async def check_token(
+    user_credentials: UserCredentials = Depends(BearerUser()),
+) -> UserCredentials:
+    return UserCredentials(
+        scheme=user_credentials.scheme,
+        token=user_credentials.token,
+        session=user_credentials.session,
+        user=User(
+            id=user_credentials.user.id,
+            username=user_credentials.user.username,
+            password="",
+            name=user_credentials.user.name,
+            scopes=user_credentials.user.scopes,
+        ),
+    )
