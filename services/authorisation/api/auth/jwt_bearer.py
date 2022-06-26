@@ -54,6 +54,8 @@ class JWTBearer:
             raise HTTPException(status_code=401, detail="Invalid session")
         if session.expires <= datetime.utcnow():
             raise HTTPException(status_code=401, detail="Session expired")
+        if session.disabled:
+            raise HTTPException(status_code=401, detail="Session expired")
 
         return JWTAuthorizationCredentials(
             scheme=scheme,

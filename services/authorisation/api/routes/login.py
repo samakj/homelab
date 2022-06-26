@@ -2,12 +2,12 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from pydantic import BaseModel
 
-from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME, SESSION_DURATION
+from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME
 from auth.jwt import sign_jwt
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
 from models.User import UserNoPassword
-from models.Session import CreateSession
+from models.Session import CreateSession, Session
 
 
 LOGIN_V0_ROUTER = APIRouter(prefix="/v0", tags=["login"])
@@ -19,7 +19,7 @@ class LoginDetails(BaseModel):
 
 
 @LOGIN_V0_ROUTER.post("/login", response_model=UserNoPassword)
-async def get_user(
+async def login(
     details: LoginDetails,
     request: Request,
     response: Response,
@@ -36,10 +36,23 @@ async def get_user(
     if user is None:
         raise HTTPException(status_code=401, detail="Log in failed.")
 
+    old_sessions = await sessions_store.get_sessions(
+        expires_gte=datetime.utcnow(), disabled=False
+    )
+    for session in old_sessions:
+        await sessions_store.update_session(
+            Session(
+                id=session.id,
+                user_id=session.user_id,
+                expires=session.expires,
+                ip=session.ip,
+                disabled=True,
+            )
+        )
+
     session = await sessions_store.create_session(
         session=CreateSession(
             user_id=user.id,
-            expires=datetime.utcnow() + SESSION_DURATION,
             ip=request.client.host,
         )
     )

@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Optional, Union
 
 from asyncpg import Connection
 from fastapi import Depends
 
 from database import Database
+from auth.config import SESSION_DURATION
 from models.Session import Session, CreateSession
 from stores.queries.sessions import (
     GET_SESSION_BY_ID,
@@ -32,7 +34,12 @@ class SessionsStore:
         id: Optional[Union[int, list[int]]] = None,
         user_id: Optional[Union[int, list[int]]] = None,
         ip: Optional[Union[str, list[str]]] = None,
-    ) -> Optional[Session]:
+        disabled: Optional[bool] = None,
+        created_gte: Optional[datetime] = None,
+        created_lte: Optional[datetime] = None,
+        expires_gte: Optional[datetime] = None,
+        expires_lte: Optional[datetime] = None,
+    ) -> Optional[list[Session]]:
         where = []
 
         if id is not None:
@@ -41,6 +48,16 @@ class SessionsStore:
             where.append(f"user_id IN {to_array_filter(user_id)}")
         if ip is not None:
             where.append(f"ip IN {to_array_filter(ip)}")
+        if disabled is not None:
+            where.append(f"disabled = {to_filter(disabled)}")
+        if created_gte is not None:
+            where.append(f"created >= {to_filter(created_gte)}")
+        if created_lte is not None:
+            where.append(f"created <= {to_filter(created_lte)}")
+        if expires_gte is not None:
+            where.append(f"expires >= {to_filter(expires_gte)}")
+        if expires_lte is not None:
+            where.append(f"expires <= {to_filter(expires_lte)}")
 
         response = await self.connection.fetch(
             GET_SESSIONS.format(where=" AND ".join(where) if where else "TRUE")
@@ -55,9 +72,10 @@ class SessionsStore:
         row = await self.connection.fetchrow(
             CREATE_SESSION.format(
                 user_id=to_filter(session.user_id),
-                expires=to_filter(session.expires),
+                created=to_filter(datetime.utcnow()),
+                expires=to_filter(datetime.utcnow() + SESSION_DURATION),
                 ip=to_filter(session.ip),
-                disabled=to_filter(session.disabled),
+                disabled=to_filter(False),
             )
         )
         return await self.get_session(id=row["id"])
@@ -67,6 +85,7 @@ class SessionsStore:
             UPDATE_SESSION.format(
                 id=to_filter(session.id),
                 user_id=to_filter(session.user_id),
+                created=to_filter(session.created),
                 expires=to_filter(session.expires),
                 ip=to_filter(session.ip),
                 disabled=to_filter(session.disabled),
