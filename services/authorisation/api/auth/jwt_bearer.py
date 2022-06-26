@@ -6,7 +6,7 @@ from models.Session import Session
 
 
 class JWTAuthorizationCredentials(HTTPAuthorizationCredentials):
-    sesion: Session
+    session: Session
 
 
 class JWTBearer(HTTPBearer):
@@ -17,9 +17,9 @@ class JWTBearer(HTTPBearer):
         credentials = await super(JWTBearer, self).__call__(request)
 
         if not credentials:
-            raise HTTPException(status_code=403, detail="Invalid authorisation")
+            raise HTTPException(status_code=401, detail="Invalid authorisation")
         if credentials.schema == "Bearer":  # type: ignore
-            raise HTTPException(status_code=403, detail="Invalid authentication scheme")
+            raise HTTPException(status_code=401, detail="Invalid authentication scheme")
 
         payload = None
 
@@ -31,10 +31,10 @@ class JWTBearer(HTTPBearer):
             raise HTTPException(status_code=500, detail=f"JWT decode failed: {error}")
 
         if payload is None:
-            raise HTTPException(status_code=403, detail="Invalid or expired token")
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
 
         return JWTAuthorizationCredentials(
             scheme=credentials.scheme,
             credentials=credentials.credentials,
-            payload=payload,
+            session=payload,
         )
