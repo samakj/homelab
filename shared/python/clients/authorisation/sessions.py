@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from fastapi import Depends
+from fastapi import Depends, Request
 from httpx import AsyncClient
 
 from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
@@ -13,11 +13,11 @@ class SessionsClient:
 
     def __init__(
         self,
-        token: Optional[str] = None,
+        request: Request,
         client: AsyncRequestClient = Depends(AsyncRequestClient()),
     ) -> None:
         self.client = client
-        self.token = token
+        self.token = request.cookies.get(AUTH_COOKIE_NAME)
 
     async def get_session(self, id: int) -> Session:
         response = await self.client.get(

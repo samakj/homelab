@@ -1,9 +1,10 @@
 from typing import Optional
-from fastapi import Depends
+from fastapi import Depends, Request
 from httpx import AsyncClient
 
 from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
 from shared.python.extensions.httpy import AsyncRequestClient
+from shared.python.models.authorisation import UserCredentials
 from shared.python.models.user import UserNoPassword
 from shared.python.clients.authorisation.users import UsersClient
 from shared.python.clients.authorisation.sessions import SessionsClient
@@ -17,13 +18,13 @@ class AuthorisationClient:
 
     def __init__(
         self,
-        token: Optional[str] = None,
+        request: Request,
         client: AsyncRequestClient = Depends(AsyncRequestClient()),
     ) -> None:
         self.client = client
-        self.token = token
-        self.users = UsersClient(token=token, client=client)
-        self.sessions = SessionsClient(token=token, client=client)
+        self.token = request.cookies.get(AUTH_COOKIE_NAME)
+        self.users = UsersClient(request=request, client=client)
+        self.sessions = SessionsClient(request=request, client=client)
 
     async def login(self, username: str, password: str) -> UserNoPassword:
         response = await self.client.post(
@@ -32,9 +33,9 @@ class AuthorisationClient:
         data = response.json()
         return UserNoPassword.parse_obj(data)
 
-    async def check_token(self) -> UserNoPassword:
+    async def check_token(self) -> UserCredentials:
         response = await self.client.get(
             "/v0/token", cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"}
         )
         data = response.json()
-        return UserNoPassword.parse_obj(data)
+        return UserCredentials.parse_obj(data)
