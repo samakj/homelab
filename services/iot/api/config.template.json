@@ -1,1 +1,19 @@
-{}
+{
+    "db": {
+        "host": "${containers.postgres}",
+        "port": "${ports.postgres}",
+        "name": "${postgres.iot.name}",
+        "user": "${postgres.iot.name}",
+        "password": "${postgres.iot.password}",
+        "tables": {
+            "devices": "${postgres.authorisation.tables.devices}",
+            "locations": "${postgres.authorisation.tables.locations}",
+            "measurements": "${postgres.authorisation.tables.measurements}",
+            "float_measurements": "${postgres.authorisation.tables.float_measurements}",
+            "integer_measurements": "${postgres.authorisation.tables.integer_measurements}",
+            "string_measurements": "${postgres.authorisation.tables.string_measurements}",
+            "boolean_measurements": "${postgres.authorisation.tables.boolean_measurements}",
+            "metrics": "${postgres.authorisation.tables.metrics}"
+        }
+    }
+}
