@@ -4,7 +4,6 @@ from typing import Optional, Union
 from asyncpg import Connection
 from fastapi import Depends
 
-from database import Database
 from shared.python.config.auth import SESSION_DURATION
 from shared.python.models.session import Session, CreateSession
 from stores.queries.sessions import (
@@ -14,6 +13,7 @@ from stores.queries.sessions import (
     UPDATE_SESSION,
     DELETE_SESSION,
 )
+from shared.python.extensions.speedyapi.database import Database
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 

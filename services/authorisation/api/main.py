@@ -2,11 +2,11 @@ from pathlib import Path
 
 from passlib.context import CryptContext
 
-from database import Database
 from routes.login import LOGIN_V0_ROUTER
 from routes.sessions import SESSIONS_V0_ROUTER
 from routes.users import USERS_V0_ROUTER
 from shared.python.extensions.speedyapi import SpeedyAPI
+from shared.python.extensions.speedyapi.database import Database
 from shared.python.helpers.load_json_file import load_json_file
 
 

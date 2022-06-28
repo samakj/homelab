@@ -4,7 +4,6 @@ from asyncpg import Connection
 from fastapi import Depends, Request
 from passlib.context import CryptContext
 
-from database import Database
 from shared.python.models.user import User, CreateUser
 from stores.queries.users import (
     GET_USER_BY_ID,
@@ -14,6 +13,7 @@ from stores.queries.users import (
     UPDATE_USER,
     DELETE_USER,
 )
+from shared.python.extensions.speedyapi.database import Database
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
