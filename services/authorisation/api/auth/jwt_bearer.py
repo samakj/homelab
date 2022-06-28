@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import Depends, Request, HTTPException
 
-from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME
+from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
 from auth.jwt import decode_jwt
 from stores.sessions import SessionsStore
 from shared.python.models.authorisation import JWTAuthorizationCredentials

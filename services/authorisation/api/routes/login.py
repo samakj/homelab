@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from pydantic import BaseModel
 
-from auth.config import AUTH_COOKIE_NAME, AUTH_SCHEME
+from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
 from auth.jwt import sign_jwt
 from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore

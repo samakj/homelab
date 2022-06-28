@@ -4,6 +4,7 @@ black
 click
 fastapi
 flake8
+httpx
 mypy
 passlib
 pyjwt
