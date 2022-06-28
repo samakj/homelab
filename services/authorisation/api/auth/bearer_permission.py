@@ -1,13 +1,9 @@
 from fastapi import Depends, HTTPException, Request
 
-from auth.bearer_user import BearerUser, UserCredentials
+from auth.bearer_user import BearerUser
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-
-
-class PermissionCredentials(UserCredentials):
-    route_scope: str
-    matched_scope: str
+from shared.python.models.authorisation import PermissionCredentials
 
 
 class BearerPermission(BearerUser):

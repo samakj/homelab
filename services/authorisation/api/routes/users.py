@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 
 from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.users import UsersStore
-from models.User import User, CreateUser, UserNoPassword
+from shared.python.models.user import User, CreateUser, UserNoPassword
 
 
 USERS_V0_ROUTER = APIRouter(prefix="/v0/users", tags=["users"])

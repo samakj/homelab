@@ -5,7 +5,7 @@ from fastapi import Depends, Request
 from passlib.context import CryptContext
 
 from database import Database
-from models.User import User, CreateUser
+from shared.python.models.user import User, CreateUser
 from stores.queries.users import (
     GET_USER_BY_ID,
     GET_USER_BY_USERNAME,

@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from database import Database
 from auth.config import SESSION_DURATION
-from models.Session import Session, CreateSession
+from shared.python.models.session import Session, CreateSession
 from stores.queries.sessions import (
     GET_SESSION_BY_ID,
     GET_SESSIONS,

@@ -1,13 +1,9 @@
 from fastapi import Depends, HTTPException, Request
 
-from auth.jwt_bearer import JWTBearer, JWTAuthorizationCredentials
+from auth.jwt_bearer import JWTBearer
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from models.User import User
-
-
-class UserCredentials(JWTAuthorizationCredentials):
-    user: User
+from shared.python.models.authorisation import UserCredentials
 
 
 class BearerUser(JWTBearer):

@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 
 from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.sessions import SessionsStore
-from models.Session import Session, CreateSession
+from shared.python.models.session import Session, CreateSession
 
 
 SESSIONS_V0_ROUTER = APIRouter(prefix="/v0/sessions", tags=["sessions"])

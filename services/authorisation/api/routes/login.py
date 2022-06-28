@@ -7,8 +7,8 @@ from auth.jwt import sign_jwt
 from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from models.User import User, UserNoPassword
-from models.Session import CreateSession, Session
+from shared.python.models.user import User, UserNoPassword
+from shared.python.models.session import CreateSession, Session
 
 
 LOGIN_V0_ROUTER = APIRouter(prefix="/v0", tags=["login"])
