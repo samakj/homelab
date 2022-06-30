@@ -113,7 +113,13 @@ class SpeedyAPI(FastAPI):
         self.add_middleware(RequestMetaMiddleware)
         self.add_middleware(RequestLoggerMiddleware)
         self.add_middleware(GZipMiddleware)
-        self.add_middleware(CORSMiddleware)
+        self.add_middleware(
+            CORSMiddleware,
+            allow_origins=["http://iot.localhost"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
         self.include_router(META_ROUTER)
         self.include_router(PING_ROUTER)

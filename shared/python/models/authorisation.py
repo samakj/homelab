@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from shared.python.models.session import Session
-from shared.python.models.user import User
+from shared.python.models.user import User, UserNoPassword
 
 
 class JWTAuthorizationCredentials(BaseModel):
@@ -24,6 +24,14 @@ class PermissionCredentials(UserCredentials):
     matched_scope: str = Field(
         description="The user scope that matched to the route scope"
     )
+
+    class Config:
+        orm_mode = True
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    user: UserNoPassword
 
     class Config:
         orm_mode = True

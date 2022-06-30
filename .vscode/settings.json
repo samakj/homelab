@@ -1,35 +1,30 @@
 {
-    "workbench.iconTheme": "material-icon-theme",
-    "workbench.colorTheme": "monokai-charcoal (yellow)",
-    "editor.formatOnSave": true,
-    "[typescriptreact]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "window.zoomLevel": -1,
-    "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[python]": {
-      "editor.defaultFormatter": "ms-python.black-formatter"
-    },
-    "python.autoComplete.extraPaths": [
-      "${workspaceFolder}/shared/python"
-    ],
-    "python.linting.enabled": true,
-    "python.linting.lintOnSave": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": [
-        "--max-line-length=100"
-    ],
-    "python.linting.pylintEnabled": false,
-    "python.linting.mypyEnabled": true,
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--line-length=100"
-    ],
-    "python.linting.mypyArgs": [
-      "--strict",
-      "--implicit-reexport",
-      "--ignore-missing-imports",
-    ]
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "monokai-charcoal (yellow)",
+  "editor.formatOnSave": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "window.zoomLevel": -1,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.autoComplete.extraPaths": ["${workspaceFolder}/shared/python"],
+  "python.linting.enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--max-line-length=100"],
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length=100"],
+  "python.linting.mypyArgs": [
+    "--strict",
+    "--implicit-reexport",
+    "--ignore-missing-imports"
+  ],
+  "python.analysis.extraPaths": ["${workspaceFolder}/shared/python"]
 }

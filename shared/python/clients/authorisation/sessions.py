@@ -1,29 +1,38 @@
 from typing import Optional, Union
 from fastapi import Depends, Request
-from httpx import AsyncClient
 
-from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
-from shared.python.extensions.httpy import AsyncRequestClient
+from shared.python.config.auth import AUTH_NAME
+from shared.python.extensions.httpy import (
+    AsyncInternalClient,
+    AsyncInternalRequestClient,
+)
 from shared.python.models.session import Session
 
 
 class SessionsClient:
-    client: AsyncClient
+    client: AsyncInternalClient
     token: Optional[str]
+    base_url: str
 
     def __init__(
         self,
         request: Request,
-        client: AsyncRequestClient = Depends(AsyncRequestClient()),
+        client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
     ) -> None:
         self.client = client
-        self.token = request.cookies.get(AUTH_COOKIE_NAME)
+
+        self.token = request.cookies.get(AUTH_NAME)
+        if self.token is None:
+            self.token = request.headers.get(AUTH_NAME)
+        if self.token is None:
+            self.token = request.query_params.get(AUTH_NAME)
+
+        self.base_url = request.app.config.get("urls", {}).get("authorisation_api")
+        if self.base_url is None:
+            raise ValueError("config.urls.auhorisation_api not set.")
 
     async def get_session(self, id: int) -> Session:
-        response = await self.client.get(
-            f"/v0/sessions/{id}",
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
-        )
+        response = await self.client.get(f"{self.base_url}/v0/sessions/{id}")
         data = response.json()
         return Session.parse_obj(data)
 
@@ -34,9 +43,8 @@ class SessionsClient:
         ip: Optional[Union[str, list[str]]] = None,
     ) -> list[Session]:
         response = await self.client.get(
-            f"/v0/sessions/{id}",
+            f"{self.base_url}/v0/sessions/{id}",
             params={"id": id, "user_id": user_id, "ip": ip},
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return [Session.parse_obj(user) for user in data]
@@ -47,12 +55,11 @@ class SessionsClient:
         ip: str,
     ) -> Session:
         response = await self.client.post(
-            f"/v0/sessions/{id}",
+            f"{self.base_url}/v0/sessions/{id}",
             data={
                 "user_id": user_id,
                 "ip": ip,
             },
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return Session.parse_obj(data)
@@ -62,9 +69,8 @@ class SessionsClient:
         session: Session,
     ) -> Session:
         response = await self.client.patch(
-            f"/v0/sessions/{session.id}",
+            f"{self.base_url}/v0/sessions/{session.id}",
             data=dict(session),
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return Session.parse_obj(data)
@@ -74,7 +80,6 @@ class SessionsClient:
         id: int,
     ) -> None:
         await self.client.delete(
-            f"/v0/sessions/{id}",
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
+            f"{self.base_url}/v0/sessions/{id}",
         )
         return None

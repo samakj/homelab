@@ -11,6 +11,7 @@ from stores.queries.users import (
     GET_USERS,
     CREATE_USER,
     UPDATE_USER,
+    UPDATE_USER_PASSWORD,
     DELETE_USER,
 )
 from shared.python.extensions.speedyapi.database import Database
@@ -89,7 +90,7 @@ class UsersStore:
 
     async def update_user_password(self, user: User) -> Optional[User]:
         await self.connection.execute(
-            UPDATE_USER.format(
+            UPDATE_USER_PASSWORD.format(
                 id=to_filter(user.id),
                 username=to_filter(user.username),
                 password=to_filter(self.password_context.hash(user.password)),

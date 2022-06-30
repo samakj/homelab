@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException
-from shared.python.models.authorisation import PermissionCredentials, UserCredentials
+
+from shared.python.models.authorisation import PermissionCredentials
 from shared.python.clients.authorisation import AuthorisationClient
 
 
@@ -10,10 +11,10 @@ class BearerPermission:
         self.scope = scope
 
     async def __call__(
-        self, authorisation_client: AuthorisationClient = Depends(AuthorisationClient)
+        self,
+        authorisation_client: AuthorisationClient = Depends(AuthorisationClient),
     ) -> PermissionCredentials:
-        response = await authorisation_client.check_token()
-        bearer_user = UserCredentials(**response.json())
+        bearer_user = await authorisation_client.check_token()
 
         match = None
 

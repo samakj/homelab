@@ -1,42 +1,48 @@
 from typing import Optional, Union
 from fastapi import Depends, Request
-from httpx import AsyncClient
 
-from shared.python.config.auth import AUTH_COOKIE_NAME, AUTH_SCHEME
-from shared.python.extensions.httpy import AsyncRequestClient
+from shared.python.config.auth import AUTH_NAME
+from shared.python.extensions.httpy import (
+    AsyncInternalClient,
+    AsyncInternalRequestClient,
+)
 from shared.python.models.user import UserNoPassword
 
 
 class UsersClient:
-    client: AsyncClient
+    client: AsyncInternalClient
     token: Optional[str]
+    base_url: str
 
     def __init__(
         self,
         request: Request,
-        client: AsyncRequestClient = Depends(AsyncRequestClient()),
+        client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
     ) -> None:
         self.client = client
-        self.token = request.cookies.get(AUTH_COOKIE_NAME)
+
+        self.token = request.cookies.get(AUTH_NAME)
+        if self.token is None:
+            self.token = request.headers.get(AUTH_NAME)
+        if self.token is None:
+            self.token = request.query_params.get(AUTH_NAME)
+        self.base_url = request.app.config.get("urls", {}).get("authorisation_api")
+        if self.base_url is None:
+            raise ValueError("config.urls.auhorisation_api not set.")
 
     async def get_user(self, id: int) -> UserNoPassword:
-        response = await self.client.get(
-            f"/v0/users/{id}", cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"}
-        )
+        response = await self.client.get(f"{self.base_url}/v0/users/{id}")
         data = response.json()
         return UserNoPassword.parse_obj(data)
 
     async def get_user_by_username(self, username: str) -> UserNoPassword:
-        response = await self.client.get(
-            f"/v0/users/{username}",
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
-        )
+        response = await self.client.get(f"{self.base_url}/v0/users/{username}")
         data = response.json()
         return UserNoPassword.parse_obj(data)
 
     async def get_self(self) -> UserNoPassword:
         response = await self.client.get(
-            "/v0/users/self", cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"}
+            f"{self.base_url}/v0/users/self",
         )
         data = response.json()
         return UserNoPassword.parse_obj(data)
@@ -49,9 +55,8 @@ class UsersClient:
         scopes: Optional[Union[str, list[str]]] = None,
     ) -> list[UserNoPassword]:
         response = await self.client.get(
-            f"/v0/users/{id}",
+            f"{self.base_url}/v0/users/{id}",
             params={"id": id, "username": username, "name": name, "scopes": scopes},
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return [UserNoPassword.parse_obj(user) for user in data]
@@ -64,14 +69,13 @@ class UsersClient:
         scopes: list[str],
     ) -> UserNoPassword:
         response = await self.client.post(
-            f"/v0/users/{id}",
+            f"{self.base_url}/v0/users/{id}",
             data={
                 "username": username,
                 "password": password,
                 "name": name,
                 "scopes": scopes,
             },
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return UserNoPassword.parse_obj(data)
@@ -81,9 +85,8 @@ class UsersClient:
         user: UserNoPassword,
     ) -> UserNoPassword:
         response = await self.client.patch(
-            f"/v0/users/{user.id}",
+            f"{self.base_url}/v0/users/{user.id}",
             data=dict(user),
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
         )
         data = response.json()
         return UserNoPassword.parse_obj(data)
@@ -92,8 +95,5 @@ class UsersClient:
         self,
         id: int,
     ) -> UserNoPassword:
-        await self.client.delete(
-            f"/v0/users/{id}",
-            cookies={AUTH_COOKIE_NAME: f"{AUTH_SCHEME} {self.token}"},
-        )
+        await self.client.delete(f"{self.base_url}/v0/users/{id}")
         return None

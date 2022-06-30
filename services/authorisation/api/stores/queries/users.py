@@ -24,6 +24,12 @@ RETURNING id
 
 UPDATE_USER = """
 UPDATE users
+SET username = {username}, name = {name}, scopes = {scopes}
+WHERE id = {id}
+"""
+
+UPDATE_USER_PASSWORD = """
+UPDATE users
 SET username = {username}, password = {password}, name = {name}, scopes = {scopes}
 WHERE id = {id}
 """

@@ -2,8 +2,16 @@
 
 version: "3"
 
+networks:
+  internal:
+    internal: true
+    driver: bridge
+
+  external:
+    driver: bridge
+
 services:
-  ${containers.nginx}:
+  "${containers.nginx}":
     image: nginx:latest
     container_name: ${containers.nginx}
     depends_on:
@@ -20,14 +28,17 @@ services:
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
-    
-  ${containers.certbot}:
+    networks:
+      - internal
+      - external
+
+  "${containers.certbot}":
     image: certbot/certbot:latest
     volumes:
       - ${folders.containers.docker_compose.apis.certbot_data.www}:/var/www/certbot/
       - ${folders.containers.docker_compose.apis.certbot_data.conf}:/etc/letsencrypt/
-    
-  ${containers.postgres}:
+
+  "${containers.postgres}":
     image: postgres:latest
     container_name: ${containers.postgres}
     environment:
@@ -43,13 +54,15 @@ services:
       - WEATHER_DB_USER=${postgres.weather.user}
       - WEATHER_DB_PASS=${postgres.weather.password}
       - WEATHER_DB_NAME=${postgres.weather.name}
-    volumes: 
-      - ${folders.containers.docker_compose.apis.postgres_data}:/var/lib/postgresql/data
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
       - ${folders.services.postgres.patches}:/docker-entrypoint-initdb.d
     ports:
       - "${ports.postgres}:${ports.postgres}"
+    networks:
+      - internal
 
-  ${containers.redis}:
+  "${containers.redis}":
     image: redis:latest
     container_name: ${containers.redis}
     command: redis-server --port ${ports.redis}
@@ -57,8 +70,10 @@ services:
       - ./redis-data:/var/lib/redis
     ports:
       - "${ports.redis}:${ports.redis}"
-    
-  ${containers.authorisation_api}:
+    networks:
+      - internal
+
+  "${containers.authorisation_api}":
     image: ${containers.authorisation_api}
     container_name: ${containers.authorisation_api}
     depends_on:
@@ -76,8 +91,10 @@ services:
     ports:
       - "${ports.authorisation_api}:${ports.authorisation_api}"
     restart: on-failure
-    
-  ${containers.iot_api}:
+    networks:
+      - internal
+
+  "${containers.iot_api}":
     image: ${containers.iot_api}
     container_name: ${containers.iot_api}
     depends_on:
@@ -95,8 +112,10 @@ services:
     ports:
       - "${ports.iot_api}:${ports.iot_api}"
     restart: on-failure
+    networks:
+      - internal
 
-  ${containers.utilities_api}:
+  "${containers.utilities_api}":
     image: ${containers.utilities_api}
     container_name: ${containers.utilities_api}
     depends_on:
@@ -114,8 +133,10 @@ services:
     ports:
       - "${ports.utilities_api}:${ports.utilities_api}"
     restart: on-failure
+    networks:
+      - internal
 
-  ${containers.weather_api}:
+  "${containers.weather_api}":
     image: ${containers.weather_api}
     container_name: ${containers.weather_api}
     depends_on:
@@ -133,8 +154,10 @@ services:
     ports:
       - "${ports.weather_api}:${ports.weather_api}"
     restart: on-failure
+    networks:
+      - internal
 
-  ${containers.portainer}:
+  "${containers.portainer}":
     image: portainer/portainer-ce:latest
     container_name: ${containers.portainer}
     restart: unless-stopped
@@ -146,3 +169,5 @@ services:
       - ${folders.containers.docker_compose.apis.portainer_data}:/data
     ports:
       - ${ports.portainer}:${ports.portainer}
+    networks:
+      - internal

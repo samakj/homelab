@@ -15,5 +15,8 @@
             "boolean_measurements": "${postgres.authorisation.tables.boolean_measurements}",
             "metrics": "${postgres.authorisation.tables.metrics}"
         }
+    },
+    "urls": {
+        "authorisation_api": "http://${containers.authorisation_api}:${ports.authorisation_api}"
     }
 }
