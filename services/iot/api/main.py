@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from routes.locations import LOCATIONS_V0_ROUTER
 from routes.metrics import METRICS_V0_ROUTER
 from shared.python.extensions.speedyapi import SpeedyAPI
 from shared.python.extensions.speedyapi.database import Database
@@ -16,6 +17,7 @@ app.db = Database(
     name=app.config["db"]["name"],
 )
 
+app.include_router(LOCATIONS_V0_ROUTER)
 app.include_router(METRICS_V0_ROUTER)
 
 
