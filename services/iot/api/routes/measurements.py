@@ -6,10 +6,7 @@ from stores.measurements import MeasurementsStore
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.measurement import Measurement, CreateMeasurement, ValueType
 from shared.python.helpers.bearer_permission import BearerPermission
-from websocket_connection_manager import websocket_connection_manager
-from shared.python.extensions.speedyapi.websocket_connenction_manager import (
-    WebsocketConnectionManager,
-)
+from shared.python.extensions.speedyapi.websockets import Websockets
 
 
 MEASUREMENTS_V0_ROUTER = APIRouter(prefix="/v0/measurements", tags=["measurements"])
@@ -114,11 +111,9 @@ async def measurements_websocket(
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="measurements")
     ),
-    websocket_connection_manager: WebsocketConnectionManager = Depends(
-        websocket_connection_manager
-    ),
+    websockets: Websockets = Depends(Websockets),
 ) -> None:
-    connection = await websocket_connection_manager.add_websocket(
+    connection = await websockets.add_websocket(
         websocket=websocket, scope="measurements", session=permissions.session
     )
     await connection.listen()

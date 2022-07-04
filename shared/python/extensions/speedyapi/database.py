@@ -1,6 +1,7 @@
 import asyncpg
 from asyncpg import Connection, Pool
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
+from fastapi.requests import HTTPConnection
 
 
 class Database:
@@ -42,16 +43,20 @@ class Database:
         raise error
 
     @staticmethod
-    async def connection(request: Request) -> Connection:
-        async with request.app.db.pool.acquire() as connection:
+    async def connection(
+        http_connection: HTTPConnection,
+    ) -> Connection:
+        async with http_connection.app.db.pool.acquire() as connection:
             try:
                 yield connection
             except Exception as error:
                 Database.raise_database_http_error(error=error)
 
     @staticmethod
-    async def transaction(request: Request) -> Connection:
-        async with request.app.db.pool.acquire() as connection:
+    async def transaction(
+        http_connection: HTTPConnection,
+    ) -> Connection:
+        async with http_connection.app.db.pool.acquire() as connection:
             async with connection.transaction():
                 try:
                     yield connection

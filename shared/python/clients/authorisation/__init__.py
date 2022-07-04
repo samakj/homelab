@@ -1,4 +1,5 @@
-from fastapi import Depends, Request, WebSocket
+from fastapi import Depends
+from fastapi.requests import HTTPConnection
 
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
@@ -17,21 +18,19 @@ class AuthorisationClient:
 
     def __init__(
         self,
-        request: Request = None,  # type: ignore
-        websocket: WebSocket = None,  # type: ignore
+        http_connection: HTTPConnection,
         client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
     ) -> None:
-        connection = request if request is not None else websocket
         self.client = client
 
-        self.base_url = connection.app.config.get("urls", {}).get("authorisation_api")
+        self.base_url = http_connection.app.config.get("urls", {}).get(
+            "authorisation_api"
+        )
         if self.base_url is None:
             raise ValueError("config.urls.auhorisation_api not set.")
 
-        self.users = UsersClient(request=request, websocket=websocket, client=client)
-        self.sessions = SessionsClient(
-            request=request, websocket=websocket, client=client
-        )
+        self.users = UsersClient(http_connection=http_connection, client=client)
+        self.sessions = SessionsClient(http_connection=http_connection, client=client)
 
     async def login(self, username: str, password: str) -> LoginResponse:
         response = await self.client.post(

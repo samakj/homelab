@@ -5,8 +5,8 @@ from typing import Optional, Union
 from asyncpg import Connection
 from fastapi import Depends
 
-from websocket_connection_manager import websocket_connection_manager
 from shared.python.models.measurement import Measurement, CreateMeasurement, ValueType
+from shared.python.extensions.speedyapi.websockets import Websockets
 from stores.queries.measurements import (
     GET_MEASUREMENT_BY_ID,
     GET_MEASUREMENTS,
@@ -15,25 +15,20 @@ from stores.queries.measurements import (
     CREATE_MEASUREMENT_VALUE,
 )
 from shared.python.extensions.speedyapi.database import Database
-from shared.python.extensions.speedyapi.websocket_connenction_manager import (
-    WebsocketConnectionManager,
-)
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
 class MeasurementsStore:
     connection: Connection
-    websocket_connection_manager: WebsocketConnectionManager
+    websockets: Websockets
 
     def __init__(
         self,
         connection: Connection = Depends(Database.transaction),
-        websocket_connection_manager: WebsocketConnectionManager = Depends(
-            websocket_connection_manager
-        ),
+        websockets: Websockets = Depends(Websockets),
     ) -> None:
         self.connection = connection
-        self.websocket_connection_manager = websocket_connection_manager
+        self.websockets = websockets
 
     async def get_measurement(self, id: int) -> Optional[Measurement]:
         response = await self.connection.fetchrow(
@@ -160,16 +155,19 @@ class MeasurementsStore:
             )
         )
 
-        newMeasurement = await self.get_measurement(id=row["id"])
+        response = await self.get_measurement(id=row["id"])
 
-        self.websocket_connection_manager.send_to_scope(
+        if response is None:
+            return None
+
+        self.websockets.broadcast_to_scope(
             "measurements.create",
             json.dumps(
                 {
                     "action": "CREATE",
-                    "measurement": newMeasurement.json(),
+                    "measurement": response.json(),
                 }
             ),
         )
 
-        return newMeasurement
+        return response

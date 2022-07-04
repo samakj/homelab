@@ -1,7 +1,8 @@
 from typing import Optional, Mapping, Callable, List, Union, Any
-from fastapi import Cookie, Header, Query, Request, HTTPException, WebSocket
+from fastapi import Query, HTTPException
+from fastapi.requests import HTTPConnection
 
-from httpx import AsyncClient, Response, USE_CLIENT_DEFAULT, head
+from httpx import AsyncClient, Response, USE_CLIENT_DEFAULT
 from httpx._client import UseClientDefault
 from httpx._config import (
     DEFAULT_TIMEOUT_CONFIG,
@@ -252,33 +253,49 @@ class AsyncInternalClient(AsyncClient):
 class AsyncInternalRequestClient:
     async def __call__(
         self,
-        request: Request = None,  # type: ignore
-        websocket: WebSocket = None,  # type: ignore
+        http_connection: HTTPConnection,
         # access_token_cookie: Optional[str] = Cookie(default=None, alias=AUTH_NAME),
         # access_token_header: Optional[str] = Header(default=None, alias=AUTH_NAME),
         access_token_param: Optional[str] = Query(defaut=None, alias=AUTH_NAME),
     ) -> AsyncInternalClient:
-        connection = request if request is not None else websocket
-        request_headers = dict(connection.headers)
+        request_headers = dict(http_connection.headers)
+        headers = {}
 
-        headers = {
-            "host": request_headers.get("host"),
-            "x-real-ip": request_headers.get("x-real-ip"),
-            "x-forwarded-proto": request_headers.get("x-forwarded-proto"),
-            "x-forwarded-host": request_headers.get("x-forwarded-host"),
-            "x-forwarded-server": request_headers.get("x-forwarded-server"),
-            "x-forwarded-for": request_headers.get("x-forwarded-for"),
-            "pragma": request_headers.get("pragma"),
-            "cache-control": request_headers.get("cache-control"),
-            "user-agent": request_headers.get("user-agent"),
-            "origin": request_headers.get("origin"),
-            "accept-encoding": request_headers.get("accept-encoding"),
-            "accept-language": request_headers.get("accept-language"),
-        }
+        #  Client
+        if request_headers.get("host") is not None:
+            headers["host"] = request_headers["host"]
+        if request_headers.get("origin") is not None:
+            headers["origin"] = request_headers["origin"]
+        if request_headers.get("user-agent") is not None:
+            headers["user-agent"] = request_headers["user-agent"]
+
+        # Cache
+        if request_headers.get("pragma") is not None:
+            headers["pragma"] = request_headers["pragma"]
+        if request_headers.get("cache-control") is not None:
+            headers["cache-control"] = request_headers["cache-control"]
+
+        # Meta
+        if request_headers.get("accept-encoding") is not None:
+            headers["accept-encoding"] = request_headers["accept-encoding"]
+        if request_headers.get("accept-language") is not None:
+            headers["accept-language"] = request_headers["accept-language"]
+
+        # Nginx
+        if request_headers.get("x-real-ip") is not None:
+            headers["x-real-ip"] = request_headers["x-real-ip"]
+        if request_headers.get("x-forwarded-proto") is not None:
+            headers["x-forwarded-proto"] = request_headers["x-forwarded-proto"]
+        if request_headers.get("x-forwarded-host") is not None:
+            headers["x-forwarded-host"] = request_headers["x-forwarded-host"]
+        if request_headers.get("x-forwarded-server") is not None:
+            headers["x-forwarded-server"] = request_headers["x-forwarded-server"]
+        if request_headers.get("x-forwarded-for") is not None:
+            headers["x-forwarded-for"] = request_headers["x-forwarded-for"]
 
         async with AsyncInternalClient(
             access_token=access_token_param,
             headers=headers,
-            cookies=connection.cookies,
+            cookies=http_connection.cookies,
         ) as client:
             yield client
