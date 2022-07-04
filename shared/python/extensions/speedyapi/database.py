@@ -1,6 +1,6 @@
 import asyncpg
 from asyncpg import Connection, Pool
-from fastapi import Request
+from fastapi import HTTPException, Request
 
 
 class Database:
@@ -36,12 +36,24 @@ class Database:
         )
 
     @staticmethod
+    def raise_database_http_error(error: Exception) -> None:
+        if isinstance(error, asyncpg.ForeignKeyViolationError):
+            raise HTTPException(status_code=400, detail=str(error))
+        raise error
+
+    @staticmethod
     async def connection(request: Request) -> Connection:
         async with request.app.db.pool.acquire() as connection:
-            yield connection
+            try:
+                yield connection
+            except Exception as error:
+                Database.raise_database_http_error(error=error)
 
     @staticmethod
     async def transaction(request: Request) -> Connection:
         async with request.app.db.pool.acquire() as connection:
             async with connection.transaction():
-                yield connection
+                try:
+                    yield connection
+                except Exception as error:
+                    Database.raise_database_http_error(error=error)
