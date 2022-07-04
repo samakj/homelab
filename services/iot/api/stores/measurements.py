@@ -1,9 +1,11 @@
 from datetime import datetime
+import json
 from typing import Optional, Union
 
 from asyncpg import Connection
 from fastapi import Depends
 
+from websocket_connection_manager import websocket_connection_manager
 from shared.python.models.measurement import Measurement, CreateMeasurement, ValueType
 from stores.queries.measurements import (
     GET_MEASUREMENT_BY_ID,
@@ -13,14 +15,25 @@ from stores.queries.measurements import (
     CREATE_MEASUREMENT_VALUE,
 )
 from shared.python.extensions.speedyapi.database import Database
+from shared.python.extensions.speedyapi.websocket_connenction_manager import (
+    WebsocketConnectionManager,
+)
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
 class MeasurementsStore:
     connection: Connection
+    websocket_connection_manager: WebsocketConnectionManager
 
-    def __init__(self, connection: Connection = Depends(Database.transaction)) -> None:
+    def __init__(
+        self,
+        connection: Connection = Depends(Database.transaction),
+        websocket_connection_manager: WebsocketConnectionManager = Depends(
+            websocket_connection_manager
+        ),
+    ) -> None:
         self.connection = connection
+        self.websocket_connection_manager = websocket_connection_manager
 
     async def get_measurement(self, id: int) -> Optional[Measurement]:
         response = await self.connection.fetchrow(
@@ -131,7 +144,7 @@ class MeasurementsStore:
     ) -> Optional[Measurement]:
         row = await self.connection.fetchrow(
             CREATE_MEASUREMENT.format(
-                timestamp=to_filter(measurement.timetsamp),
+                timestamp=to_filter(measurement.timestamp),
                 device_id=to_filter(measurement.device_id),
                 location_id=to_filter(measurement.location_id),
                 metric_id=to_filter(measurement.metric_id),
@@ -146,4 +159,17 @@ class MeasurementsStore:
                 value=measurement.value,
             )
         )
-        return await self.get_measurement(id=row["id"])
+
+        newMeasurement = await self.get_measurement(id=row["id"])
+
+        self.websocket_connection_manager.send_to_scope(
+            "measurements.create",
+            json.dumps(
+                {
+                    "action": "CREATE",
+                    "measurement": newMeasurement.json(),
+                }
+            ),
+        )
+
+        return newMeasurement

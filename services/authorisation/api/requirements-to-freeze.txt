@@ -8,4 +8,4 @@ httpx
 mypy
 passlib
 pyjwt
-uvicorn
+uvicorn[standard]

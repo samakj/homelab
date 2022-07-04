@@ -1,7 +1,6 @@
 from typing import Optional, Union
-from fastapi import Depends, Request
+from fastapi import Depends, Request, WebSocket
 
-from shared.python.config.auth import AUTH_NAME
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
     AsyncInternalRequestClient,
@@ -11,22 +10,18 @@ from shared.python.models.user import UserNoPassword
 
 class UsersClient:
     client: AsyncInternalClient
-    token: Optional[str]
     base_url: str
 
     def __init__(
         self,
-        request: Request,
+        request: Request = None,  # type: ignore
+        websocket: WebSocket = None,  # type: ignore
         client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
     ) -> None:
+        connection = request if request is not None else websocket
         self.client = client
 
-        self.token = request.cookies.get(AUTH_NAME)
-        if self.token is None:
-            self.token = request.headers.get(AUTH_NAME)
-        if self.token is None:
-            self.token = request.query_params.get(AUTH_NAME)
-        self.base_url = request.app.config.get("urls", {}).get("authorisation_api")
+        self.base_url = connection.app.config.get("urls", {}).get("authorisation_api")
         if self.base_url is None:
             raise ValueError("config.urls.auhorisation_api not set.")
 

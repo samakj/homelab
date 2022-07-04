@@ -1,13 +1,10 @@
-from typing import Optional
-from fastapi import Depends, Request
+from fastapi import Depends, Request, WebSocket
 
-from shared.python.config.auth import AUTH_NAME, AUTH_SCHEME
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
     AsyncInternalRequestClient,
 )
 from shared.python.models.authorisation import UserCredentials, LoginResponse
-from shared.python.models.user import UserNoPassword
 from shared.python.clients.authorisation.users import UsersClient
 from shared.python.clients.authorisation.sessions import SessionsClient
 
@@ -20,17 +17,21 @@ class AuthorisationClient:
 
     def __init__(
         self,
-        request: Request,
+        request: Request = None,  # type: ignore
+        websocket: WebSocket = None,  # type: ignore
         client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
     ) -> None:
+        connection = request if request is not None else websocket
         self.client = client
 
-        self.base_url = request.app.config.get("urls", {}).get("authorisation_api")
+        self.base_url = connection.app.config.get("urls", {}).get("authorisation_api")
         if self.base_url is None:
             raise ValueError("config.urls.auhorisation_api not set.")
 
-        self.users = UsersClient(request=request, client=client)
-        self.sessions = SessionsClient(request=request, client=client)
+        self.users = UsersClient(request=request, websocket=websocket, client=client)
+        self.sessions = SessionsClient(
+            request=request, websocket=websocket, client=client
+        )
 
     async def login(self, username: str, password: str) -> LoginResponse:
         response = await self.client.post(

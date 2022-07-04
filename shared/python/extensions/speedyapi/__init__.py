@@ -115,7 +115,7 @@ class SpeedyAPI(FastAPI):
         self.add_middleware(GZipMiddleware)
         self.add_middleware(
             CORSMiddleware,
-            allow_origins=["http://iot.localhost"],
+            allow_origins=["*"],
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],

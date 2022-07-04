@@ -6,4 +6,4 @@ fastapi
 flake8
 httpx
 mypy
-uvicorn
+uvicorn[standard]

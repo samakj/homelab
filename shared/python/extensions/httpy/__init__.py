@@ -1,8 +1,7 @@
-from os import access
 from typing import Optional, Mapping, Callable, List, Union, Any
-from fastapi import Query, Request, HTTPException
+from fastapi import Cookie, Header, Query, Request, HTTPException, WebSocket
 
-from httpx import AsyncClient, Response, USE_CLIENT_DEFAULT
+from httpx import AsyncClient, Response, USE_CLIENT_DEFAULT, head
 from httpx._client import UseClientDefault
 from httpx._config import (
     DEFAULT_TIMEOUT_CONFIG,
@@ -37,13 +36,11 @@ class AsyncRequestClient:
 
 class AsyncInternalClient(AsyncClient):
     token: str
-    headers: HeaderTypes
-    cookies: CookieTypes
 
     def __init__(
         self,
         *,
-        request: Request,
+        access_token: Optional[str] = None,
         auth: Optional[AuthTypes] = None,
         params: Optional[QueryParamTypes] = None,
         headers: Optional[HeaderTypes] = None,
@@ -64,33 +61,19 @@ class AsyncInternalClient(AsyncClient):
         app: Optional[Callable] = None,
         trust_env: bool = True,
         default_encoding: str = "utf-8",
-        access_token: Optional[str] = Query(
-            default=None,
-            alias=AUTH_NAME,
-            description="The access token to authorise the current user",
-        ),
     ):
-        self.headers = dict(request.headers)
-        self.cookies = dict(request.cookies)
         self.token = access_token
-        if self.token is None:
-            self.token = request.cookies.get(AUTH_NAME)
-        if self.token is None:
-            self.token = request.headers.get(AUTH_NAME)
-        if self.token is None:
-            self.token = request.query_params.get(AUTH_NAME)
 
         super().__init__(
             auth=auth,
             params=params,
             headers={
                 **(headers or {}),
-                **self.headers,
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
                 if self.token is not None
                 else "",
             },
-            cookies={**(cookies or {}), **self.cookies},
+            cookies=cookies,
             verify=verify,
             cert=cert,
             http1=http1,
@@ -126,12 +109,11 @@ class AsyncInternalClient(AsyncClient):
             params=params,
             headers={
                 **(headers or {}),
-                **self.headers,
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
                 if self.token is not None
                 else "",
             },
-            cookies={**(cookies or {}), **self.cookies},
+            cookies=cookies,
             auth=auth,
             follow_redirects=follow_redirects,
             timeout=timeout,
@@ -170,12 +152,11 @@ class AsyncInternalClient(AsyncClient):
             params=params,
             headers={
                 **(headers or {}),
-                **self.headers,
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
                 if self.token is not None
                 else "",
             },
-            cookies={**(cookies or {}), **self.cookies},
+            cookies=cookies,
             auth=auth,
             follow_redirects=follow_redirects,
             timeout=timeout,
@@ -214,12 +195,11 @@ class AsyncInternalClient(AsyncClient):
             params=params,
             headers={
                 **(headers or {}),
-                **self.headers,
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
                 if self.token is not None
                 else "",
             },
-            cookies={**(cookies or {}), **self.cookies},
+            cookies=cookies,
             auth=auth,
             follow_redirects=follow_redirects,
             timeout=timeout,
@@ -250,12 +230,11 @@ class AsyncInternalClient(AsyncClient):
             params=params,
             headers={
                 **(headers or {}),
-                **self.headers,
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
                 if self.token is not None
                 else "",
             },
-            cookies={**(cookies or {}), **self.cookies},
+            cookies=cookies,
             auth=auth,
             follow_redirects=follow_redirects,
             timeout=timeout,
@@ -273,14 +252,33 @@ class AsyncInternalClient(AsyncClient):
 class AsyncInternalRequestClient:
     async def __call__(
         self,
-        request: Request,
-        access_token: Optional[str] = Query(
-            default=None,
-            alias=AUTH_NAME,
-            description="The access token to authorise the current user",
-        ),
+        request: Request = None,  # type: ignore
+        websocket: WebSocket = None,  # type: ignore
+        # access_token_cookie: Optional[str] = Cookie(default=None, alias=AUTH_NAME),
+        # access_token_header: Optional[str] = Header(default=None, alias=AUTH_NAME),
+        access_token_param: Optional[str] = Query(defaut=None, alias=AUTH_NAME),
     ) -> AsyncInternalClient:
+        connection = request if request is not None else websocket
+        request_headers = dict(connection.headers)
+
+        headers = {
+            "host": request_headers.get("host"),
+            "x-real-ip": request_headers.get("x-real-ip"),
+            "x-forwarded-proto": request_headers.get("x-forwarded-proto"),
+            "x-forwarded-host": request_headers.get("x-forwarded-host"),
+            "x-forwarded-server": request_headers.get("x-forwarded-server"),
+            "x-forwarded-for": request_headers.get("x-forwarded-for"),
+            "pragma": request_headers.get("pragma"),
+            "cache-control": request_headers.get("cache-control"),
+            "user-agent": request_headers.get("user-agent"),
+            "origin": request_headers.get("origin"),
+            "accept-encoding": request_headers.get("accept-encoding"),
+            "accept-language": request_headers.get("accept-language"),
+        }
+
         async with AsyncInternalClient(
-            request=request, access_token=access_token
+            access_token=access_token_param,
+            headers=headers,
+            cookies=connection.cookies,
         ) as client:
             yield client

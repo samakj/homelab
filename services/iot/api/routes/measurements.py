@@ -1,11 +1,15 @@
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, WebSocket
 
 from stores.measurements import MeasurementsStore
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.measurement import Measurement, CreateMeasurement, ValueType
 from shared.python.helpers.bearer_permission import BearerPermission
+from websocket_connection_manager import websocket_connection_manager
+from shared.python.extensions.speedyapi.websocket_connenction_manager import (
+    WebsocketConnectionManager,
+)
 
 
 MEASUREMENTS_V0_ROUTER = APIRouter(prefix="/v0/measurements", tags=["measurements"])
@@ -101,3 +105,20 @@ async def create_measurement(
         raise HTTPException(status_code=404, detail="Measurement not found.")
 
     return measurement
+
+
+@MEASUREMENTS_V0_ROUTER.websocket("/ws")
+async def measurements_websocket(
+    websocket: WebSocket,
+    scope: Optional[str] = Query(default="measurements"),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="measurements")
+    ),
+    websocket_connection_manager: WebsocketConnectionManager = Depends(
+        websocket_connection_manager
+    ),
+) -> None:
+    connection = await websocket_connection_manager.add_websocket(
+        websocket=websocket, scope="measurements", session=permissions.session
+    )
+    await connection.listen()
