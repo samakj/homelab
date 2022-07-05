@@ -81,8 +81,11 @@ class DevicesStore:
     ) -> Optional[Device]:
         row = await self.connection.fetchrow(
             CREATE_DEVICE.format(
-                name=to_filter(device.name),
-                tags=to_array_filter(device.tags),
+                mac=to_filter(device.mac),
+                ip=to_filter(device.ip),
+                websocket_path=to_filter(device.websocket_path),
+                location_id=to_filter(device.location_id),
+                last_message=to_filter(device.last_message),
             )
         )
         return await self.get_device(id=row["id"])
@@ -91,8 +94,11 @@ class DevicesStore:
         await self.connection.execute(
             UPDATE_DEVICE.format(
                 id=to_filter(device.id),
-                name=to_filter(device.name),
-                tags=to_array_filter(device.tags),
+                mac=to_filter(device.mac),
+                ip=to_filter(device.ip),
+                websocket_path=to_filter(device.websocket_path),
+                location_id=to_filter(device.location_id),
+                last_message=to_filter(device.last_message),
             )
         )
         return await self.get_device(id=device.id)

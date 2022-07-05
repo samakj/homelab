@@ -13,7 +13,7 @@ def to_filter(value: FilterTypes) -> str:
         return f"'{value.isoformat()}'"
     if isinstance(value, bool):
         return f"{value.upper()}"
-    return value
+    return to_filter(str(value))
 
 
 def to_array_filter(value: Union[FilterTypes, List[FilterTypes]]) -> str:
