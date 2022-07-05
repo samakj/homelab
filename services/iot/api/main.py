@@ -34,5 +34,4 @@ async def startup() -> None:
 
 @app.on_event("shutdown")  # type: ignore
 async def shutdown() -> None:
-    for connection in app.websockets.get_connections():
-        await connection.close(reason="Server shutting down.")
+    pass

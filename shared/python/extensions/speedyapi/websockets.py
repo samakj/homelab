@@ -1,3 +1,4 @@
+from asyncio import CancelledError
 from datetime import datetime
 import json
 from typing import Any, Callable, Coroutine, Dict, Iterator, Optional
@@ -54,6 +55,7 @@ class WebsocketConnection:
     async def listen(
         self, on_message: Optional[Callable[[str], Coroutine[Any, Any, None]]] = None
     ) -> None:
+        log = self.logger.warning if self.logger is not None else print
         try:
             while True:
                 if self.session.expires < datetime.utcnow():
@@ -65,13 +67,20 @@ class WebsocketConnection:
                 message = await self.websocket.receive_text()
                 if on_message is not None:
                     await on_message(message)
-        except WebSocketDisconnect:
-            log = self.logger.warning if self.logger is not None else print
-            log("Websocket unexpectedly closed:")
+        except CancelledError:
+            log("Websocket unexpectedly cancelled:")
             log(
                 f"    client={self.websocket.client.host if self.websocket.client else 'unknown'}"
                 + f"    path={self.websocket.url.path}"
             )
+            await self.close(reason="Server cancel")
+        except WebSocketDisconnect:
+            log("Websocket unexpectedly disconnected:")
+            log(
+                f"    client={self.websocket.client.host if self.websocket.client else 'unknown'}"
+                + f"    path={self.websocket.url.path}"
+            )
+            await self.close(reason="Server disconnect")
 
 
 class WebsocketsStore:
@@ -100,6 +109,11 @@ class WebsocketsStore:
         self,
     ) -> Iterator[WebsocketConnection]:
         for connection in self.connections.values():
+            # For when socket closes without using store remove function
+            if connection.closed:
+                del self.connections[connection.id]
+                continue
+
             yield connection
 
     def get_scope(
