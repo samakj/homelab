@@ -114,6 +114,6 @@ async def measurements_websocket(
     websockets: Websockets = Depends(Websockets),
 ) -> None:
     connection = await websockets.add_websocket(
-        websocket=websocket, scope="measurements", session=permissions.session
+        scope="measurements", session=permissions.session
     )
     await connection.listen()
