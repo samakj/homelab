@@ -39,7 +39,7 @@ class MeasurementsStore:
             return None
 
         row = dict(response)
-        row["value"] = row[f"{row['value_type']}_value"]
+        row["value"] = row.get(f"{row['value_type']}_value")
 
         return Measurement.parse_obj(row)
 
@@ -87,7 +87,7 @@ class MeasurementsStore:
 
         for row in response:
             _row = dict(row)
-            _row["value"] = _row[f"{row['value_type']}_value"]
+            _row["value"] = _row.get(f"{row['value_type']}_value")
 
             if (
                 (value is not None and _row["value"] != value)
@@ -128,7 +128,7 @@ class MeasurementsStore:
 
         for row in response:
             _row = dict(row)
-            _row["value"] = _row[f"{row['value_type']}_value"]
+            _row["value"] = _row.get(f"{row['value_type']}_value")
             rows.push(Measurement.parse_obj(_row))
 
         return rows
@@ -144,14 +144,14 @@ class MeasurementsStore:
                 location_id=to_filter(measurement.location_id),
                 metric_id=to_filter(measurement.metric_id),
                 tags=to_array_filter(measurement.tags),
-                value_type=to_array_filter(measurement.value_type),
+                value_type=to_filter(measurement.value_type),
             )
         )
         await self.connection.execute(
             CREATE_MEASUREMENT_VALUE.format(
                 measurement_id=row["id"],
                 value_type=measurement.value_type,
-                value=measurement.value,
+                value=to_filter(measurement.value),
             )
         )
 
