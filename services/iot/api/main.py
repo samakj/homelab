@@ -30,3 +30,9 @@ app.include_router(METRICS_V0_ROUTER)
 @app.on_event("startup")  # type: ignore
 async def startup() -> None:
     await app.db.initialise()
+
+
+@app.on_event("shutdown")  # type: ignore
+async def shutdown() -> None:
+    for connection in app.websockets.get_connections():
+        await connection.close(reason="Server shutting down.")
