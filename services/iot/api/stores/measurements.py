@@ -165,6 +165,7 @@ class MeasurementsStore:
             json.dumps(
                 {
                     "action": "CREATE",
+                    "resource": "measurement",
                     "measurement": response.json(),
                 }
             ),

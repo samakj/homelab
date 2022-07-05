@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from typing import Optional, Union
 
 from asyncpg import Connection
@@ -15,14 +16,21 @@ from stores.queries.devices import (
     DELETE_DEVICE,
 )
 from shared.python.extensions.speedyapi.database import Database
+from shared.python.extensions.speedyapi.websockets import Websockets
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
 class DevicesStore:
     connection: Connection
+    websockets: Websockets
 
-    def __init__(self, connection: Connection = Depends(Database.transaction)) -> None:
+    def __init__(
+        self,
+        connection: Connection = Depends(Database.transaction),
+        websockets: Websockets = Depends(Websockets),
+    ) -> None:
         self.connection = connection
+        self.websockets = websockets
 
     async def get_device(self, id: int) -> Optional[Device]:
         response = await self.connection.fetchrow(
@@ -101,7 +109,24 @@ class DevicesStore:
                 last_message=to_filter(device.last_message),
             )
         )
-        return await self.get_device(id=device.id)
+        response = await self.get_device(id=device.id)
+
+        if response is None:
+            return None
+
+        await self.websockets.broadcast_to_scope(
+            "devices.update",
+            json.dumps(
+                {
+                    "action": "UPDATE",
+                    "resource": "device",
+                    "device": response.json(),
+                    "oldDevice": device.json(),
+                }
+            ),
+        )
+
+        return response
 
     async def delete_device(self, id: int) -> None:
         await self.connection.execute(DELETE_DEVICE.format(id=to_filter(id)))
