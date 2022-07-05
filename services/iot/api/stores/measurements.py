@@ -160,7 +160,7 @@ class MeasurementsStore:
         if response is None:
             return None
 
-        self.websockets.broadcast_to_scope(
+        await self.websockets.broadcast_to_scope(
             "measurements.create",
             json.dumps(
                 {
