@@ -21,6 +21,10 @@ postgres_config_path = config_folder / "postgres.config.json"
 subdomains_config_path = config_folder / "subdomains.config.json"
 wifi_config_path = config_folder / "wifi.config.json"
 
+#  Devcies
+devices_folder = root_folder / "devices"
+sandbox_folder = devices_folder / "sandbox"
+
 #  DX
 dx_folder = root_folder / "dx"
 cli_folder = dx_folder / "cli"
@@ -37,6 +41,8 @@ weather_service_folder = services_folder / "weather"
 
 # Shared
 shared_folder = root_folder / "shared"
+shared_python_folder = shared_folder / "python"
+shared_cpp_folder = shared_folder / "c++"
 
 
 # Map

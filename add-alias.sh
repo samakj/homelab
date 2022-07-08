@@ -1,1 +1,1 @@
-alias homelab="python dx/cli"
+alias homelab="python ${PWD/\/homelab\/*//homelab}/dx/cli"
