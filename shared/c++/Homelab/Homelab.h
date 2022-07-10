@@ -1,6 +1,8 @@
 #ifndef Homelab_h
 #define Homelab_h
 
+#include <Arduino.h>
+
 #include "Logger/Logger.h"
 #include "OTA/OTA.h"
 #include "Peripherals/Peripherals.h"

@@ -2,7 +2,6 @@
 #ifndef _Homelab_Time_h
 #define _Homelab_Time_h
 
-#include <Arduino.h>
 #include <string>
 #include <functional>
 #include <time.h>

@@ -1,6 +1,4 @@
-#include <Arduino.h>
-
-#include <Logger/Logger.h>
+#include <Homelab.h>
 
 void setup()
 {

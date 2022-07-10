@@ -3,7 +3,6 @@
 #ifndef _Homelab_Wifi_h
 #define _Homelab_Wifi_h
 
-#include <Arduino.h>
 #include <string>
 #include <vector>
 

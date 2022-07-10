@@ -1,7 +1,6 @@
 #ifndef _Homelab_Logger_h
 #define _Homelab_Logger_h
 
-#include <Arduino.h>
 #include <TelnetStream.h>
 #include <algorithm>
 #include <string>
