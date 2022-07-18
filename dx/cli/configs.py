@@ -7,21 +7,25 @@ from utils import load_json_file, flattern_dict
 from variables import (
     auth_config_path,
     containers_config_path,
+    devices_config_path,
     hosts_config_path,
     location_config_path,
+    ntp_config_path,
     ports_config_path,
+    postgres_config_path,
     subdomains_config_path,
     wifi_config_path,
     flat_folders_config,
-    postgres_config_path,
 )
 
 
 # Cached configs to ensure we dont waste time re-reading files
 auth_config: Optional[dict[str, Any]] = None
 containers_config: Optional[dict[str, Any]] = None
+devices_config: Optional[dict[str, Any]] = None
 hosts_config: Optional[dict[str, Any]] = None
 location_config: Optional[dict[str, Any]] = None
+ntp_config: Optional[dict[str, Any]] = None
 ports_config: Optional[dict[str, Any]] = None
 postgres_config: Optional[dict[str, Any]] = None
 subdomains_config: Optional[dict[str, Any]] = None
@@ -42,6 +46,13 @@ def get_containers_config() -> dict[str, Any]:
     return containers_config
 
 
+def get_devices_config() -> dict[str, Any]:
+    global devices_config
+    if devices_config is None:
+        devices_config = load_json_file(path=devices_config_path)
+    return devices_config
+
+
 def get_hosts_config() -> dict[str, Any]:
     global hosts_config
     if hosts_config is None:
@@ -54,6 +65,13 @@ def get_location_config() -> dict[str, Any]:
     if location_config is None:
         location_config = load_json_file(path=location_config_path)
     return location_config
+
+
+def get_ntp_config() -> dict[str, Any]:
+    global ntp_config
+    if ntp_config is None:
+        ntp_config = load_json_file(path=ntp_config_path)
+    return ntp_config
 
 
 def get_ports_config() -> dict[str, Any]:
@@ -94,8 +112,10 @@ def apply_config_variables(
     flat_containers_config = flattern_dict(
         obj=get_containers_config(), prefix="containers"
     )
+    flat_devices_config = flattern_dict(obj=get_devices_config(), prefix="devices")
     flat_hosts_config = flattern_dict(obj=get_hosts_config(), prefix="hosts")
     flat_location_config = flattern_dict(obj=get_location_config(), prefix="location")
+    flat_ntp_config = flattern_dict(obj=get_ntp_config(), prefix="ntp")
     flat_ports_config = flattern_dict(obj=get_ports_config(), prefix="ports")
     flat_postgres_config = flattern_dict(obj=get_postgres_config(), prefix="postgres")
     flat_subdomains_config = flattern_dict(
@@ -119,11 +139,19 @@ def apply_config_variables(
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
+    for key, value in flat_devices_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
     for key, value in flat_hosts_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
     for key, value in flat_location_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
+    for key, value in flat_ntp_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
@@ -168,6 +196,13 @@ def print_containers() -> None:
 
 
 @configs.command()
+def print_devices() -> None:
+    print(
+        json.dumps(flattern_dict(obj=get_devices_config(), prefix="devices"), indent=4)
+    )
+
+
+@configs.command()
 def print_folders() -> None:
     print(json.dumps(flat_folders_config, indent=4))
 
@@ -184,6 +219,11 @@ def print_location() -> None:
             flattern_dict(obj=get_location_config(), prefix="location"), indent=4
         )
     )
+
+
+@configs.command()
+def print_ntp() -> None:
+    print(json.dumps(flattern_dict(obj=get_ntp_config(), prefix="ntp"), indent=4))
 
 
 @configs.command()
@@ -225,12 +265,20 @@ def print_all(ctx: click.Context) -> None:
     print_containers.invoke(ctx=ctx)
     print("")
 
+    print("Devices")
+    print_devices.invoke(ctx=ctx)
+    print("")
+
     print("Hosts")
     print_hosts.invoke(ctx=ctx)
     print("")
 
     print("Location")
     print_location.invoke(ctx=ctx)
+    print("")
+
+    print("NTP")
+    print_ntp.invoke(ctx=ctx)
     print("")
 
     print("Ports")

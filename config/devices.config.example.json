@@ -1,0 +1,7 @@
+{
+    "device1": {
+        "hostname": "device1",
+        "ip": "192.1.1.100",
+        "ota_password": "password"
+    }
+}
