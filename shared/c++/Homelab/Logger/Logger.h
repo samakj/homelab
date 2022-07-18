@@ -1,14 +1,13 @@
 #ifndef _Homelab_Logger_h
 #define _Homelab_Logger_h
 
-#include <TelnetStream.h>
+#include <Arduino.h>
 #include <algorithm>
 #include <string>
 
 namespace Homelab::Time
 {
-    bool isConnected();
-    std::string formatTime(const char *format);
+    std::string getIsoTimestamp();
 }
 
 namespace Homelab::Logger
@@ -20,33 +19,38 @@ namespace Homelab::Logger
         WARN,
         ERROR
     };
-    extern Homelab::Logger::LogLevel level;
-    extern bool timestamp;
-    extern bool colour;
 
-    std::string levelName(Homelab::Logger::LogLevel _level);
-    const char *levelColour(Homelab::Logger::LogLevel _level);
-    std::string levelLogPrefix(Homelab::Logger::LogLevel _level);
-    void log(Homelab::Logger::LogLevel _level, const char *message, const char *start = "", const char *end = "\n");
-    void log(Homelab::Logger::LogLevel _level, std::string message, const char *start = "", const char *end = "\n");
+    extern LogLevel level;
+    extern bool showTimestamp;
+    extern bool formatWithColour;
+
+    void setLogLevel(LogLevel level);
+    void setShowTimestamp(bool showTimestamp);
+    void setFormatWithColour(bool formatWithColour);
+
+    std::string levelName(LogLevel level);
+    std::string levelColour(LogLevel level);
+    std::string levelLogPrefix(LogLevel level);
+
+    void log(LogLevel level, std::string message, std::string start = "", std::string end = "\n");
     template <typename... Args>
-    void logf(Homelab::Logger::LogLevel _level, const char *format, Args... args);
-    void debug(const char *message, const char *start = "", const char *end = "\n");
-    void debug(std::string message, const char *start = "", const char *end = "\n");
+    void logf(LogLevel level, std::string format, Args... args);
+
+    void debug(std::string message, std::string start = "", std::string end = "\n");
     template <typename... Args>
-    void debugf(const char *format, Args... args);
-    void info(const char *message, const char *start = "", const char *end = "\n");
-    void info(std::string message, const char *start = "", const char *end = "\n");
+    void debugf(std::string format, Args... args);
+
+    void info(std::string message, std::string start = "", std::string end = "\n");
     template <typename... Args>
-    void infof(const char *format, Args... args);
-    void warn(const char *message, const char *start = "", const char *end = "\n");
-    void warn(std::string message, const char *start = "", const char *end = "\n");
+    void infof(std::string format, Args... args);
+
+    void warn(std::string message, std::string start = "", std::string end = "\n");
     template <typename... Args>
-    void warnf(const char *format, Args... args);
-    void error(const char *message, const char *start = "", const char *end = "\n");
-    void error(std::string message, const char *start = "", const char *end = "\n");
+    void warnf(std::string format, Args... args);
+
+    void error(std::string message, std::string start = "", std::string end = "\n");
     template <typename... Args>
-    void errorf(const char *format, Args... args);
+    void errorf(std::string format, Args... args);
 };
 
 #include "Logger.tpp"

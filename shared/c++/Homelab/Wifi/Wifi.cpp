@@ -1,13 +1,13 @@
 #include "Wifi.h"
 
 std::string Homelab::Wifi::SSID_NULL_VALUE = nullptr;
-float Homelab::Wifi::STRENGTH_NULL_VALUE = 0.0f;
+Homelab::Wifi::strength_t Homelab::Wifi::STRENGTH_NULL_VALUE = 0.0f;
 std::string Homelab::Wifi::IP_NULL_VALUE = nullptr;
 std::string Homelab::Wifi::HOSTNAME_NULL_VALUE = nullptr;
 
-std::vector<Homelab::Wifi::Credentials *> Homelab::Wifi::netorks = {};
-Homelab::Wifi::Credentials *Homelab::Wifi::netork = nullptr;
-float Homelab::Wifi::strength = Homelab::Wifi::STRENGTH_NULL_VALUE;
+std::vector<Homelab::Wifi::Credentials *> Homelab::Wifi::networks = {};
+Homelab::Wifi::Credentials *Homelab::Wifi::network = nullptr;
+Homelab::Wifi::strength_t Homelab::Wifi::strength = Homelab::Wifi::STRENGTH_NULL_VALUE;
 std::string Homelab::Wifi::_hostname = Homelab::Wifi::IP_NULL_VALUE;
 std::string Homelab::Wifi::_ip = Homelab::Wifi::HOSTNAME_NULL_VALUE;
 
@@ -26,7 +26,7 @@ bool Homelab::Wifi::isConnecting()
 {
     return Homelab::Wifi::_isConnecting;
 }
-#
+
 bool Homelab::Wifi::isConnected()
 {
     return WiFi.status() == WL_CONNECTED;
@@ -65,15 +65,15 @@ std::string Homelab::Wifi::getIPAddress()
 
 std::string Homelab::Wifi::getHostname()
 {
-    return (std::string)(Homelab::Wifi::isConnected() ? WiFi.getHostname().c_str() : Homelab::Wifi::HOSTNAME_NULL_VALUE);
+    return (std::string)(Homelab::Wifi::isConnected() ? WiFi.getHostname() : Homelab::Wifi::HOSTNAME_NULL_VALUE);
 }
 
-std::string Homelab::Wifi::getSSID()
+Homelab::Wifi::ssid_t Homelab::Wifi::getSSID()
 {
-    return (std::string)(Homelab::Wifi::isConnected() ? WiFi.SSID().c_str() : Homelab::Wifi::SSID_NULL_VALUE);
+    return (Homelab::Wifi::ssid_t)(Homelab::Wifi::isConnected() ? WiFi.SSID().c_str() : Homelab::Wifi::SSID_NULL_VALUE);
 }
 
-float Homelab::Wifi::getStrength()
+Homelab::Wifi::strength_t Homelab::Wifi::getStrength()
 {
     return Homelab::Wifi::isConnected() ? (255 + WiFi.RSSI()) / 255.0f : Homelab::Wifi::STRENGTH_NULL_VALUE;
 }
@@ -94,13 +94,13 @@ Homelab::Wifi::Credentials *Homelab::Wifi::getStrongestNetwork(std::vector<Homel
     Homelab::Logger::debugf("%d networks found in range.\n", networkCount);
 
     Homelab::Wifi::Credentials *strongest = nullptr;
-    float strengthOfStrongest = 0;
+    Homelab::Wifi::strength_t strengthOfStrongest = 0;
 
     for (uint8_t i = 0; i < networkCount; i++)
         for (Homelab::Wifi::Credentials *_credential : networks)
             if (_credential->ssid == WiFi.SSID(i).c_str())
             {
-                float strength = (255 + WiFi.RSSI(i)) / 2.55;
+                Homelab::Wifi::strength_t strength = (255 + WiFi.RSSI(i)) / 2.55;
                 Homelab::Logger::debugf("    '%s' network found with strength %.1f%%.\n", _credential->ssid.c_str(), strength);
                 if (strength > strengthOfStrongest)
                 {
@@ -122,7 +122,7 @@ void Homelab::Wifi::addConnectCallback(Homelab::Wifi::ConnectCallback callback)
     Homelab::Wifi::connectCallbacks.push_back(callback);
 }
 
-void Homelab::Wifi::addSSIDChangeCallback(Homelab::Wifi::SsidChangeCallback callback)
+void Homelab::Wifi::addSSIDChangeCallback(Homelab::Wifi::SSIDChangeCallback callback)
 {
     Homelab::Wifi::ssidChangeCallbacks.push_back(callback);
 }
@@ -132,7 +132,7 @@ void Homelab::Wifi::addStrengthChangeCallback(Homelab::Wifi::StrengthChangeCallb
     Homelab::Wifi::strengthChangeCallbacks.push_back(callback);
 }
 
-void Homelab::Wifi::callConnectCallbacks(std::string ssid)
+void Homelab::Wifi::callConnectCallbacks(Homelab::Wifi::ssid_t ssid)
 {
     for (
         Homelab::Wifi::ConnectCallback callback :
@@ -140,7 +140,7 @@ void Homelab::Wifi::callConnectCallbacks(std::string ssid)
         callback(ssid);
 }
 
-void Homelab::Wifi::callSSIDChangeCallbacks(std::string ssid)
+void Homelab::Wifi::callSSIDChangeCallbacks(Homelab::Wifi::ssid_t ssid)
 {
     for (
         Homelab::Wifi::SSIDChangeCallback callback :
@@ -148,7 +148,7 @@ void Homelab::Wifi::callSSIDChangeCallbacks(std::string ssid)
         callback(ssid);
 }
 
-void Homelab::Wifi::callStrengthChangeCallbacks(float strength)
+void Homelab::Wifi::callStrengthChangeCallbacks(Homelab::Wifi::strength_t strength)
 {
     for (
         Homelab::Wifi::StrengthChangeCallback callback :
@@ -174,7 +174,7 @@ void Homelab::Wifi::setIPAddress(std::string ip)
 
     if (!Homelab::Wifi::isConnected())
     {
-        std::vector<std::string> ipSplit = Homelab::Utils::string::split(Homelab::Wifi::_ip, ":");
+        std::vector<std::string> ipSplit = Homelab::Utils::string::split(Homelab::Wifi::_ip, ':');
 
         if (ipSplit.size() != 4)
         {
@@ -182,14 +182,14 @@ void Homelab::Wifi::setIPAddress(std::string ip)
             return;
         }
 
-        IPAddress _ip(stoi(ipSplit)[0], stoi(ipSplit)[1], stoi(ipSplit)[2], stoi(ipSplit)[3]);
+        IPAddress localIp(stoi(ipSplit[0]), stoi(ipSplit[1]), stoi(ipSplit[2]), stoi(ipSplit[3]));
         IPAddress gateway(192, 168, 1, 1);
         IPAddress subnet(255, 255, 0, 0);
         IPAddress dns1(8, 8, 8, 8);
         IPAddress dns2(4, 4, 4, 4);
 
         Homelab::Logger::infof("Setting IP to: %s\n", Homelab::Wifi::_ip.c_str());
-        WiFi.config(local_ip, gateway, subnet, dns1, dns2);
+        WiFi.config(localIp, gateway, subnet, dns1, dns2);
     }
     else
         Homelab::Logger::warn("IP changes will only take effect on wifi re-connect.");
@@ -205,7 +205,7 @@ void Homelab::Wifi::setStrengthUpdatePeriod(uint16_t strengthUpdatePeriod)
     Homelab::Wifi::strengthUpdatePeriod = strengthUpdatePeriod;
 };
 
-Homelab::Wifi::rawMACAddressToString(byte *mac)
+std::string Homelab::Wifi::rawMACAddressToString(byte *mac)
 {
     char buffer[32];
     sprintf(
@@ -237,15 +237,15 @@ void Homelab::Wifi::connect(Homelab::Wifi::Credentials *network, std::string hos
 {
     Homelab::Wifi::strength = Homelab::Wifi::STRENGTH_NULL_VALUE;
     if (Homelab::Wifi::isConnected())
-        WiFi.disconnnect();
+        WiFi.disconnect();
 
     Homelab::Wifi::network = network;
-    std::string _hostname = hostname || Homelab::Wifi::_hostname;
-    std::string _ip = ip || Homelab::Wifi::_ip;
+    std::string _hostname = hostname == Homelab::Wifi::HOSTNAME_NULL_VALUE ? Homelab::Wifi::_hostname : hostname;
+    std::string _ip = ip == Homelab::Wifi::IP_NULL_VALUE ? Homelab::Wifi::_ip : ip;
 
-    if (_hostname != nullptr)
+    if (_hostname != Homelab::Wifi::HOSTNAME_NULL_VALUE)
         Homelab::Wifi::setHostname(_hostname);
-    if (_ip != nullptr)
+    if (_ip != Homelab::Wifi::IP_NULL_VALUE)
         Homelab::Wifi::setIPAddress(_ip);
 
     Homelab::Logger::infof("Connecting to: %s\n", Homelab::Wifi::network->ssid.c_str());
@@ -257,18 +257,18 @@ void Homelab::Wifi::connect(Homelab::Wifi::Credentials *network, std::string hos
         Homelab::Wifi::network->password.c_str());
 }
 
-void Homelab::Wifi::connect(std::vector<Homelab::Wifi::Credentials> *networks, std::string hostname, std::string ip)
+void Homelab::Wifi::connect(std::vector<Homelab::Wifi::Credentials*> networks, std::string hostname, std::string ip)
 {
-    std::vector<Homelab::Wifi::Credentials *> Homelab::Wifi::networks = credentials;
-    Homelab::Wifi::Credentials *strongest = Homelab::Wifi::getStrongestNetwork(credentials);
+    Homelab::Wifi::networks = networks;
+    Homelab::Wifi::Credentials *strongest = Homelab::Wifi::getStrongestNetwork(Homelab::Wifi::networks);
 
     if (strongest != nullptr)
-        Homelab::Wifi::connect(strongest, hostname, ipLocation, maxWait);
+        Homelab::Wifi::connect(strongest, hostname, ip);
 }
 
 void Homelab::Wifi::reconnect()
 {
-    if (Homelab::Wifi::networks)
+    if (Homelab::Wifi::networks.size())
         Homelab::Wifi::connect(Homelab::Wifi::networks);
     else
         Homelab::Wifi::connect(Homelab::Wifi::network);
@@ -281,18 +281,18 @@ void Homelab::Wifi::loop()
         if (Homelab::Wifi::isConnected())
         {
             Homelab::Wifi::_isConnecting = false;
-            std::string ssid = Homelab::Wifi::getSSID();
-            float strength = Homelab::Wifi::getStrength();
+            Homelab::Wifi::ssid_t ssid = Homelab::Wifi::getSSID();
+            Homelab::Wifi::strength_t strength = Homelab::Wifi::getStrength();
             std::string ip = Homelab::Wifi::getIPAddress();
             std::string mac = Homelab::Wifi::getMACAddress();
 
-            Homelab::Logger::infof("Connected to %s @ %.1f\n", ssid.c_str(), strength);
+            Homelab::Logger::infof("Connected to %s @ %.1f\n", Homelab::Wifi::network->ssid.c_str(), strength);
             Homelab::Logger::infof("IP:   %s\n", ip.c_str());
             Homelab::Logger::infof("MAC:  %s\n", mac.c_str());
 
             Homelab::Wifi::callConnectCallbacks(ssid);
             Homelab::Wifi::callSSIDChangeCallbacks(ssid);
-            Homelab::Wifi::callStrengthCallbacks(strength);
+            Homelab::Wifi::callStrengthChangeCallbacks(strength);
         }
         else if (Homelab::Time::millisSince(Homelab::Wifi::_connectionAttemptStart) > Homelab::Wifi::maxWait)
         {
@@ -303,8 +303,8 @@ void Homelab::Wifi::loop()
         }
         else if (Homelab::Time::millisSince(Homelab::Wifi::_lastConnectionMessage) > 10000)
         {
-            float dt = Homelab::Time::millisSince(Homelab::Wifi::_lastConnectionMessage) / 1000.0f;
-            Homelab::Logger::infof("Connecting to %s, %.1fs\n", ssid.c_str(), dt);
+            Homelab::Wifi::strength_t dt = Homelab::Time::millisSince(Homelab::Wifi::_lastConnectionMessage) / 1000.0f;
+            Homelab::Logger::infof("Connecting to %s, %.1fs\n", Homelab::Wifi::network->ssid.c_str(), dt);
             Homelab::Wifi::_lastConnectionMessage = millis();
         }
     }
@@ -313,14 +313,14 @@ void Homelab::Wifi::loop()
         if (network != nullptr)
             Homelab::Logger::warnf("Lost connection to %s, trying to reconnect\n", network->ssid.c_str());
         else
-            Homelab::Logger::warf("No connection found, trying to reconnect");
+            Homelab::Logger::warnf("No connection found, trying to reconnect");
         Homelab::Wifi::reconnect();
     }
     else
     {
         if (Homelab::Time::millisSince(Homelab::Wifi::_lastStrengthUpdate) > Homelab::Wifi::strengthUpdatePeriod)
         {
-            float strength = Homelab::Wifi::getStrength();
+            Homelab::Wifi::strength_t strength = Homelab::Wifi::getStrength();
             if (strength != Homelab::Wifi::strength)
             {
                 Homelab::Wifi::strength = strength;

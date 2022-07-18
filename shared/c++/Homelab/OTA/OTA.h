@@ -2,10 +2,9 @@
 #define _Homelab_OTA_h
 
 #include <ArduinoOTA.h>
-#include <TelnetStream.h>
 #include <string>
 
-#include "../Logger/Logger.h"
+#include <Logger/Logger.h>
 
 namespace Homelab::OTA
 {

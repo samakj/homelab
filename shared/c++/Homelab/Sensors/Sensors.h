@@ -1,8 +1,8 @@
 #ifndef _Homelab_Sensors_h
 #define _Homelab_Sensors_h
 
-#include "DHT/DHT.h"
-#include "Switch/Switch.h"
+#include <Sensors/DHT/DHT.h>
+#include <Sensors/Switch/Switch.h>
 
 namespace SamIoT::Sensors
 {

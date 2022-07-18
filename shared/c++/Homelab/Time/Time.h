@@ -2,15 +2,17 @@
 #ifndef _Homelab_Time_h
 #define _Homelab_Time_h
 
+#include <Arduino.h>
 #include <string>
 #include <functional>
 #include <time.h>
-#include "../Logger/Logger.h"
+
+#include <Logger/Logger.h>
 
 namespace Homelab::Wifi
 {
     bool isConnected();
-}
+};
 
 namespace Homelab::Time
 {

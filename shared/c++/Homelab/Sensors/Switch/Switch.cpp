@@ -1,7 +1,5 @@
 #include "Switch.h"
 
-Homelab::Sensors::Switch::PIN_NULL_VALUE = 0;
-
 Homelab::Sensors::Switch::Switch(
     uint8_t _pinNo,
     uint8_t _outPin,
@@ -10,7 +8,7 @@ Homelab::Sensors::Switch::Switch(
                           state(_defaultState){};
 
 void Homelab::Sensors::Switch::addSwitchCallback(
-    SwitchCallback callback)
+    Homelab::Sensors::Switch::SwitchCallback callback)
 {
     this->switchCallbacks.push_back(callback);
 };

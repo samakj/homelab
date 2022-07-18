@@ -3,6 +3,7 @@
 #ifndef _Homelab_Wifi_h
 #define _Homelab_Wifi_h
 
+#include <Arduino.h>
 #include <string>
 #include <vector>
 
@@ -12,30 +13,33 @@
 #include <WiFi.h>
 #endif
 
-#include "../Logger/Logger.h"
-#include "../Time/Time.h"
-#include "../Utils/Utils.h"
+#include <Logger/Logger.h>
+#include <Time/Time.h>
+#include <Utils/Utils.h>
 
 namespace Homelab::Wifi
 {
+    typedef std::string ssid_t;
+    typedef float strength_t;
+
     struct Credentials
     {
-        std::string ssid;
+        ssid_t ssid;
         std::string password;
     };
 
-    typedef std::function<void(std::string ssid)> ConnectCallback;
-    typedef std::function<void(std::string ssid)> SSIDChangeCallback;
-    typedef std::function<void(float strength)> StrengthChangeCallback;
+    typedef std::function<void(ssid_t ssid)> ConnectCallback;
+    typedef std::function<void(ssid_t ssid)> SSIDChangeCallback;
+    typedef std::function<void(strength_t strength)> StrengthChangeCallback;
 
-    extern std::string SSID_NULL_VALUE;
-    extern float STRENGTH_NULL_VALUE;
+    extern ssid_t SSID_NULL_VALUE;
+    extern strength_t STRENGTH_NULL_VALUE;
     extern std::string IP_NULL_VALUE;
     extern std::string HOSTNAME_NULL_VALUE;
 
     extern std::vector<Credentials *> networks;
     extern Credentials *network;
-    extern float strength;
+    extern strength_t strength;
     extern std::string _hostname;
     extern std::string _ip;
 
@@ -55,8 +59,8 @@ namespace Homelab::Wifi
     std::string getMACAddress();
     std::string getIPAddress();
     std::string getHostname();
-    std::string getSSID();
-    float getStrength();
+    ssid_t getSSID();
+    strength_t getStrength();
 
     Credentials *getStrongestNetwork(std::vector<Credentials *> networks);
 
@@ -66,7 +70,7 @@ namespace Homelab::Wifi
 
     void callConnectCallbacks(std::string ssid);
     void callSSIDChangeCallbacks(std::string ssid);
-    void callStrengthChangeCallbacks(float strength);
+    void callStrengthChangeCallbacks(strength_t strength);
 
     void setHostname(std::string hostname);
     void setIPAddress(std::string ip);

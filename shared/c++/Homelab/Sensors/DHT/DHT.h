@@ -1,64 +1,73 @@
 #ifndef _Homelab_Sensors_DHT_h
 #define _Homelab_Sensors_DHT_h
 
+#include <Arduino.h>
 #include <functional>
 #include <vector>
 
 #include <DHT.h>
-class _DHT : public DHT {}
+class _DHT : public DHT
+{
+    public:
+        _DHT(uint8_t pin, uint8_t type, uint8_t count = 6) : DHT(pin, type, count) {}
+};
 
-#include "../../Time/Time.h"
-#include "../../Logger/Logger.h"
+#include <Time/Time.h>
+#include <Logger/Logger.h>
 
-namespace Homelab::Sensors {
+namespace Homelab::Sensors
+{
     class DHT
     {
-        public:
-            typedef std::function<void(float temperature)> TemperatureCallback;
-            typedef std::function<void(float humidity)> HumidityCallback;
+    public:
+        typedef float temperature_t;
+        typedef float humidity_t;
 
-            extern float TEMPERATURE_NULL_VALUE;
-            extern float HUMIDITY_NULL_VALUE;
-            extern float PIN_NULL_VALUE;
+        typedef std::function<void(temperature_t temperature)> TemperatureCallback;
+        typedef std::function<void(humidity_t humidity)> HumidityCallback;
 
-            _DHT *client = nullptr;
-            uint8_t pinNo = PIN_NULL_VALUE;
-            uint8_t type = DHT22;
+        static constexpr temperature_t TEMPERATURE_NULL_VALUE = -1000.0f;
+        static constexpr humidity_t HUMIDITY_NULL_VALUE = -1000.0f;
+        static constexpr float PIN_NULL_VALUE = 0;
 
-            float temperature = TEMPERATURE_NULL_VALUE;
-            float humidity = HUMIDITY_NULL_VALUE;
+        _DHT *client = nullptr;
+        uint8_t pinNo = PIN_NULL_VALUE;
+        uint8_t type = DHT22;
 
-            std::vector<TemperatureCallback> temperatureCallbacks = {};
-            std::vector<HumidityCallback> humidityCallbacks = {};
+        temperature_t temperature = TEMPERATURE_NULL_VALUE;
+        humidity_t humidity = HUMIDITY_NULL_VALUE;
 
-            float temperatureTolerance = 0.15;
-            float humidityTolerance = 0.25;
+        std::vector<TemperatureCallback> temperatureCallbacks = {};
+        std::vector<HumidityCallback> humidityCallbacks = {};
 
-            uint16_t readPeriod = 2000;
-            unsigned long lastTemperatureRead = 0;
-            unsigned long lastHumidityRead = 0;
-            uint32_t temperatureReadCount = 0;
-            uint32_t humidityReadCount = 0;
+        temperature_t temperatureTolerance = 0.15;
+        humidity_t humidityTolerance = 0.25;
 
-        private:
-            bool nanTemperatureReported = false;
-            bool nanHumidityReported = false;
-        
-        public:
-            DHT(uint8_t pinNo, uint8_t type = DHT22);
+        uint16_t readPeriod = 2000;
+        unsigned long lastTemperatureRead = 0;
+        unsigned long lastHumidityRead = 0;
+        uint32_t temperatureReadCount = 0;
+        uint32_t humidityReadCount = 0;
 
-            float getTemperature();
-            float getHumidity();
+    private:
+        bool m_nanTemperatureReported = false;
+        bool m_nanHumidityReported = false;
 
-            void setReadPeriod(uint16_t period);
-            void setTemperatureTolerance(float tolerance);
-            void setHumidityTolerance(float tolerance);
+    public:
+        DHT(uint8_t pinNo, uint8_t type = DHT22);
 
-            void addTemperatureCallback(TemperatureCallback callback);
-            void addHumidityCallback(HumidityCallback callback);
+        temperature_t getTemperature();
+        humidity_t getHumidity();
 
-            void setup();
-            void loop();
+        void setReadPeriod(uint16_t period);
+        void setTemperatureTolerance(temperature_t tolerance);
+        void setHumidityTolerance(humidity_t tolerance);
+
+        void addTemperatureCallback(TemperatureCallback callback);
+        void addHumidityCallback(HumidityCallback callback);
+
+        void setup();
+        void loop();
     };
 };
 

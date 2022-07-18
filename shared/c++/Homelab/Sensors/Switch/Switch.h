@@ -1,11 +1,12 @@
 #ifndef Async_Switch_h
 #define Async_Switch_h
 
+#include <Arduino.h>
 #include <functional>
 #include <vector>
 
-#include "../../Logger/Logger.h"
-#include "../../Time/Time.h"
+#include <Logger/Logger.h>
+#include <Time/Time.h>
 
 namespace Homelab::Sensors
 {
@@ -14,7 +15,7 @@ namespace Homelab::Sensors
     public:
         typedef std::function<void(bool state)> SwitchCallback;
 
-        extern uint8_t PIN_NULL_VALUE;
+        static const uint8_t PIN_NULL_VALUE = 0;
 
         uint8_t pinNo = -1;
         uint8_t outPin = -1;

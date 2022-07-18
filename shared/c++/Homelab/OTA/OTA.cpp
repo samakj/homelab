@@ -42,8 +42,6 @@ void Homelab::OTA::setup(std::string hostname, std::string password)
 
     ArduinoOTA.begin();
     Homelab::Logger::info("OTA initialised");
-    TelnetStream.begin();
-    Homelab::Logger::info("Telnet initialised");
 };
 
 void Homelab::OTA::loop()
