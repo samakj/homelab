@@ -95,6 +95,10 @@ void Homelab::Logger::log(Homelab::Logger::LogLevel _level, std::string message,
             end.c_str(),
             "\033[00m");
     }
+
+    #ifdef _Homelab_Server_h
+    Homelab::Server::sendLog(_level, message);
+    #endif
 };
 
 void Homelab::Logger::debug(std::string message, std::string start, std::string end)

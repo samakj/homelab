@@ -2,13 +2,9 @@
 #define _Homelab_Logger_h
 
 #include <Arduino.h>
+#include <ESPAsyncWebServer.h>
 #include <algorithm>
 #include <string>
-
-namespace Homelab::Time
-{
-    std::string getIsoTimestamp();
-}
 
 namespace Homelab::Logger
 {
@@ -19,7 +15,24 @@ namespace Homelab::Logger
         WARN,
         ERROR
     };
+}
 
+namespace Homelab::Time
+{
+    std::string getIsoTimestamp();
+}
+
+namespace Homelab::Server
+{
+    void sendLog(
+        Homelab::Logger::LogLevel level,
+        std::string message,
+        AsyncWebSocketClient *client
+    );
+}
+
+namespace Homelab::Logger
+{
     extern LogLevel level;
     extern bool showTimestamp;
     extern bool formatWithColour;
