@@ -281,6 +281,7 @@ void Homelab::Server::loop()
         {
             auto it = Homelab::Server::queuedReports.begin();
             Homelab::Server::QueuedMessage* queuedMessage = *it;
+            Homelab::Logger::debugf("Sending queued message: %s", queuedMessage->message.c_str());
             Homelab::Server::sendReport(queuedMessage->message, queuedMessage->client);
             Homelab::Server::queuedReports.erase(it);
             delete queuedMessage;

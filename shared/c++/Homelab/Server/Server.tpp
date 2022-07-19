@@ -17,6 +17,7 @@ void Homelab::Server::sendReport(T value, std::string metric, std::vector<std::s
 
     state[stateKey] = serialisedData;
 
+    Homelab::Logger::debugf("Queueing message %s", serialisedData.c_str());
     QueuedMessage *queuedMessage = new QueuedMessage;
     queuedMessage->client = client;
     queuedMessage->message = serialisedData;

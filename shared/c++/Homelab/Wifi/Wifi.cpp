@@ -248,7 +248,7 @@ void Homelab::Wifi::connect(Homelab::Wifi::Credentials *network, std::string hos
     if (_ip != Homelab::Wifi::IP_NULL_VALUE)
         Homelab::Wifi::setIPAddress(_ip);
 
-    Homelab::Logger::infof("Connecting to: %s\n", Homelab::Wifi::network->ssid.c_str());
+    Homelab::Logger::infof("Wifi connecting to: %s\n", Homelab::Wifi::network->ssid.c_str());
     Homelab::Wifi::_isConnecting = true;
     Homelab::Wifi::_connectionAttemptStart = millis();
     Homelab::Wifi::_lastConnectionMessage = millis();

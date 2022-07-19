@@ -60,7 +60,10 @@ void Homelab::Time::NTP::connect(bool force)
         Homelab::Logger::warn("No internet connection, skiping NTP.");
     else if (force || (!Homelab::Time::NTP::isConnecting() && !Homelab::Time::NTP::isConnected()))
     {
+        Homelab::Logger::debugf("Connecting NTP to %s", Homelab::Time::NTP::server.c_str());
         Homelab::Time::NTP::_isConnecting = true;
+        // Re-sync every 10 minutes.
+        sntp_set_sync_interval(1000 * 60 * 10);
         configTime(0, 0, Homelab::Time::NTP::server.c_str());
     }
 };

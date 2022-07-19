@@ -16,15 +16,16 @@ Homelab::Sensors::DHT::temperature_t Homelab::Sensors::DHT::getTemperature()
         {
             if (abs(this->temperature - _temperature) > this->temperatureTolerance)
             {
+                Homelab::Logger::debugf("DHT temperature changed from %.1fc to %.1c", this->temperature, _temperature);
                 this->temperature = _temperature;
                 for (Homelab::Sensors::DHT::TemperatureCallback callback : this->temperatureCallbacks)
                     callback(this->temperature);
             }
-            else
-            {
-                Homelab::Logger::debug("null value recieved for temperature.");
-                this->m_nanTemperatureReported = true;
-            }
+        }
+        else
+        {
+            Homelab::Logger::debug("null value recieved for temperature.");
+            this->m_nanTemperatureReported = true;
         }
     }
 
@@ -43,15 +44,16 @@ Homelab::Sensors::DHT::humidity_t Homelab::Sensors::DHT::getHumidity()
         {
             if (abs(this->humidity - _humidity) > this->humidityTolerance)
             {
+                Homelab::Logger::debugf("DHT humidity changed from %.1f%% to %.1f%%", this->humidity, _humidity);
                 this->humidity = _humidity;
                 for (Homelab::Sensors::DHT::HumidityCallback callback : this->humidityCallbacks)
                     callback(this->humidity);
             }
-            else
-            {
-                Homelab::Logger::debug("null value recieved for humidity.");
-                this->m_nanHumidityReported = true;
-            }
+        }
+        else
+        {
+            Homelab::Logger::debug("null value recieved for humidity.");
+            this->m_nanHumidityReported = true;
         }
     }
 
