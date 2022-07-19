@@ -1,5 +1,3 @@
-
-
 #ifndef _Homelab_Wifi_h
 #define _Homelab_Wifi_h
 
@@ -26,6 +24,7 @@ namespace Homelab::Wifi
     {
         ssid_t ssid;
         std::string password;
+        Credentials(ssid_t _ssid, std::string _password): ssid(_ssid), password(_password) {};
     };
 
     typedef std::function<void(ssid_t ssid)> ConnectCallback;

@@ -1,5 +1,5 @@
-#ifndef Homelab_h
-#define Homelab_h
+#ifndef _Homelab_h
+#define _Homelab_h
 
 #include <Arduino.h>
 

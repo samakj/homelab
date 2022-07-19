@@ -1,5 +1,5 @@
-#ifndef Async_Switch_h
-#define Async_Switch_h
+#ifndef _Homelab_Sensors_Switch_h
+#define _Homelab_Sensors_Switch_h
 
 #include <Arduino.h>
 #include <functional>
