@@ -53,17 +53,17 @@ namespace Homelab::Server
 
     void rootResponse(AsyncWebServerRequest *request);
 
+    std::string getStateKey(std::string metric, std::vector<std::string> tags = {});
+    void addMetaInformation(DynamicJsonDocument* data);
+
     void sendLog(std::string message, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
     void sendLog(
         Homelab::Logger::LogLevel level,
         std::string message,
         AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
     void sendReport(std::string message, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
-    void sendReport(
-        JsonVariant message,
-        std::string metric,
-        JsonArray tags = {},
-        AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    template <typename T>
+    void sendReport(T value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
     void sendPing();
     void sendState(AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
 
@@ -94,5 +94,7 @@ namespace Homelab::Server
     void setup();
     void loop();
 };
+
+#include "Server.tpp"
 
 #endif

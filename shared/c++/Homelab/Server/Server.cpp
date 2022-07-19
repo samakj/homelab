@@ -43,6 +43,25 @@ void Homelab::Server::rootResponse(AsyncWebServerRequest *request)
     request->send(response);
 }
 
+std::string Homelab::Server::getStateKey(std::string metric, std::vector<std::string> tags)
+{
+    std::string stateKey = "";
+    stateKey += metric;
+    stateKey += Homelab::Server::STATE_KEY_SEPERATOR;
+    
+    for (std::string tag : tags)
+        stateKey += tag;
+        stateKey += Homelab::Server::STATE_TAGS_SEPERATOR;
+
+    return stateKey;
+}
+
+void Homelab::Server::addMetaInformation(DynamicJsonDocument* data)
+{
+    data->operator[]("timestamp") = Homelab::Time::getIsoTimestamp();
+    data->operator[]("mac") = Homelab::Wifi::getMACAddress();
+}
+
 void Homelab::Server::sendLog(std::string message, AsyncWebSocketClient *client)
 {
     if (client != Homelab::Server::WEBSOCKET_CLIENT_NULL_VALUE)
@@ -60,7 +79,7 @@ void Homelab::Server::sendLog(std::string message, AsyncWebSocketClient *client)
 void Homelab::Server::sendLog(Homelab::Logger::LogLevel level, std::string message, AsyncWebSocketClient *client)
 {
     DynamicJsonDocument data(256);
-    data["timestamp"] = Homelab::Time::getIsoTimestamp();
+    Homelab::Server::addMetaInformation(&data);
     data["level"] = Homelab::Logger::levelName(level);
     data["message"] = message;
 
@@ -86,38 +105,10 @@ void Homelab::Server::sendReport(std::string message, AsyncWebSocketClient *clie
     }
 };
 
-void Homelab::Server::sendReport(JsonVariant message, std::string metric, JsonArray tags, AsyncWebSocketClient *client)
-{
-    DynamicJsonDocument data(512);
-    data["timestamp"] = Homelab::Time::getIsoTimestamp();
-    data["mac"] = Homelab::Wifi::getMACAddress();
-    data["metric"] = metric;
-    data["message"] = message;
-    data["tags"] = tags;
-
-    std::string stateKey = "";
-    stateKey += metric;
-    stateKey += Homelab::Server::STATE_KEY_SEPERATOR;
-    std::string serialisedTags = "";
-    serializeJson(tags, serialisedTags);
-    stateKey += serialisedTags;
-
-    std::string serialisedData = "";
-    serializeJson(data, serialisedData);
-
-    state[stateKey] = serialisedData;
-
-    QueuedMessage *queuedMessage = new QueuedMessage;
-    queuedMessage->client = client;
-    queuedMessage->message = serialisedData;
-    Homelab::Server::queuedReports.push_back(queuedMessage);
-};
-
 void Homelab::Server::sendPing()
 {
     DynamicJsonDocument data(256);
-    data["timestamp"] = Homelab::Time::getIsoTimestamp();
-    data["mac"] = Homelab::Wifi::getMACAddress();
+    Homelab::Server::addMetaInformation(&data);
     data["metric"] = "ping";
     data["message"] = "pong";
     data["tags"] = JsonArray();
@@ -152,7 +143,7 @@ void Homelab::Server::addHttpEndpoint(
     Homelab::Server::httpClient.on(uri, method, onRequest, onUpload, onBody);
 };
 
-void logsSocketEventHandler(
+void Homelab::Server::logsSocketEventHandler(
     AsyncWebSocket *server,
     AsyncWebSocketClient *client,
     AwsEventType type,
@@ -196,7 +187,7 @@ void logsSocketEventHandler(
     }
 };
 
-void reportsSocketEventHandler(
+void Homelab::Server::reportsSocketEventHandler(
     AsyncWebSocket *server,
     AsyncWebSocketClient *client,
     AwsEventType type,
@@ -265,7 +256,7 @@ void Homelab::Server::setup()
     }
 };
 
-void loop()
+void Homelab::Server::loop()
 {
     if (!Homelab::Server::isSetup)
         Homelab::Server::setup();
