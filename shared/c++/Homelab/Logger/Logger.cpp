@@ -86,14 +86,13 @@ void Homelab::Logger::log(Homelab::Logger::LogLevel _level, std::string message,
     if (_level >= Homelab::Logger::level)
     {
         Serial.printf(
-            "%s%s%s %s %s%s%s",
+            "%s%s%s %s %s\033[0m%s",
             colour.c_str(),
             start.c_str(),
             timestamp.c_str(),
             levelLogPrefix(level).c_str(),
             message.c_str(),
-            end.c_str(),
-            "\033[00m");
+            end.c_str());
     }
 
     #ifdef _Homelab_Server_h

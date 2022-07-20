@@ -6,6 +6,11 @@
 #include <algorithm>
 #include <string>
 
+namespace Homelab::Time
+{
+    std::string getIsoTimestamp();
+}
+
 namespace Homelab::Logger
 {
     enum LogLevel
@@ -15,24 +20,7 @@ namespace Homelab::Logger
         WARN,
         ERROR
     };
-}
 
-namespace Homelab::Time
-{
-    std::string getIsoTimestamp();
-}
-
-namespace Homelab::Server
-{
-    void sendLog(
-        Homelab::Logger::LogLevel level,
-        std::string message,
-        AsyncWebSocketClient *client
-    );
-}
-
-namespace Homelab::Logger
-{
     extern LogLevel level;
     extern bool showTimestamp;
     extern bool formatWithColour;
@@ -65,6 +53,15 @@ namespace Homelab::Logger
     template <typename... Args>
     void errorf(std::string format, Args... args);
 };
+
+namespace Homelab::Server
+{
+    void sendLog(
+        Homelab::Logger::LogLevel level,
+        std::string message,
+        AsyncWebSocketClient *client
+    );
+}
 
 #include "Logger.tpp"
 

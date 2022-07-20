@@ -105,6 +105,131 @@ void Homelab::Server::sendReport(std::string message, AsyncWebSocketClient *clie
     }
 };
 
+void Homelab::Server::sendReport(std::nullptr_t value, std::string metric, std::vector<std::string> tags, AsyncWebSocketClient *client)
+{
+    DynamicJsonDocument data(512);
+    Homelab::Server::addMetaInformation(&data);
+    data["metric"] = metric;
+    data["message"] = value;
+
+    auto tagsArray = data.createNestedArray("tags");
+    for (std::string tag : tags)
+        tagsArray.add(tag);
+
+    std::string stateKey = Homelab::Server::getStateKey(metric, tags);
+
+    std::string serialisedData = "";
+    serializeJson(data, serialisedData);
+
+    state[stateKey] = serialisedData;
+
+    Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+    QueuedMessage *queuedMessage = new QueuedMessage;
+    queuedMessage->client = client;
+    queuedMessage->message = serialisedData;
+    Homelab::Server::queuedReports.push_back(queuedMessage);
+};
+
+void Homelab::Server::sendReport(std::string value, std::string metric, std::vector<std::string> tags, AsyncWebSocketClient *client)
+{
+    DynamicJsonDocument data(512);
+    Homelab::Server::addMetaInformation(&data);
+    data["metric"] = metric;
+    data["message"] = value;
+
+    auto tagsArray = data.createNestedArray("tags");
+    for (std::string tag : tags)
+        tagsArray.add(tag);
+
+    std::string stateKey = Homelab::Server::getStateKey(metric, tags);
+
+    std::string serialisedData = "";
+    serializeJson(data, serialisedData);
+
+    state[stateKey] = serialisedData;
+
+    Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+    QueuedMessage *queuedMessage = new QueuedMessage;
+    queuedMessage->client = client;
+    queuedMessage->message = serialisedData;
+    Homelab::Server::queuedReports.push_back(queuedMessage);
+};
+
+void Homelab::Server::sendReport(float value, std::string metric, std::vector<std::string> tags, AsyncWebSocketClient *client)
+{
+    DynamicJsonDocument data(512);
+    Homelab::Server::addMetaInformation(&data);
+    data["metric"] = metric;
+    data["message"] = value;
+
+    auto tagsArray = data.createNestedArray("tags");
+    for (std::string tag : tags)
+        tagsArray.add(tag);
+
+    std::string stateKey = Homelab::Server::getStateKey(metric, tags);
+
+    std::string serialisedData = "";
+    serializeJson(data, serialisedData);
+
+    state[stateKey] = serialisedData;
+
+    Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+    QueuedMessage *queuedMessage = new QueuedMessage;
+    queuedMessage->client = client;
+    queuedMessage->message = serialisedData;
+    Homelab::Server::queuedReports.push_back(queuedMessage);
+};
+
+void Homelab::Server::sendReport(int value, std::string metric, std::vector<std::string> tags, AsyncWebSocketClient *client)
+{
+    DynamicJsonDocument data(512);
+    Homelab::Server::addMetaInformation(&data);
+    data["metric"] = metric;
+    data["message"] = value;
+
+    auto tagsArray = data.createNestedArray("tags");
+    for (std::string tag : tags)
+        tagsArray.add(tag);
+
+    std::string stateKey = Homelab::Server::getStateKey(metric, tags);
+
+    std::string serialisedData = "";
+    serializeJson(data, serialisedData);
+
+    state[stateKey] = serialisedData;
+
+    Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+    QueuedMessage *queuedMessage = new QueuedMessage;
+    queuedMessage->client = client;
+    queuedMessage->message = serialisedData;
+    Homelab::Server::queuedReports.push_back(queuedMessage);
+};
+
+void Homelab::Server::sendReport(bool value, std::string metric, std::vector<std::string> tags, AsyncWebSocketClient *client)
+{
+    DynamicJsonDocument data(512);
+    Homelab::Server::addMetaInformation(&data);
+    data["metric"] = metric;
+    data["message"] = value;
+
+    auto tagsArray = data.createNestedArray("tags");
+    for (std::string tag : tags)
+        tagsArray.add(tag);
+
+    std::string stateKey = Homelab::Server::getStateKey(metric, tags);
+
+    std::string serialisedData = "";
+    serializeJson(data, serialisedData);
+
+    state[stateKey] = serialisedData;
+
+    Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+    QueuedMessage *queuedMessage = new QueuedMessage;
+    queuedMessage->client = client;
+    queuedMessage->message = serialisedData;
+    Homelab::Server::queuedReports.push_back(queuedMessage);
+};
+
 void Homelab::Server::sendPing()
 {
     DynamicJsonDocument data(256);
@@ -115,10 +240,7 @@ void Homelab::Server::sendPing()
 
     std::string serialisedData = "";
     serializeJson(data, serialisedData);
-    QueuedMessage *queuedMessage = new QueuedMessage;
-    queuedMessage->client = nullptr;
-    queuedMessage->message = serialisedData;
-    Homelab::Server::queuedReports.push_back(queuedMessage);
+    Homelab::Server::sendReport(serialisedData);
 }
 
 void Homelab::Server::sendState(AsyncWebSocketClient *client)
@@ -151,7 +273,7 @@ void Homelab::Server::logsSocketEventHandler(
     uint8_t *data,
     size_t len)
 {
-    AwsFrameInfo *info = (AwsFrameInfo *)arg;
+    AwsFrameInfo *info = reinterpret_cast<AwsFrameInfo *>(arg);
     std::string ip = "TO-DO";
 
     switch (type)
@@ -239,7 +361,8 @@ void Homelab::Server::setup()
         Homelab::Logger::info("Starting SPIFFS.");
         Homelab::Server::isSPIFFSSetup = SPIFFS.begin();
     }
-    if (Homelab::Server::isSPIFFSSetup && Homelab::Wifi::isConnected()) {
+    if (Homelab::Server::isSPIFFSSetup && !Homelab::Server::isSetup && Homelab::Wifi::isConnected()) 
+    {
         Homelab::Logger::info("Starting http & websocket server.");
         Homelab::Server::reportsSocketClient.onEvent(Homelab::Server::reportsSocketEventHandler);
         Homelab::Server::logsSocketClient.onEvent(Homelab::Server::logsSocketEventHandler);
@@ -253,6 +376,7 @@ void Homelab::Server::setup()
         Homelab::Server::httpClient.onNotFound(Homelab::Server::NOT_FOUND);
         Homelab::Server::httpClient.begin();
         Homelab::Logger::info("http & websocket server started.");
+        Homelab::Server::isSetup = true;
     }
 };
 
@@ -281,7 +405,7 @@ void Homelab::Server::loop()
         {
             auto it = Homelab::Server::queuedReports.begin();
             Homelab::Server::QueuedMessage* queuedMessage = *it;
-            Homelab::Logger::debugf("Sending queued message: %s", queuedMessage->message.c_str());
+            Homelab::Logger::debugf("Sending queued message: %s\n", queuedMessage->message.c_str());
             Homelab::Server::sendReport(queuedMessage->message, queuedMessage->client);
             Homelab::Server::queuedReports.erase(it);
             delete queuedMessage;

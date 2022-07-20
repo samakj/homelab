@@ -20,6 +20,7 @@
 #include <Logger/Logger.h>
 #include <Wifi/Wifi.h>
 #include <Time/Time.h>
+#include <Utils/Utils.h>
 
 namespace Homelab::Server
 {
@@ -62,8 +63,11 @@ namespace Homelab::Server
         std::string message,
         AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
     void sendReport(std::string message, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
-    template <typename T>
-    void sendReport(T value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    void sendReport(std::nullptr_t value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    void sendReport(std::string value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    void sendReport(float value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    void sendReport(int value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
+    void sendReport(bool value, std::string metric, std::vector<std::string> tags = {}, AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
     void sendPing();
     void sendState(AsyncWebSocketClient *client = WEBSOCKET_CLIENT_NULL_VALUE);
 
@@ -94,7 +98,5 @@ namespace Homelab::Server
     void setup();
     void loop();
 };
-
-#include "Server.tpp"
 
 #endif

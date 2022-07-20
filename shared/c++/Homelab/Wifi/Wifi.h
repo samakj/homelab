@@ -17,28 +17,25 @@
 
 namespace Homelab::Wifi
 {
-    typedef std::string ssid_t;
-    typedef float strength_t;
-
     struct Credentials
     {
-        ssid_t ssid;
+        std::string ssid;
         std::string password;
-        Credentials(ssid_t _ssid, std::string _password): ssid(_ssid), password(_password) {};
+        Credentials(std::string _ssid, std::string _password): ssid(_ssid), password(_password) {};
     };
 
-    typedef std::function<void(ssid_t ssid)> ConnectCallback;
-    typedef std::function<void(ssid_t ssid)> SSIDChangeCallback;
-    typedef std::function<void(strength_t strength)> StrengthChangeCallback;
+    typedef std::function<void(std::string ssid)> ConnectCallback;
+    typedef std::function<void(std::string ssid)> SSIDChangeCallback;
+    typedef std::function<void(float strength)> StrengthChangeCallback;
 
-    extern ssid_t SSID_NULL_VALUE;
-    extern strength_t STRENGTH_NULL_VALUE;
+    extern std::string SSID_NULL_VALUE;
+    extern float STRENGTH_NULL_VALUE;
     extern std::string IP_NULL_VALUE;
     extern std::string HOSTNAME_NULL_VALUE;
 
     extern std::vector<Credentials *> networks;
     extern Credentials *network;
-    extern strength_t strength;
+    extern float strength;
     extern std::string _hostname;
     extern std::string _ip;
 
@@ -58,8 +55,8 @@ namespace Homelab::Wifi
     std::string getMACAddress();
     std::string getIPAddress();
     std::string getHostname();
-    ssid_t getSSID();
-    strength_t getStrength();
+    std::string getSSID();
+    float getStrength();
 
     Credentials *getStrongestNetwork(std::vector<Credentials *> networks);
 
@@ -69,7 +66,7 @@ namespace Homelab::Wifi
 
     void callConnectCallbacks(std::string ssid);
     void callSSIDChangeCallbacks(std::string ssid);
-    void callStrengthChangeCallbacks(strength_t strength);
+    void callStrengthChangeCallbacks(float strength);
 
     void setHostname(std::string hostname);
     void setIPAddress(std::string ip);
