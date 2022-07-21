@@ -26,6 +26,7 @@ wifi_config_path = config_folder / "wifi.config.json"
 #  Devcies
 devices_folder = root_folder / "devices"
 sandbox_folder = devices_folder / "sandbox"
+device_ui_folder = devices_folder / "ui"
 
 #  DX
 dx_folder = root_folder / "dx"

@@ -1,7 +1,7 @@
 import click
 import os
 
-from variables import sandbox_folder, shared_cpp_folder
+from variables import sandbox_folder, shared_cpp_folder, device_ui_folder
 from configs import apply_config_variables
 from clang_format import CLANG_FORMAT_STYLE
 
@@ -32,3 +32,9 @@ def format() -> None:
     os.system(
         f"find {sandbox_folder}/src -type f -name '*.cpp' -or -name '*.h' -or -name '*.tpp' | xargs clang-format -i -style='{CLANG_FORMAT_STYLE}'"
     )
+
+
+@sandbox.command()
+def build_ui() -> None:
+    os.chdir(device_ui_folder)
+    os.system(f"npm run build:prod -- --output-path {sandbox_folder}/data")

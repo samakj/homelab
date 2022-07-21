@@ -13,6 +13,10 @@ shared/python/include
 shared/python/lib
 shared/python/lib64
 
+# Frontend build/package folders
+node_modules
+build
+
 # Byte-compiled / optimized / DLL files
 .idea/
 __pycache__/
