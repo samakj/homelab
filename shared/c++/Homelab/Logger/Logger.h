@@ -31,7 +31,7 @@ namespace Homelab::Logger
   void setFormatWithColour(bool formatWithColour);
 
   std::string levelName(LogLevel level);
-  std::string levelColour(LogLevel level);
+  const char* levelColour(LogLevel level);
   std::string levelLogPrefix(LogLevel level);
 
   void log(LogLevel level, std::string message, std::string start = "", std::string end = "\n");
@@ -57,7 +57,7 @@ namespace Homelab::Logger
 
 namespace Homelab::Server
 {
-  void sendLog(Homelab::Logger::LogLevel level, std::string message, AsyncWebSocketClient *client);
+  void sendLog(Homelab::Logger::LogLevel level, std::string message, AsyncWebSocketClient * client);
 }
 
 #include "Logger.tpp"

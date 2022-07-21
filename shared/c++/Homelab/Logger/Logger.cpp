@@ -29,7 +29,7 @@ std::string Homelab::Logger::levelName(Homelab::Logger::LogLevel level)
   }
 };
 
-std::string Homelab::Logger::levelColour(Homelab::Logger::LogLevel level)
+const char* Homelab::Logger::levelColour(Homelab::Logger::LogLevel level)
 {
   switch(level)
   {
@@ -71,13 +71,13 @@ void Homelab::Logger::log(
 #else
   std::string timestamp = "";
 #endif
-  std::string colour = Homelab::Logger::formatWithColour ? Homelab::Logger::levelColour(level) : "";
 
   if(_level >= Homelab::Logger::level)
   {
     Serial.printf(
-        "%s%s%s %s %s\033[0m%s", colour.c_str(), start.c_str(), timestamp.c_str(),
-        levelLogPrefix(level).c_str(), message.c_str(), end.c_str()
+        "%s%s%s %s %s%s%s",
+        "", start.c_str(),
+        timestamp.c_str(), levelLogPrefix(level).c_str(), message.c_str(), end.c_str(), "\033[00m"
     );
   }
 
