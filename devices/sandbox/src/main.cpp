@@ -28,16 +28,10 @@ void setup()
   Homelab::Logger::info("---- Setup complete ----");
 }
 
-unsigned long lastHeartbeat = 0;
-
 void loop()
 {
-  if(Homelab::Time::millisSince(lastHeartbeat) > 15000)
-  {
-    Homelab::Logger::info("Heartbeat");
-    lastHeartbeat = millis();
-  }
-  // Homelab::Wifi::loop();
+  Homelab::Wifi::loop();
+  Homelab::Time::NTP::loop();
   Homelab::Server::loop();
   Homelab::OTA::loop();
   DHTSensor.loop();

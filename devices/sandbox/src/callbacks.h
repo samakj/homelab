@@ -7,12 +7,7 @@
 #include "globals.h"
 #include "tags.h"
 
-void onWifiConnect(std::string ssid)
-{
-  Homelab::OTA::setup(HOSTNAME, OTA_PASSWORD);
-  Homelab::Time::NTP::connect();
-  Homelab::Server::setup();
-};
+void onWifiConnect(std::string ssid) { Homelab::OTA::setup(HOSTNAME, OTA_PASSWORD); };
 
 void onWifiSSIDChange(std::string ssid)
 {
