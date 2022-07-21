@@ -14,7 +14,7 @@ module.exports = {
   mode: 'production',
   output: {
     path: path.resolve(__dirname + '/build'),
-    filename: '[name].js',
+    filename: 'index.js',
     publicPath: '',
   },
   resolve: {
@@ -50,8 +50,8 @@ module.exports = {
     new WebpackManifestPlugin(),
     new DefinePlugin({
       'process.env': JSON.stringify({
-        HOSTNAME: process.env.HOSTNAME,
-        IP_ADDRESS: process.env.IP_ADDRESS,
+        HOSTNAME: 'dev',
+        IP_ADDRESS: 'localhost',
       }),
     }),
   ],
