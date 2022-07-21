@@ -17,8 +17,8 @@ body {
 `;
 
 export const PageGrid = styled.div`
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   display: grid;
   grid-template-areas: 'header' 'state' 'logs';
   grid-template-rows: auto auto 1fr;
