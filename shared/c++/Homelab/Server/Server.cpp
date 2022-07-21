@@ -92,10 +92,11 @@ void Homelab::Server::sendLog(
 
   std::string serialisedData = "";
   serializeJson(data, serialisedData);
-  QueuedMessage *queuedMessage = new QueuedMessage;
-  queuedMessage->client = client;
-  queuedMessage->message = serialisedData;
-  Homelab::Server::queuedLogs.push_back(queuedMessage);
+  Homelab::Server::sendLog(serialisedData, client);
+  // QueuedMessage *queuedMessage = new QueuedMessage;
+  // queuedMessage->client = client;
+  // queuedMessage->message = serialisedData;
+  // Homelab::Server::queuedLogs.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(std::string message, AsyncWebSocketClient *client)
@@ -131,11 +132,12 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  QueuedMessage *queuedMessage = new QueuedMessage;
-  queuedMessage->client = client;
-  queuedMessage->message = serialisedData;
-  Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Server::sendReport(serialisedData, client);
+  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  // QueuedMessage *queuedMessage = new QueuedMessage;
+  // queuedMessage->client = client;
+  // queuedMessage->message = serialisedData;
+  // Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(
