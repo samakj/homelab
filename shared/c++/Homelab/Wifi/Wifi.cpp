@@ -45,20 +45,20 @@ std::string Homelab::Wifi::getIPAddress()
 
 std::string Homelab::Wifi::getHostname()
 {
-  return (std::string
-  )(Homelab::Wifi::isConnected() ? WiFi.getHostname() : Homelab::Wifi::HOSTNAME_NULL_VALUE);
+  if(!Homelab::Wifi::isConnected()) return Homelab::Wifi::HOSTNAME_NULL_VALUE;
+  return (std::string)WiFi.getHostname();
 }
 
 std::string Homelab::Wifi::getSSID()
 {
-  return (std::string
-  )(Homelab::Wifi::isConnected() ? WiFi.SSID().c_str() : Homelab::Wifi::SSID_NULL_VALUE);
+  if(!Homelab::Wifi::isConnected()) return Homelab::Wifi::SSID_NULL_VALUE;
+  return (std::string)WiFi.SSID().c_str();
 }
 
 float Homelab::Wifi::getStrength()
 {
-  return Homelab::Wifi::isConnected() ? (255 + WiFi.RSSI()) / 255.0f :
-                                        Homelab::Wifi::STRENGTH_NULL_VALUE;
+  if(!Homelab::Wifi::isConnected()) return Homelab::Wifi::STRENGTH_NULL_VALUE;
+  return (255 + WiFi.RSSI()) / 255.0f;
 }
 
 Homelab::Wifi::Credentials *Homelab::Wifi::getStrongestNetwork(
@@ -152,7 +152,7 @@ void Homelab::Wifi::setIPAddress(std::string ip)
 
   if(!Homelab::Wifi::isConnected())
   {
-    std::vector<std::string> ipSplit = Homelab::Utils::string::split(Homelab::Wifi::_ip, ':');
+    std::vector<std::string> ipSplit = Homelab::Utils::string::split(Homelab::Wifi::_ip, '.');
 
     if(ipSplit.size() != 4)
     {
@@ -286,9 +286,21 @@ void Homelab::Wifi::loop()
       float _strength = Homelab::Wifi::getStrength();
       if(_strength != Homelab::Wifi::strength)
       {
-        Homelab::Wifi::strength = strength;
+        Homelab::Logger::infof(
+            "Wifi strength changed from %s to %s\n",
+            Homelab::Utils::string::formatFloat(
+                "%.1f%%", Homelab::Wifi::strength * 100, Homelab::Wifi::STRENGTH_NULL_VALUE
+            )
+                .c_str(),
+            Homelab::Utils::string::formatFloat(
+                "%.1f%%", _strength * 100, Homelab::Wifi::STRENGTH_NULL_VALUE
+            )
+                .c_str()
+        );
+        Homelab::Wifi::strength = _strength;
         Homelab::Wifi::callStrengthChangeCallbacks(Homelab::Wifi::strength);
       }
+      Homelab::Wifi::_lastStrengthUpdate = millis();
     }
   }
 }

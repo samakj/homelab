@@ -15,6 +15,7 @@ class _DHT : public DHT
 
 #include <Logger/Logger.h>
 #include <Time/Time.h>
+#include <Utils/Utils.h>
 
 namespace Homelab::Sensors
 {

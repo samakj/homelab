@@ -1,5 +1,7 @@
 #include "Time.h"
 
+std::string Homelab::Time::TIMESTAMP_NULL_VALUE = "";
+
 unsigned long Homelab::Time::millisDiff(unsigned long start, unsigned long end)
 {
   if(end >= start) return end - start;
@@ -14,7 +16,7 @@ unsigned long Homelab::Time::millisSince(unsigned long start)
 
 std::string Homelab::Time::getIsoTimestamp()
 {
-  if(!Homelab::Time::NTP::isConnected()) return std::string("                    ");
+  if(!Homelab::Time::NTP::isConnected()) return Homelab::Time::TIMESTAMP_NULL_VALUE;
 
   char buffer[23];
   time_t tm = time(nullptr);
@@ -50,28 +52,22 @@ void Homelab::Time::NTP::addConnectCallbak(Homelab::Time::NTP::ConnectCallback c
   Homelab::Time::NTP::connectCallbacks.push_back(callback);
 };
 
-extern "C" void sntp_update_delay_not_less_than_15000(uint32 ms);
-
 void Homelab::Time::NTP::connect(bool force)
 {
-#ifndef _Homelab_Wifi_h
-  return;
-#endif
-
   if(!Homelab::Wifi::isConnected()) Homelab::Logger::warn("No internet connection, skiping NTP.");
   else if(force || (!Homelab::Time::NTP::isConnecting() && !Homelab::Time::NTP::isConnected()))
   {
-    Homelab::Logger::debugf("Connecting NTP to %s\n", Homelab::Time::NTP::server.c_str());
+    Homelab::Logger::infof("Connecting NTP to %s\n", Homelab::Time::NTP::server.c_str());
     Homelab::Time::NTP::_isConnecting = true;
-    // Re-sync every 10 minutes.
-    sntp_update_delay_not_less_than_15000(1000 * 60 * 10);
     configTime(0, 0, Homelab::Time::NTP::server.c_str());
   }
 };
 
 void Homelab::Time::NTP::loop()
 {
-  if(!Homelab::Time::NTP::isConnected() && !Homelab::Time::NTP::isConnecting()) connect();
+  if(!Homelab::Time::NTP::isConnected() && !Homelab::Time::NTP::isConnecting() &&
+     Homelab::Wifi::isConnected())
+    connect();
 
   if(Homelab::Time::NTP::isConnected() && Homelab::Time::NTP::isConnecting())
   {

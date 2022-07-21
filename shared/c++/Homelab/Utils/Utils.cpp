@@ -21,3 +21,11 @@ std::string Homelab::Utils::string::join(std::vector<std::string> list, char del
   out.pop_back();
   return out;
 }
+
+std::string Homelab::Utils::string::formatFloat(std::string format, float value, float nullValue)
+{
+  if(value == nullValue) return (std::string) "null";
+  char buf[64];
+  sprintf(buf, format.c_str(), value);
+  return (std::string)buf;
+};

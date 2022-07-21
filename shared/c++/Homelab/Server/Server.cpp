@@ -62,7 +62,9 @@ std::string Homelab::Server::getStateKey(std::string metric, std::vector<std::st
 
 void Homelab::Server::addMetaInformation(DynamicJsonDocument *data)
 {
-  data->operator[]("timestamp") = Homelab::Time::getIsoTimestamp();
+  std::string timestamp = Homelab::Time::getIsoTimestamp();
+  if(timestamp != Homelab::Time::TIMESTAMP_NULL_VALUE) data->operator[]("timestamp") = timestamp;
+  else data->operator[]("timestamp") = nullptr;
   data->operator[]("mac") = Homelab::Wifi::getMACAddress();
 }
 
@@ -397,9 +399,16 @@ void Homelab::Server::loop()
   if(!Homelab::Wifi::isConnected()) Homelab::Server::isSetup = false;
   if(Homelab::Server::isSetup)
   {
-    if(Homelab::Time::millisSince(Homelab::Server::lastLog) > 1000)
-      Homelab::Server::sendLog(Homelab::Logger::LogLevel::DEBUG, "ping");
-    if(Homelab::Time::millisSince(Homelab::Server::lastReport) > 1000) Homelab::Server::sendPing();
+    if(Homelab::Time::millisSince(Homelab::Server::lastLog) > 10000)
+    {
+      Homelab::Logger::debug("Hearbeat");
+      Homelab::Server::lastLog = millis();
+    }
+    if(Homelab::Time::millisSince(Homelab::Server::lastReport) > 1000)
+    {
+      Homelab::Server::sendPing();
+      Homelab::Server::lastReport = millis();
+    }
 
     if(Homelab::Server::queuedLogs.size())
     {

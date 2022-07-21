@@ -16,6 +16,8 @@ namespace Homelab::Wifi
 
 namespace Homelab::Time
 {
+  extern std::string TIMESTAMP_NULL_VALUE;
+
   unsigned long millisDiff(unsigned long start, unsigned long end);
   unsigned long millisSince(unsigned long start);
   std::string getIsoTimestamp();

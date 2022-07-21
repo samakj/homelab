@@ -10,23 +10,23 @@ void Homelab::Logger::logf(Homelab::Logger::LogLevel _level, std::string format,
 template <typename... Args>
 void Homelab::Logger::debugf(std::string format, Args... args)
 {
-  Homelab::Logger::logf(Homelab::Logger::LogLevel::DEBUG, format, args...);
+  Homelab::Logger::logf(Homelab::Logger::DEBUG, format, args...);
 };
 
 template <typename... Args>
 void Homelab::Logger::infof(std::string format, Args... args)
 {
-  Homelab::Logger::logf(Homelab::Logger::LogLevel::INFO, format, args...);
+  Homelab::Logger::logf(Homelab::Logger::INFO, format, args...);
 };
 
 template <typename... Args>
 void Homelab::Logger::warnf(std::string format, Args... args)
 {
-  Homelab::Logger::logf(Homelab::Logger::LogLevel::WARN, format, args...);
+  Homelab::Logger::logf(Homelab::Logger::WARN, format, args...);
 };
 
 template <typename... Args>
 void Homelab::Logger::errorf(std::string format, Args... args)
 {
-  Homelab::Logger::logf(Homelab::Logger::LogLevel::ERROR, format, args...);
+  Homelab::Logger::logf(Homelab::Logger::ERROR, format, args...);
 };

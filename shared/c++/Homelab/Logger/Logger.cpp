@@ -19,26 +19,20 @@ void setFormatWithColour(bool _formatWithColour)
 
 std::string Homelab::Logger::levelName(Homelab::Logger::LogLevel level)
 {
-  switch(level)
-  {
-    case Homelab::Logger::LogLevel::DEBUG : return "debug";
-    case Homelab::Logger::LogLevel::INFO : return "info";
-    case Homelab::Logger::LogLevel::WARN : return "warn";
-    case Homelab::Logger::LogLevel::ERROR : return "error";
-    default : return "unknown";
-  }
+  if(level == Homelab::Logger::DEBUG) return "debug";
+  if(level == Homelab::Logger::INFO) return "info";
+  if(level == Homelab::Logger::WARN) return "warn";
+  if(level == Homelab::Logger::ERROR) return "error";
+  return "unknown";
 };
 
 const char* Homelab::Logger::levelColour(Homelab::Logger::LogLevel level)
 {
-  switch(level)
-  {
-    case Homelab::Logger::LogLevel::DEBUG : return "\033[36m";
-    case Homelab::Logger::LogLevel::INFO : return "";
-    case Homelab::Logger::LogLevel::WARN : return "\033[33m";
-    case Homelab::Logger::LogLevel::ERROR : return "\033[31m";
-    default : return "";
-  }
+  if(level == Homelab::Logger::DEBUG) return "\033[36m";
+  if(level == Homelab::Logger::INFO) return "";
+  if(level == Homelab::Logger::WARN) return "\033[33m";
+  if(level == Homelab::Logger::ERROR) return "\033[31m";
+  return "";
 };
 
 std::string Homelab::Logger::levelLogPrefix(Homelab::Logger::LogLevel level)
@@ -66,42 +60,35 @@ void Homelab::Logger::log(
     }
   }
 
-#ifdef _Homelab_Time_h
   std::string timestamp = !Homelab::Logger::showTimestamp ? "" : Homelab::Time::getIsoTimestamp();
-#else
-  std::string timestamp = "";
-#endif
 
   if(_level >= Homelab::Logger::level)
   {
     Serial.printf(
-        "%s%s%s %s %s%s%s",
-        "", start.c_str(),
-        timestamp.c_str(), levelLogPrefix(level).c_str(), message.c_str(), end.c_str(), "\033[00m"
+        "%s%s%s %s %s%s%s", "", start.c_str(), timestamp.c_str(), levelLogPrefix(level).c_str(),
+        message.c_str(), end.c_str(), ""
     );
   }
 
-#ifdef _Homelab_Server_h
-  Homelab::Server::sendLog(_level, message);
-#endif
+  Homelab::Server::sendLog(_level, message, nullptr);
 };
 
 void Homelab::Logger::debug(std::string message, std::string start, std::string end)
 {
-  Homelab::Logger::log(DEBUG, message, start, end);
+  Homelab::Logger::log(Homelab::Logger::DEBUG, message, start, end);
 };
 
 void Homelab::Logger::info(std::string message, std::string start, std::string end)
 {
-  Homelab::Logger::log(INFO, message, start, end);
+  Homelab::Logger::log(Homelab::Logger::INFO, message, start, end);
 };
 
 void Homelab::Logger::warn(std::string message, std::string start, std::string end)
 {
-  Homelab::Logger::log(WARN, message, start, end);
+  Homelab::Logger::log(Homelab::Logger::WARN, message, start, end);
 };
 
 void Homelab::Logger::error(std::string message, std::string start, std::string end)
 {
-  Homelab::Logger::log(ERROR, message, start, end);
+  Homelab::Logger::log(Homelab::Logger::ERROR, message, start, end);
 };

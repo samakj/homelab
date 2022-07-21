@@ -20,7 +20,7 @@ void Homelab::Sensors::Switch::loop()
   bool _state = digitalRead(this->pinNo);
   if(_state != this->state)
   {
-    Homelab::Logger::debugf(
+    Homelab::Logger::infof(
         "Switch state changes from %s to %s\n", this->state ? "ON" : "OFF", _state ? "ON" : "OFF"
     );
     this->state = _state;
