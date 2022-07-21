@@ -7,7 +7,7 @@ export const LogsContainer = styled.div`
   display: flex;
   flex-direction: column-reverse;
   overflow-y: auto;
-  height: fill-available;
+  max-height: calc(100% - 1.5rem);
   padding: 0.5rem 1rem;
 `;
 
