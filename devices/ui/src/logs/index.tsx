@@ -12,17 +12,24 @@ export const Logs: React.FunctionComponent = () => {
   const [lastMessage, setLastMessage] = useState<Date | null>(null);
   const [logs, setLogs] = useState<LogsWebsocketDataType[]>([]);
 
-  const onMessage = useCallback(
-    (_, data: LogsWebsocketDataType) => {
-      data = { ...data, timestamp: data.timestamp || new Date().toISOString() };
+  const onJson = useCallback(
+    (newLogs: LogsWebsocketDataType[]) => {
       setLastMessage(new Date());
-      if (data.message != null) setLogs([data, ...logs].slice(0, 1000));
+      setLogs(
+        [
+          ...newLogs.map((log) => ({
+            ...log,
+            timestamp: log.timestamp || new Date().toISOString(),
+          })),
+          ...logs,
+        ].slice(0, 1000)
+      );
     },
     [logs]
   );
 
   const websocket = useJsonWebsocket<LogsWebsocketDataType>(`ws://${process.env.IP_ADDRESS}/logs`, {
-    onMessage,
+    onJson,
   });
 
   return (

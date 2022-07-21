@@ -29,6 +29,7 @@ export const LiveTimeDelta: React.FunctionComponent<LiveTimeDeltaPropsType> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (date == null) return;
       const dt = +new Date() - +new Date(date);
       if (dt < 1000) setDelta(`${dt}ms`);
       else setDelta(`${Math.round(dt / 1000)}s`);
@@ -44,19 +45,31 @@ export const StateTable: React.FunctionComponent = () => {
   const [lastMessage, setLastMessage] = useState<Date | null>(null);
   const [deviceState, setDeviceState] = useState<DeviceStateType>({});
 
-  const onMessage = useCallback(
-    (_, data: ReportWebsocketDataType) => {
-      data = { ...data, timestamp: data.timestamp || new Date().toISOString() };
+  const onJson = useCallback(
+    (newReports: ReportWebsocketDataType[]) => {
       setLastMessage(new Date());
-      if (data.metric !== 'ping')
-        setDeviceState({ ...deviceState, [`${data.tags},${data.metric}`]: data });
+      setDeviceState(
+        newReports.reduce(
+          (acc, report) => {
+            if (report.metric === 'ping') return acc;
+            return {
+              ...acc,
+              [`${report.tags},${report.metric}`]: {
+                ...report,
+                timestamp: report.timestamp || new Date().toISOString(),
+              },
+            };
+          },
+          { ...deviceState }
+        )
+      );
     },
     [deviceState]
   );
 
   const websocket = useJsonWebsocket<ReportWebsocketDataType>(
     `ws://${process.env.IP_ADDRESS}/reports`,
-    { onMessage }
+    { onJson }
   );
 
   return (

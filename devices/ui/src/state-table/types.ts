@@ -13,5 +13,5 @@ export interface DeviceStateType {
 }
 
 export interface LiveTimeDeltaPropsType {
-  date: Date | number | string;
+  date: Date | number | string | null;
 }
