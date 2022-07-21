@@ -1,9 +1,9 @@
 #include "Wifi.h"
 
-std::string Homelab::Wifi::SSID_NULL_VALUE = nullptr;
+std::string Homelab::Wifi::SSID_NULL_VALUE = "";
 float Homelab::Wifi::STRENGTH_NULL_VALUE = 0.0f;
-std::string Homelab::Wifi::IP_NULL_VALUE = nullptr;
-std::string Homelab::Wifi::HOSTNAME_NULL_VALUE = nullptr;
+std::string Homelab::Wifi::IP_NULL_VALUE = "";
+std::string Homelab::Wifi::HOSTNAME_NULL_VALUE = "";
 
 std::vector<Homelab::Wifi::Credentials *> Homelab::Wifi::networks = {};
 Homelab::Wifi::Credentials *Homelab::Wifi::network = nullptr;
@@ -24,7 +24,8 @@ uint16_t Homelab::Wifi::_lastStrengthUpdate = 0;
 
 bool Homelab::Wifi::isConnecting()
 {
-    return Homelab::Wifi::_isConnecting;}
+    return Homelab::Wifi::_isConnecting;
+}
 
 bool Homelab::Wifi::isConnected()
 {
