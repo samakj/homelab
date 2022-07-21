@@ -1,4 +1,5 @@
 /** @format */
+<<<<<<< HEAD
 
 import styled from 'styled-components';
 
@@ -38,3 +39,5 @@ export const LogLineMessage = styled.span`
   grid-area: message;
   font-size: 0.75rem;
 `;
+=======
+>>>>>>> f347110 (fix: Start device ui with simple state view)

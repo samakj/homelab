@@ -17,8 +17,13 @@ body {
 `;
 
 export const PageGrid = styled.div`
+<<<<<<< HEAD
   height: 100vh;
   width: 100vw;
+=======
+  height: 100%;
+  width: 100%;
+>>>>>>> f347110 (fix: Start device ui with simple state view)
   display: grid;
   grid-template-areas: 'header' 'state' 'logs';
   grid-template-rows: auto auto 1fr;
