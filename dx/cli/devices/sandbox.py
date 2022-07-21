@@ -2,7 +2,7 @@ import click
 import os
 
 from variables import sandbox_folder, shared_cpp_folder, device_ui_folder
-from configs import apply_config_variables
+from configs import apply_config_variables, get_devices_config
 from clang_format import CLANG_FORMAT_STYLE
 
 
@@ -36,5 +36,8 @@ def format() -> None:
 
 @sandbox.command()
 def build_ui() -> None:
+    config = get_devices_config()["sandbox"]
     os.chdir(device_ui_folder)
-    os.system(f"npm run build:prod -- --output-path {sandbox_folder}/data")
+    os.system(
+        f"HOSTNAME={config['hostname']} IP_ADDRESS={config['ip']} npm run build:prod -- --output-path {sandbox_folder}/data"
+    )

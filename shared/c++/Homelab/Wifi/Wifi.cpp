@@ -239,19 +239,18 @@ void Homelab::Wifi::loop()
     if(Homelab::Wifi::isConnected())
     {
       Homelab::Wifi::_isConnecting = false;
-      std::string ssid = Homelab::Wifi::getSSID();
       float _strength = Homelab::Wifi::getStrength();
       std::string ip = Homelab::Wifi::getIPAddress();
       std::string mac = Homelab::Wifi::getMACAddress();
 
       Homelab::Logger::infof(
-          "Connected to %s @ %.1f\n", Homelab::Wifi::network->ssid.c_str(), _strength
+          "Connected to %s @ %.1f%%\n", Homelab::Wifi::network->ssid.c_str(), _strength * 100
       );
       Homelab::Logger::infof("IP:   %s\n", ip.c_str());
       Homelab::Logger::infof("MAC:  %s\n", mac.c_str());
 
-      Homelab::Wifi::callConnectCallbacks(ssid);
-      Homelab::Wifi::callSSIDChangeCallbacks(ssid);
+      Homelab::Wifi::callConnectCallbacks(Homelab::Wifi::network->ssid);
+      Homelab::Wifi::callSSIDChangeCallbacks(Homelab::Wifi::network->ssid);
       Homelab::Wifi::callStrengthChangeCallbacks(_strength);
     }
     else if(Homelab::Time::millisSince(Homelab::Wifi::_connectionAttemptStart) > Homelab::Wifi::maxWait)

@@ -12,7 +12,7 @@ void onWifiConnect(std::string ssid) { Homelab::OTA::setup(HOSTNAME, OTA_PASSWOR
 void onWifiSSIDChange(std::string ssid)
 {
   if(ssid != Homelab::Wifi::SSID_NULL_VALUE)
-    Homelab::Server::sendReport(ssid.c_str(), "name", WIFI_SSID_TAGS);
+    Homelab::Server::sendReport(ssid, "name", WIFI_SSID_TAGS);
   else Homelab::Server::sendReport(nullptr, "name", WIFI_SSID_TAGS);
 };
 
