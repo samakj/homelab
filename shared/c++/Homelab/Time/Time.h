@@ -3,45 +3,45 @@
 #define _Homelab_Time_h
 
 #include <Arduino.h>
-#include <string>
-#include <functional>
+#include <Logger/Logger.h>
 #include <time.h>
 
-#include <Logger/Logger.h>
+#include <functional>
+#include <string>
 
 namespace Homelab::Wifi
 {
-    bool isConnected();
+  bool isConnected();
 };
 
 namespace Homelab::Time
 {
-    unsigned long millisDiff(unsigned long start, unsigned long end);
-    unsigned long millisSince(unsigned long start);
-    std::string getIsoTimestamp();
-    std::string formatTime(const char *format);
+  unsigned long millisDiff(unsigned long start, unsigned long end);
+  unsigned long millisSince(unsigned long start);
+  std::string getIsoTimestamp();
+  std::string formatTime(const char *format);
 
-    namespace NTP
-    {
-        typedef std::function<void()> ConnectCallback;
+  namespace NTP
+  {
+    typedef std::function<void()> ConnectCallback;
 
-        extern std::string server;
-        extern uint16_t maxWait;
-        extern std::vector<ConnectCallback> connectCallbacks;
-        extern bool _isConnecting;
+    extern std::string server;
+    extern uint16_t maxWait;
+    extern std::vector<ConnectCallback> connectCallbacks;
+    extern bool _isConnecting;
 
-        bool isConnecting();
-        bool isConnected();
+    bool isConnecting();
+    bool isConnected();
 
-        void setServer(std::string server);
-        void setMaxWait(uint16_t maxWait);
+    void setServer(std::string server);
+    void setMaxWait(uint16_t maxWait);
 
-        void addConnectCallbak(ConnectCallback callback);
+    void addConnectCallbak(ConnectCallback callback);
 
-        void connect(bool force = false);
-        void loop();
-    }
+    void connect(bool force = false);
+    void loop();
+  }    // namespace NTP
 
-};
+};    // namespace Homelab::Time
 
 #endif

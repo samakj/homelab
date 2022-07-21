@@ -16,5 +16,4 @@ namespace Homelab
 {
 };
 
-
 #endif

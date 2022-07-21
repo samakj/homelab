@@ -3,6 +3,7 @@ from configs import configs
 from containers import containers
 from devices import devices
 from services import services
+from shared import shared
 
 
 @click.group()
@@ -14,3 +15,4 @@ cli.add_command(cmd=configs)
 cli.add_command(cmd=containers)
 cli.add_command(cmd=devices)
 cli.add_command(cmd=services)
+cli.add_command(cmd=shared)

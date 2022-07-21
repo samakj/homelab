@@ -3,6 +3,7 @@ import os
 
 from variables import sandbox_folder, shared_cpp_folder
 from configs import apply_config_variables
+from clang_format import CLANG_FORMAT_STYLE
 
 
 @click.group()
@@ -23,4 +24,11 @@ def build_config() -> None:
         output_path=sandbox_folder / "src/config.h",
         template_prefix="${",
         template_suffix="}",
+    )
+
+
+@sandbox.command()
+def format() -> None:
+    os.system(
+        f"find {sandbox_folder}/src -type f -name '*.cpp' -or -name '*.h' -or -name '*.tpp' | xargs clang-format -i -style='{CLANG_FORMAT_STYLE}'"
     )
