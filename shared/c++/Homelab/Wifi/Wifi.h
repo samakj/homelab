@@ -45,11 +45,11 @@ namespace Homelab::Wifi
   extern std::vector<StrengthChangeCallback> strengthChangeCallbacks;
 
   extern bool _isConnecting;
-  extern uint16_t _connectionAttemptStart;
-  extern uint16_t _lastConnectionMessage;
+  extern uint32_t _connectionAttemptStart;
+  extern uint32_t _lastConnectionMessage;
   extern uint16_t maxWait;
   extern uint16_t strengthUpdatePeriod;
-  extern uint16_t _lastStrengthUpdate;
+  extern uint32_t _lastStrengthUpdate;
 
   bool isConnecting();
   bool isConnected();

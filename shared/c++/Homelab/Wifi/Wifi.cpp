@@ -16,11 +16,11 @@ std::vector<Homelab::Wifi::SSIDChangeCallback> Homelab::Wifi::ssidChangeCallback
 std::vector<Homelab::Wifi::StrengthChangeCallback> Homelab::Wifi::strengthChangeCallbacks = {};
 
 bool Homelab::Wifi::_isConnecting = false;
-uint16_t Homelab::Wifi::_connectionAttemptStart = 0;
-uint16_t Homelab::Wifi::_lastConnectionMessage = 0;
+uint32_t Homelab::Wifi::_connectionAttemptStart = 0;
+uint32_t Homelab::Wifi::_lastConnectionMessage = 0;
 uint16_t Homelab::Wifi::maxWait = 60000;
 uint16_t Homelab::Wifi::strengthUpdatePeriod = 10000;
-uint16_t Homelab::Wifi::_lastStrengthUpdate = 0;
+uint32_t Homelab::Wifi::_lastStrengthUpdate = 0;
 
 bool Homelab::Wifi::isConnecting() { return Homelab::Wifi::_isConnecting; }
 
