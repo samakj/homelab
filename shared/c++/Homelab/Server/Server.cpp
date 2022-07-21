@@ -385,7 +385,7 @@ void Homelab::Server::setup()
     Homelab::Server::httpClient.addHandler(&Homelab::Server::logsSocketClient);
     Homelab::Server::httpClient.on("/", HTTP_GET, Homelab::Server::rootResponse);
 
-    Homelab::Server::httpClient.serveStatic("/static/", SPIFFS, "/");
+    Homelab::Server::httpClient.serveStatic("/", SPIFFS, "/");
     Homelab::Server::httpClient.onNotFound(Homelab::Server::NOT_FOUND);
     Homelab::Server::httpClient.begin();
     Homelab::Logger::info("http & websocket server started.");
