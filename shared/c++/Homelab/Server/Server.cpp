@@ -92,11 +92,10 @@ void Homelab::Server::sendLog(
 
   std::string serialisedData = "";
   serializeJson(data, serialisedData);
-  Homelab::Server::sendLog(serialisedData, client);
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedLogs.push_back(queuedMessage);
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedLogs.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(std::string message, AsyncWebSocketClient *client)
@@ -132,13 +131,11 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Sending report: %s\n", serialisedData.c_str());
-  Homelab::Server::sendReport(serialisedData, client);
-  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(
@@ -161,13 +158,11 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Sending report: %s\n", serialisedData.c_str());
-  Homelab::Server::sendReport(serialisedData, client);
-  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(
@@ -189,13 +184,11 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Sending report: %s\n", serialisedData.c_str());
-  Homelab::Server::sendReport(serialisedData, client);
-  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(
@@ -217,13 +210,11 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Sending report: %s\n", serialisedData.c_str());
-  Homelab::Server::sendReport(serialisedData, client);
-  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendReport(
@@ -245,13 +236,11 @@ void Homelab::Server::sendReport(
 
   state[stateKey] = serialisedData;
 
-  Homelab::Logger::debugf("Sending report: %s\n", serialisedData.c_str());
-  Homelab::Server::sendReport(serialisedData, client);
-  // Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
-  // QueuedMessage *queuedMessage = new QueuedMessage;
-  // queuedMessage->client = client;
-  // queuedMessage->message = serialisedData;
-  // Homelab::Server::queuedReports.push_back(queuedMessage);
+  Homelab::Logger::debugf("Queueing message %s\n", serialisedData.c_str());
+  QueuedMessage *queuedMessage = new QueuedMessage;
+  queuedMessage->client = client;
+  queuedMessage->message = serialisedData;
+  Homelab::Server::queuedReports.push_back(queuedMessage);
 };
 
 void Homelab::Server::sendPing()
@@ -421,7 +410,8 @@ void Homelab::Server::loop()
       Homelab::Server::lastReport = millis();
     }
 
-    if(Homelab::Server::queuedLogs.size())
+    if(Homelab::Server::queuedLogs.size() &&
+       Homelab::Time::millisSince(Homelab::Server::lastLog) > 10)
     {
       auto it = Homelab::Server::queuedLogs.begin();
       Homelab::Server::QueuedMessage *queuedMessage = *it;
@@ -429,7 +419,8 @@ void Homelab::Server::loop()
       Homelab::Server::queuedLogs.erase(it);
       delete queuedMessage;
     }
-    if(Homelab::Server::queuedReports.size())
+    if(Homelab::Server::queuedReports.size() &&
+       Homelab::Time::millisSince(Homelab::Server::lastReport) > 10)
     {
       auto it = Homelab::Server::queuedReports.begin();
       Homelab::Server::QueuedMessage *queuedMessage = *it;
