@@ -2,15 +2,24 @@
 
 <<<<<<< HEAD
 import React, { useCallback, useState } from 'react';
-import { PageSection, PageSectionTitle } from '../shared-elements';
+import { PageSection } from '../shared-elements';
 import { useJsonWebsocket } from '../websocket';
-import { LogLine, LogLineLevel, LogLineMessage, LogLineTimestamp, LogsContainer } from './elements';
-import { LogsWebsocketDataType } from './types';
+import {
+  LevelSelect,
+  LogLine,
+  LogLineLevel,
+  LogLineMessage,
+  LogLineTimestamp,
+  LogsContainer,
+  LogsSectionTitle,
+} from './elements';
+import { LogLevel, LogsWebsocketDataType } from './types';
 
 export const Logs: React.FunctionComponent = () => {
   const [closed, setClosed] = useState(false);
   const [lastMessage, setLastMessage] = useState<Date | null>(null);
   const [logs, setLogs] = useState<LogsWebsocketDataType[]>([]);
+  const [logLevel, setLogLevel] = useState<LogLevel>(LogLevel.DEBUG);
 
   const onJson = useCallback(
     (newLogs: LogsWebsocketDataType[]) => {
@@ -34,10 +43,25 @@ export const Logs: React.FunctionComponent = () => {
 
   return (
     <PageSection closed={closed}>
-      <PageSectionTitle onClick={() => setClosed(!closed)}>Logs</PageSectionTitle>
+      <LogsSectionTitle onClick={() => setClosed(!closed)}>
+        <span>Logs</span>
+        <LevelSelect
+          onChange={(event) => setLogLevel(LogLevel[event.target.value.toUpperCase()])}
+          defaultValue={logLevel}
+        >
+          <option>DEBUG</option>
+          <option>INFO</option>
+          <option>WARN</option>
+          <option>ERROR</option>
+        </LevelSelect>
+      </LogsSectionTitle>
       <LogsContainer>
         {logs.map((log) => (
-          <LogLine key={log.timestamp} level={log.level}>
+          <LogLine
+            key={log.timestamp}
+            level={log.level}
+            hide={LogLevel[log.level.toUpperCase()] < logLevel}
+          >
             <LogLineTimestamp>{new Date(log.timestamp).toLocaleTimeString()}</LogLineTimestamp>
             <LogLineLevel>{log.level}</LogLineLevel>
             <LogLineMessage>{log.message}</LogLineMessage>

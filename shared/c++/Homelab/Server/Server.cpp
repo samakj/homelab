@@ -88,7 +88,7 @@ void Homelab::Server::sendLog(
   DynamicJsonDocument data(256);
   Homelab::Server::addMetaInformation(&data);
   data["level"] = Homelab::Logger::levelName(level);
-  data["message"] = message;
+  data["message"] = message.c_str();
 
   std::string serialisedData = "";
   serializeJson(data, serialisedData);
@@ -146,7 +146,7 @@ void Homelab::Server::sendReport(
   DynamicJsonDocument data(512);
   Homelab::Server::addMetaInformation(&data);
   data["metric"] = metric;
-  data["message"] = value;
+  data["message"] = value.c_str();
 
   auto tagsArray = data.createNestedArray("tags");
   for(std::string tag : tags) tagsArray.add(tag);
@@ -283,7 +283,7 @@ void Homelab::Server::logsSocketEventHandler(
 )
 {
   AwsFrameInfo *info = reinterpret_cast<AwsFrameInfo *>(arg);
-  std::string ip = "TO-DO";
+  std::string ip = Homelab::Wifi::rawIPAddressToString(client->remoteIP());
 
   switch(type)
   {
@@ -323,8 +323,8 @@ void Homelab::Server::reportsSocketEventHandler(
     uint8_t *data, size_t len
 )
 {
-  AwsFrameInfo *info = (AwsFrameInfo *)arg;
-  std::string ip = "TO-DO";
+  AwsFrameInfo *info = reinterpret_cast<AwsFrameInfo *>(arg);
+  std::string ip = Homelab::Wifi::rawIPAddressToString(client->remoteIP());
 
   switch(type)
   {

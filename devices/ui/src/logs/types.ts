@@ -6,3 +6,10 @@ export interface LogsWebsocketDataType {
   message: string;
   timestamp: string;
 }
+
+export enum LogLevel {
+  DEBUG,
+  INFO,
+  WARN,
+  ERROR,
+}
