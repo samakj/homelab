@@ -10,6 +10,17 @@ def docker_compose() -> None:
 
 
 @docker_compose.command()
+def build_apis() -> None:
+    apply_config_variables(
+        input_path=docker_compose_folder / "apis/docker-compose.template.yml",
+        output_path=docker_compose_folder / "apis/docker-compose.yml",
+        template_prefix="${",
+        template_suffix="}",
+    )
+    print("Docker Compose | apis file built.")
+
+
+@docker_compose.command()
 def build_frontend() -> None:
     apply_config_variables(
         input_path=docker_compose_folder / "frontend/docker-compose.template.yml",
@@ -32,19 +43,8 @@ def build_scrapers() -> None:
 
 
 @docker_compose.command()
-def build_apis() -> None:
-    apply_config_variables(
-        input_path=docker_compose_folder / "apis/docker-compose.template.yml",
-        output_path=docker_compose_folder / "apis/docker-compose.yml",
-        template_prefix="${",
-        template_suffix="}",
-    )
-    print("Docker Compose | apis file built.")
-
-
-@docker_compose.command()
 @click.pass_context
 def build(ctx: click.Context) -> None:
+    build_apis.invoke(ctx=ctx)
     build_frontend.invoke(ctx=ctx)
     build_scrapers.invoke(ctx=ctx)
-    build_apis.invoke(ctx=ctx)

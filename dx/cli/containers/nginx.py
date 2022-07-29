@@ -12,14 +12,25 @@ def nginx() -> None:
 
 
 @nginx.command()
-def build_iot_scraper() -> None:
+def build_apis() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "scrapers/iot_scraper.template",
-        output_path=nginx_folder / "scrapers/iot_scraper.conf",
+        input_path=nginx_folder / "apis.template",
+        output_path=nginx_folder / "apis.conf",
         template_prefix="${",
         template_suffix="}",
     )
-    print("Nginx | iot_scraper.conf built.")
+    print("Nginx | apis.conf built.")
+
+
+@nginx.command()
+def build_authorisation_api() -> None:
+    apply_config_variables(
+        input_path=nginx_folder / "apis/authorisation_api.template",
+        output_path=nginx_folder / "apis/authorisation_api.conf",
+        template_prefix="${",
+        template_suffix="}",
+    )
+    print("Nginx | authorisation_api.conf built.")
 
 
 @nginx.command()
@@ -67,14 +78,14 @@ def build_iot_api() -> None:
 
 
 @nginx.command()
-def build_authorisation_api() -> None:
+def build_iot_scraper() -> None:
     apply_config_variables(
-        input_path=nginx_folder / "apis/authorisation_api.template",
-        output_path=nginx_folder / "apis/authorisation_api.conf",
+        input_path=nginx_folder / "scrapers/iot_scraper.template",
+        output_path=nginx_folder / "scrapers/iot_scraper.conf",
         template_prefix="${",
         template_suffix="}",
     )
-    print("Nginx | authorisation_api.conf built.")
+    print("Nginx | iot_scraper.conf built.")
 
 
 @nginx.command()
@@ -86,17 +97,6 @@ def build_portainer() -> None:
         template_suffix="}",
     )
     print("Nginx | portainer.conf built.")
-
-
-@nginx.command()
-def build_apis() -> None:
-    apply_config_variables(
-        input_path=nginx_folder / "apis.template",
-        output_path=nginx_folder / "apis.conf",
-        template_prefix="${",
-        template_suffix="}",
-    )
-    print("Nginx | apis.conf built.")
 
 
 @nginx.command()
@@ -146,14 +146,14 @@ def build_weather_scraper() -> None:
 @nginx.command()
 @click.pass_context
 def build(ctx: click.Context) -> None:
-    build_iot_scraper.invoke(ctx=ctx)
+    build_apis.invoke(ctx=ctx)
+    build_authorisation_api.invoke(ctx=ctx)
     build_frontend.invoke(ctx=ctx)
     build_http.invoke(ctx=ctx)
     build_https.invoke(ctx=ctx)
-    build_authorisation_api.invoke(ctx=ctx)
     build_iot_api.invoke(ctx=ctx)
+    build_iot_scraper.invoke(ctx=ctx)
     build_portainer.invoke(ctx=ctx)
-    build_apis.invoke(ctx=ctx)
     build_utilities_api.invoke(ctx=ctx)
     build_utilities_scraper.invoke(ctx=ctx)
     build_weather_api.invoke(ctx=ctx)

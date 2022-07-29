@@ -11,6 +11,7 @@ from variables import (
     hosts_config_path,
     location_config_path,
     ntp_config_path,
+    passwords_config_path,
     ports_config_path,
     postgres_config_path,
     subdomains_config_path,
@@ -26,6 +27,7 @@ devices_config: Optional[dict[str, Any]] = None
 hosts_config: Optional[dict[str, Any]] = None
 location_config: Optional[dict[str, Any]] = None
 ntp_config: Optional[dict[str, Any]] = None
+passwords_config: Optional[dict[str, Any]] = None
 ports_config: Optional[dict[str, Any]] = None
 postgres_config: Optional[dict[str, Any]] = None
 subdomains_config: Optional[dict[str, Any]] = None
@@ -74,6 +76,13 @@ def get_ntp_config() -> dict[str, Any]:
     return ntp_config
 
 
+def get_passwords_config() -> dict[str, Any]:
+    global passwords_config
+    if passwords_config is None:
+        passwords_config = load_json_file(path=passwords_config_path)
+    return passwords_config
+
+
 def get_ports_config() -> dict[str, Any]:
     global ports_config
     if ports_config is None:
@@ -116,6 +125,9 @@ def apply_config_variables(
     flat_hosts_config = flattern_dict(obj=get_hosts_config(), prefix="hosts")
     flat_location_config = flattern_dict(obj=get_location_config(), prefix="location")
     flat_ntp_config = flattern_dict(obj=get_ntp_config(), prefix="ntp")
+    flat_passwords_config = flattern_dict(
+        obj=get_passwords_config(), prefix="passwords"
+    )
     flat_ports_config = flattern_dict(obj=get_ports_config(), prefix="ports")
     flat_postgres_config = flattern_dict(obj=get_postgres_config(), prefix="postgres")
     flat_subdomains_config = flattern_dict(
@@ -124,6 +136,10 @@ def apply_config_variables(
     flat_wifi_config = flattern_dict(obj=get_wifi_config(), prefix="wifi")
 
     output_text = ""
+
+    if not input_path.exists():
+        raise ValueError(f"Path does not exist: {input_path}")
+
     with open(file=input_path, mode="r") as input_file:
         output_text = input_file.read()
 
@@ -152,6 +168,10 @@ def apply_config_variables(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
     for key, value in flat_ntp_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
+    for key, value in flat_passwords_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
@@ -224,6 +244,15 @@ def print_location() -> None:
 @configs.command()
 def print_ntp() -> None:
     print(json.dumps(flattern_dict(obj=get_ntp_config(), prefix="ntp"), indent=4))
+
+
+@configs.command()
+def print_passwords() -> None:
+    print(
+        json.dumps(
+            flattern_dict(obj=get_passwords_config(), prefix="passwords"), indent=4
+        )
+    )
 
 
 @configs.command()

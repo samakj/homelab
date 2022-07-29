@@ -2,6 +2,7 @@ import click
 from configs import configs
 from containers import containers
 from devices import devices
+from hosts import hosts
 from services import services
 from shared import shared
 
@@ -14,5 +15,6 @@ def cli() -> None:
 cli.add_command(cmd=configs)
 cli.add_command(cmd=containers)
 cli.add_command(cmd=devices)
+cli.add_command(cmd=hosts)
 cli.add_command(cmd=services)
 cli.add_command(cmd=shared)

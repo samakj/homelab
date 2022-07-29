@@ -1,0 +1,8 @@
+asyncio
+asyncpg
+black
+click
+fastapi
+flake8
+mypy
+uvicorn[standard]
