@@ -4,7 +4,7 @@
 #include <Sensors/DHT/DHT.h>
 #include <Sensors/Switch/Switch.h>
 
-namespace SamIoT::Sensors
+namespace Homelab::Sensors
 {
 }
 
