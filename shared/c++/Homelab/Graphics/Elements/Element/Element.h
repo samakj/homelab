@@ -47,6 +47,9 @@ namespace Homelab::Graphics::Elements
             virtual void setZIndex(uint8_t zIndex);
 
             virtual void recalculateBoundingBox();
+            
+            virtual bool containsPoint(Homelab::Graphics::Point point);
+            virtual bool intersectsBox(Homelab::Graphics::Box box);
 
             virtual void clear(TFT_eSPI *tft = nullptr);
             virtual void draw(TFT_eSPI *tft = nullptr);

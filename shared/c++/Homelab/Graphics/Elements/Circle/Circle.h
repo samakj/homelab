@@ -25,6 +25,9 @@ namespace Homelab::Graphics::Elements
             virtual void setWidth(uint16_t width);
             virtual void setFill(uint16_t fill);
             virtual void setBackground(uint16_t backround);
+            
+            virtual bool containsPoint(Homelab::Graphics::Point point);
+            virtual bool intersectsBox(Homelab::Graphics::Box box);
 
             virtual void clear(TFT_eSPI *tft = nullptr);
             virtual void draw(TFT_eSPI *tft = nullptr);

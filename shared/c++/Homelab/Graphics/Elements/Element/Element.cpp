@@ -61,6 +61,16 @@ void Homelab::Graphics::Elements::Element::recalculateBoundingBox()
     this->boundingBox.set.bottomRight.y = this->y.set + this->height.set;
 }
 
+void Homelab::Graphics::Elements::Element::containsPoint(Homelab::Graphics::Point point)
+{
+    return Homelab::Graphics::Collision::boxContainsPoint(this->boundingBox, point);
+};
+
+void Homelab::Graphics::Elements::Element::intersectsBox(Homelab::Graphics::Box box)
+{
+    return Homelab::Graphics::Collision::boxIntersectsBox(this->boundingBox, box);
+};
+
 void Homelab::Graphics::Elements::Element::clear(TFT_eSPI *tft) {};
 
 void Homelab::Graphics::Elements::Element::draw(TFT_eSPI *tft) {};

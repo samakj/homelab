@@ -27,11 +27,18 @@ bool Homelab::Graphics::Collision::boxIntersectsBox(
     Homelab::Graphics::Box box2)
 {
     return (
-        (box.topLeft.y > box2.topLeft.y && box.topLeft.y < box2.bottomRight.y && box.topLeft.y < box2.bottomRight.y && box.bottomRight.y > box2.topLeft.y) ||
-        (box.bottomRight.y > box2.topLeft.y && box.bottomRight.y < box2.bottomRight.y && box.topLeft.y < box2.bottomRight.y && box.bottomRight.y > box2.topLeft.y) ||
-        (box.topLeft.x > box2.topLeft.x && box.topLeft.x < box2.bottomRight.x && box.topLeft.x < box2.bottomRight.x && box.bottomRight.x > box2.topLeft.x) ||
-        (box.bottomRight.x > box2.topLeft.x && box.bottomRight.x < box2.bottomRight.x && box.topLeft.x < box2.bottomRight.x && box.bottomRight.x > box2.topLeft.x)
-    );
+        Homelab::Graphics::Collision::boxContainsPoint(box, box2.topLeft) ||
+        Homelab::Graphics::Collision::boxContainsPoint(box, box2.bottomRight) ||
+        Homelab::Graphics::Collision::boxContainsPoint(box, {box2.topLeft.x, box2.bottomRight.y}) ||
+        Homelab::Graphics::Collision::boxContainsPoint(box, {box2.bottomRight.x, box2.topLeft.y}) ||
+        Homelab::Graphics::Collision::boxContainsBox(box, box2)
+    )
+    // return (
+    //     (box.topLeft.y > box2.topLeft.y && box.topLeft.y < box2.bottomRight.y && box.topLeft.y < box2.bottomRight.y && box.bottomRight.y > box2.topLeft.y) ||
+    //     (box.bottomRight.y > box2.topLeft.y && box.bottomRight.y < box2.bottomRight.y && box.topLeft.y < box2.bottomRight.y && box.bottomRight.y > box2.topLeft.y) ||
+    //     (box.topLeft.x > box2.topLeft.x && box.topLeft.x < box2.bottomRight.x && box.topLeft.x < box2.bottomRight.x && box.bottomRight.x > box2.topLeft.x) ||
+    //     (box.bottomRight.x > box2.topLeft.x && box.bottomRight.x < box2.bottomRight.x && box.topLeft.x < box2.bottomRight.x && box.bottomRight.x > box2.topLeft.x)
+    // );
 }
 
 std::vector<Homelab::Graphics::Box> Homelab::Graphics::Collision::uncontainedBoxs(

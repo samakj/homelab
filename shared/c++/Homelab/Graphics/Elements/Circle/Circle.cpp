@@ -43,6 +43,21 @@ void Homelab::Graphics::Elements::Circle::recalculateBoundingBox()
     this->boundingBox.set.bottomRight = {this->x.set + this->radius.set, this->y.set + this->radius.set};
 };
 
+bool Homelab::Graphics::Elements::Circle::containsPoint(Homelab::Graphics::Point point)
+{
+    return sqrt((this->x - point.x) ** 2 + (this->y - point.y) ** 2) <= this->radius;
+};
+
+bool Homelab::Graphics::Elements::Circle::intersectsBox(Homelab::Graphics::Box box)
+{
+    return (
+        this->containsPoint(box.topLeft) ||
+        this->containsPoint(box.bottomRight) ||
+        this->containsPoint({box.topLeft.x, box.bottomRight.y}) ||
+        this->containsPoint({box.bottomRight.x, box.topLeft.y}) ||
+        Homelab::Graphics::Collision::boxContainsBox(box, this->boundingBox)
+};
+
 void Homelab::Graphics::Elements::Circle::clear(TFT_eSPI *tft) 
 {
     tft->fillCircle(this->x.displayed, this->y.displayed, this->radius.displayed, this->background.set);
