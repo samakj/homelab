@@ -61,8 +61,8 @@ void Homelab::Graphics::Elements::Element::recalculateBoundingBox()
     this->boundingBox.set.bottomRight.y = this->y.set + this->height.set;
 }
 
-void Homelab::Graphics::Elements::Element::clear() {};
+void Homelab::Graphics::Elements::Element::clear(TFT_eSPI *tft) {};
 
-void Homelab::Graphics::Elements::Element::draw() {};
+void Homelab::Graphics::Elements::Element::draw(TFT_eSPI *tft) {};
 
-void Homelab::Graphics::Elements::Element::loop() {};
+void Homelab::Graphics::Elements::Element::loop(TFT_eSPI *tft) {};

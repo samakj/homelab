@@ -1,6 +1,8 @@
 #ifndef _Homelab_Graphics_Elements_Element_h
 #define _Homelab_Graphics_Elements_Element_h
 
+#include <TFT_eSPI.h>
+
 #include "../../Collision/Collision.h"
 #include "../../structs.h"
 
@@ -46,9 +48,9 @@ namespace Homelab::Graphics::Elements
 
             virtual void recalculateBoundingBox();
 
-            virtual void clear();
-            virtual void draw();
-            virtual void loop();
+            virtual void clear(TFT_eSPI *tft = nullptr);
+            virtual void draw(TFT_eSPI *tft = nullptr);
+            virtual void loop(TFT_eSPI *tft = nullptr);
     };
 }
 
