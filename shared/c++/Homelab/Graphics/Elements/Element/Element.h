@@ -17,6 +17,24 @@ namespace Homelab::Graphics::Elements
         bool hasChanged() { return set == displayed };
     };
 
+    template<typename T>
+    struct BoxSides {
+        T top;
+        T bottom;
+        T left;
+        T right;
+
+        bool operator== (const PaddingArray &a, const PaddingArray &b)
+        {
+            return (
+                a.top == b.top &&
+                a.bottom == b.bottom &&
+                a.left == b.left &&
+                a.right == b.right
+            )
+        }
+    }
+
     class Element {
         public:
             DisplayedValue<int16_t> x;
