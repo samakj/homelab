@@ -67,7 +67,10 @@ namespace Homelab::Graphics::Elements
             virtual void recalculateBoundingBox();
             virtual void recalculateTextOffset();
 
+            virtual bool hasChangesToDisplay();
+
             virtual void draw(TFT_eSPI *tft = nullptr);
+            virtual void loop(TFT_eSPI *tft = nullptr);
     };
 }
 

@@ -29,6 +29,8 @@ namespace Homelab::Graphics::Elements
             virtual bool containsPoint(Homelab::Graphics::Point point);
             virtual bool intersectsBox(Homelab::Graphics::Box box);
 
+            virtual bool hasChangesToDisplay();
+
             virtual void clear(TFT_eSPI *tft = nullptr);
             virtual void draw(TFT_eSPI *tft = nullptr);
             virtual void loop(TFT_eSPI *tft = nullptr);

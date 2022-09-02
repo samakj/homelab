@@ -58,6 +58,20 @@ bool Homelab::Graphics::Elements::Circle::intersectsBox(Homelab::Graphics::Box b
         Homelab::Graphics::Collision::boxContainsBox(box, this->boundingBox)
 };
 
+void Homelab::Graphics::Elements::Circle::hasChangesToDisplay() 
+{
+    return (
+        Homelab::Graphics::Elements::Element::hasChangesToDisplay() ||
+        this->x.hasChanged() ||
+        this->y.hasChanged() ||
+        this->radius.hasChanged() ||
+        this->height.hasChanged() ||
+        this->width.hasChanged() ||
+        this->fill.hasChanged() ||
+        this->background.hasChanged()
+    )
+}
+
 void Homelab::Graphics::Elements::Circle::clear(TFT_eSPI *tft) 
 {
     tft->fillCircle(this->x.displayed, this->y.displayed, this->radius.displayed, this->background.set);
@@ -77,15 +91,7 @@ void Homelab::Graphics::Elements::Circle::draw(TFT_eSPI *tft) {
 
 void Homelab::Graphics::Elements::Circle::loop(TFT_eSPI *tft) 
 {
-    if (
-        this->x.hasChanged() ||
-        this->y.hasChanged() ||
-        this->radius.hasChanged() ||
-        this->height.hasChanged() ||
-        this->width.hasChanged() ||
-        this->fill.hasChanged() ||
-        this->background.hasChanged()
-    )
+    if (this->hasChangesToDisplay())
     {
         this->clear(tft);
         this->draw(tft);

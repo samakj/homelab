@@ -144,6 +144,25 @@ void Homelab::Graphics:Elements::Text::recalculateTextOffset()
     else this->textOffsetX = this->padding.set.left;
 }
 
+void Homelab::Graphics::Elements::Text::hasChangesToDisplay() 
+{
+    return (
+        Homelab::Graphics::Elements::Element::hasChangesToDisplay() ||
+        this->x.hasChanged() ||
+        this->y.hasChanged() ||
+        this->height.hasChanged() ||
+        this->width.hasChanged() ||
+        this->fill.hasChanged() ||
+        this->background.hasChanged() ||
+        this->text.hasChanged() ||
+        this->font.hasChanged() ||
+        this->colour.hasChanged() ||
+        this->padding.hasChanged() ||
+        this->verticalDatum.hasChanged() ||
+        this->horizontalDatum.hasChanged()
+    )
+}
+
 void Homelab::Graphics::Elements::Text::draw(TFT_eSPI *tft) {
     this->applyFontStyles(tft);
     if (!this->textHeight || !this->textWidth)
@@ -172,20 +191,7 @@ void Homelab::Graphics::Elements::Text::draw(TFT_eSPI *tft) {
 
 void Homelab::Graphics::Elements::Text::loop(TFT_eSPI *tft) 
 {
-    if (
-        this->x.hasChanged() ||
-        this->y.hasChanged() ||
-        this->height.hasChanged() ||
-        this->width.hasChanged() ||
-        this->fill.hasChanged() ||
-        this->background.hasChanged() ||
-        this->text.hasChanged() ||
-        this->font.hasChanged() ||
-        this->colour.hasChanged() ||
-        this->padding.hasChanged() ||
-        this->verticalDatum.hasChanged() ||
-        this->horizontalDatum.hasChanged()
-    )
+    if (this->hasChangesToDisplay())
     {
         this->clear(tft);
         this->draw(tft);

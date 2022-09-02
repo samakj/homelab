@@ -40,6 +40,14 @@ void Homelab::Graphics:Elements::Icon::setText(char icon) {
     this->setText(icon);
 }
 
+void Homelab::Graphics::Elements::Icon::hasChangesToDisplay() 
+{
+    return (
+        Homelab::Graphics::Elements::Text::hasChangesToDisplay() ||
+        this->icon.hasChanged()
+    )
+}
+
 void Homelab::Graphics::Elements::Icon::draw(TFT_eSPI *tft) 
 {
     Homelab::Graphics::Elements::Rectangle::draw(tft);
@@ -48,21 +56,7 @@ void Homelab::Graphics::Elements::Icon::draw(TFT_eSPI *tft)
 
 void Homelab::Graphics::Elements::Icon::loop(TFT_eSPI *tft) 
 {
-    if (
-        this->x.hasChanged() ||
-        this->y.hasChanged() ||
-        this->height.hasChanged() ||
-        this->width.hasChanged() ||
-        this->fill.hasChanged() ||
-        this->background.hasChanged() ||
-        this->text.hasChanged() ||
-        this->icon.hasChanged() ||
-        this->font.hasChanged() ||
-        this->colour.hasChanged() ||
-        this->padding.hasChanged() ||
-        this->verticalDatum.hasChanged() ||
-        this->horizontalDatum.hasChanged()
-    )
+    if (this->hasChangesToDisplay())
     {
         this->clear(tft);
         this->draw(tft);

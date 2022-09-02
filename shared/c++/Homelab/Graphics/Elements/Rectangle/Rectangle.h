@@ -21,6 +21,8 @@ namespace Homelab::Graphics::Elements
             virtual void setFill(uint16_t fill);
             virtual void setBackground(uint16_t background);
 
+            virtual bool hasChangesToDisplay();
+
             virtual void clear(TFT_eSPI *tft = nullptr);
             virtual void draw(TFT_eSPI *tft = nullptr);
             virtual void loop(TFT_eSPI *tft = nullptr);

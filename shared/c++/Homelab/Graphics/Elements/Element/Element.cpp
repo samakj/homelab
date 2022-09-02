@@ -71,6 +71,8 @@ void Homelab::Graphics::Elements::Element::intersectsBox(Homelab::Graphics::Box 
     return Homelab::Graphics::Collision::boxIntersectsBox(this->boundingBox, box);
 };
 
+bool Homelab::Graphics::Elements::Element::hasChangesToDisplay() { return false };
+
 void Homelab::Graphics::Elements::Element::clear(TFT_eSPI *tft) {};
 
 void Homelab::Graphics::Elements::Element::draw(TFT_eSPI *tft) {};

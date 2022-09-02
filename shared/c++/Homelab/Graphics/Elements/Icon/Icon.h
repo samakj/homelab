@@ -1,5 +1,5 @@
-#ifndef _Homelab_Graphics_Elements_Text_h
-#define _Homelab_Graphics_Elements_Text_h
+#ifndef _Homelab_Graphics_Elements_Icon_h
+#define _Homelab_Graphics_Elements_Icon_h
 
 #include "../../Collision/Collision.h"
 
@@ -33,6 +33,8 @@ namespace Homelab::Graphics::Elements
             virtual char getIcon();
 
             virtual void setIcon(char icon);
+
+            virtual bool hasChangesToDisplay();
 
             virtual void draw(TFT_eSPI *tft = nullptr);
             virtual void loop(TFT_eSPI *tft = nullptr);

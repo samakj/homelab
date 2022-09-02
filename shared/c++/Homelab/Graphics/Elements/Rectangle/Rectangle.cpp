@@ -16,6 +16,19 @@ void Homelab::Graphics::Elements::Rectangle::setFill(uint16_t fill) { this->fill
 
 void Homelab::Graphics::Elements::Rectangle::setBackground(uint16_t background) { this->background.set = background; };
 
+void Homelab::Graphics::Elements::Rectangle::hasChangesToDisplay() 
+{
+    return (
+        Homelab::Graphics::Elements::Element::hasChangesToDisplay() ||
+        this->x.hasChanged() ||
+        this->y.hasChanged() ||
+        this->height.hasChanged() ||
+        this->width.hasChanged() ||
+        this->fill.hasChanged() ||
+        this->background.hasChanged() 
+    )
+}
+
 void Homelab::Graphics::Elements::Rectangle::clear(TFT_eSPI *tft) 
 {
     tft->fillRect(this->x.displayed, this->y.displayed, this->height.displayed, this->width.displayed, this->background.set);
@@ -34,14 +47,7 @@ void Homelab::Graphics::Elements::Rectangle::draw(TFT_eSPI *tft) {
 
 void Homelab::Graphics::Elements::Rectangle::loop(TFT_eSPI *tft) 
 {
-    if (
-        this->x.hasChanged() ||
-        this->y.hasChanged() ||
-        this->height.hasChanged() ||
-        this->width.hasChanged() ||
-        this->fill.hasChanged() ||
-        this->background.hasChanged() 
-    )
+    if (this->hasChangesToDisplay())
     {
         this->clear(tft);
         this->draw(tft);
