@@ -49,7 +49,10 @@ void Homelab::Graphics::Elements::Element::setWidth(int16_t width)
     this->recalculateBoundingBox();
 };
 
-void Homelab::Graphics::Elements::Element::setVisible(bool visible = true) { this->visible = visible; };
+void Homelab::Graphics::Elements::Element::setVisible(bool visible = true) {
+    if (!this->visible && !visible) clear();
+    this->visible = visible;
+};
 
 void Homelab::Graphics::Elements::Element::setZIndex(uint8_t zIndex) { this->zIndex = zIndex; };
 

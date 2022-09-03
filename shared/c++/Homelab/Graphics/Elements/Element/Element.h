@@ -35,6 +35,7 @@ namespace Homelab::Graphics::Elements
         }
     }
 
+
     class Element {
         public:
             DisplayedValue<int16_t> x;
@@ -47,6 +48,8 @@ namespace Homelab::Graphics::Elements
             bool visible = false;
             uint8_t zIndex = 1;
         
+            static bool compareZIndex (Element a, Element b) { return a.getZIndex() < b.getZIndex(); }
+            
             Element(int16_t x, int16_t y, int16_t height, int16_t width, uint8_t zIndex);
 
             virtual int16_t getX();
