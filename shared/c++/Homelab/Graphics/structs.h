@@ -3,25 +3,37 @@
 
 #include <stdint.h>
 
-namespace Homelab::Graphics {
-    struct Point
-    {
-        int16_t x = 0;
-        int16_t y = 0;
-    };
+namespace Homelab::Graphics
+{
+  struct Point
+  {
+    int16_t x = 0;
+    int16_t y = 0;
 
-    struct Line
-    {
-        Point from;
-        Point to;
-    };
+    bool operator==(const Point &other) const { return (other.x == this->x && other.y == this->y); }
+  };
 
-    struct Box
+  struct Line
+  {
+    Point from;
+    Point to;
+
+    bool operator==(const Line &other) const
     {
-        Point topLeft;
-        Point bottomRight;
-    };
-}
+      return (other.from == this->from && other.to == this->to);
+    }
+  };
+
+  struct Box
+  {
+    Point topLeft;
+    Point bottomRight;
+
+    bool operator==(const Box &other) const
+    {
+      return (other.topLeft == this->topLeft && other.bottomRight == this->bottomRight);
+    }
+  };
+}    // namespace Homelab::Graphics
 
 #endif
-    

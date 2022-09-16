@@ -4,6 +4,7 @@
 #include "Element/Element.h"
 
 namespace Homelab::Graphics::Elements
-{}
+{
+}
 
 #endif

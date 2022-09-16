@@ -4,11 +4,11 @@ Homelab::Graphics::Elements::Element::Element(
     int16_t x, int16_t y, int16_t height, int16_t width, uint8_t zIndex
 )
 {
-    this->setX(x);
-    this->setY(y);
-    this->setHeight(height);
-    this->setWidth(width);
-    this->setZIndex(zIndex);
+  this->setX(x);
+  this->setY(y);
+  this->setHeight(height);
+  this->setWidth(width);
+  this->setZIndex(zIndex);
 };
 
 int16_t Homelab::Graphics::Elements::Element::getX() { return this->x.set; };
@@ -23,58 +23,62 @@ bool Homelab::Graphics::Elements::Element::getVisible() { return this->visible; 
 
 uint8_t Homelab::Graphics::Elements::Element::getZIndex() { return this->zIndex; };
 
-Homelab::Graphics::Box Homelab::Graphics::Elements::Element::getBoundingBox() { return this->boundingBox.set; };
+Homelab::Graphics::Box Homelab::Graphics::Elements::Element::getBoundingBox()
+{
+  return this->boundingBox;
+};
 
 void Homelab::Graphics::Elements::Element::setX(int16_t x)
 {
-    this->x.set = x;
-    this->recalculateBoundingBox();
+  this->x.set = x;
+  this->recalculateBoundingBox();
 };
 
 void Homelab::Graphics::Elements::Element::setY(int16_t y)
 {
-    this->y.set = y;
-    this->recalculateBoundingBox();
+  this->y.set = y;
+  this->recalculateBoundingBox();
 };
 
 void Homelab::Graphics::Elements::Element::setHeight(int16_t height)
 {
-    this->height.set = height;
-    this->recalculateBoundingBox();
+  this->height.set = height;
+  this->recalculateBoundingBox();
 };
 
 void Homelab::Graphics::Elements::Element::setWidth(int16_t width)
 {
-    this->width.set = width;
-    this->recalculateBoundingBox();
+  this->width.set = width;
+  this->recalculateBoundingBox();
 };
 
-void Homelab::Graphics::Elements::Element::setVisible(bool visible = true) {
-    if (!this->visible && !visible) clear();
-    this->visible = visible;
+void Homelab::Graphics::Elements::Element::setVisible(bool visible)
+{
+  if(!this->visible && !visible) clear();
+  this->visible = visible;
 };
 
 void Homelab::Graphics::Elements::Element::setZIndex(uint8_t zIndex) { this->zIndex = zIndex; };
 
 void Homelab::Graphics::Elements::Element::recalculateBoundingBox()
 {
-    this->boundingBox.set.topLeft.x = this->x.set;
-    this->boundingBox.set.topLeft.y = this->y.set;
-    this->boundingBox.set.bottomRight.y = this->x.set + this->width.set;
-    this->boundingBox.set.bottomRight.y = this->y.set + this->height.set;
+  this->boundingBox.topLeft.x = this->x.set;
+  this->boundingBox.topLeft.y = this->y.set;
+  this->boundingBox.bottomRight.y = this->x.set + this->width.set;
+  this->boundingBox.bottomRight.y = this->y.set + this->height.set;
 }
 
-void Homelab::Graphics::Elements::Element::containsPoint(Homelab::Graphics::Point point)
+bool Homelab::Graphics::Elements::Element::containsPoint(Homelab::Graphics::Point point)
 {
-    return Homelab::Graphics::Collision::boxContainsPoint(this->boundingBox, point);
+  return Homelab::Graphics::Collision::boxContainsPoint(this->boundingBox, point);
 };
 
-void Homelab::Graphics::Elements::Element::intersectsBox(Homelab::Graphics::Box box)
+bool Homelab::Graphics::Elements::Element::intersectsBox(Homelab::Graphics::Box box)
 {
-    return Homelab::Graphics::Collision::boxIntersectsBox(this->boundingBox, box);
+  return Homelab::Graphics::Collision::boxIntersectsBox(this->boundingBox, box);
 };
 
-bool Homelab::Graphics::Elements::Element::hasChangesToDisplay() { return false };
+bool Homelab::Graphics::Elements::Element::hasChangesToDisplay() { return false; };
 
 void Homelab::Graphics::Elements::Element::clear(TFT_eSPI *tft) {};
 

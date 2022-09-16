@@ -6,78 +6,110 @@
 #include "../../Collision/Collision.h"
 #include "../../structs.h"
 
-
 namespace Homelab::Graphics::Elements
 {
-    template<typename T>
-    struct DisplayedValue {
-        T set;
-        T displayed;
-        DisplayedValue(T _set = 0, T _displayed = 0): set(_set), displayed(_displayed) {}
-        bool hasChanged() { return set == displayed };
-    };
+  template <typename T>
+  struct DisplayedValue
+  {
+    T set;
+    T displayed;
 
-    template<typename T>
-    struct BoxSides {
-        T top;
-        T bottom;
-        T left;
-        T right;
+    DisplayedValue(T _set = 0, T _displayed = 0) : set(_set), displayed(_displayed) {}
 
-        bool operator== (const PaddingArray &a, const PaddingArray &b)
-        {
-            return (
-                a.top == b.top &&
-                a.bottom == b.bottom &&
-                a.left == b.left &&
-                a.right == b.right
-            )
-        }
+    bool hasChanged() { return set == displayed; };
+  };
+
+  template <>
+  struct DisplayedValue<Homelab::Graphics::Box>
+  {
+    Homelab::Graphics::Box set;
+    Homelab::Graphics::Box displayed;
+
+    DisplayedValue(
+        Homelab::Graphics::Box _set = {{0, 0}, {0, 0}},
+        Homelab::Graphics::Box _displayed = {{0, 0}, {0, 0}}
+    )
+        : set(_set), displayed(_displayed)
+    {
     }
 
+    bool hasChanged() { return set == displayed; };
+  };
 
-    class Element {
-        public:
-            DisplayedValue<int16_t> x;
-            DisplayedValue<int16_t> y;
-            DisplayedValue<int16_t> height;
-            DisplayedValue<int16_t> width;
-            DisplayedValue<Homelab::Graphics::Box> boundingBox;
+  template <typename T>
+  struct BoxSides
+  {
+    T top;
+    T bottom;
+    T left;
+    T right;
 
-            bool redraw = true;
-            bool visible = false;
-            uint8_t zIndex = 1;
-        
-            static bool compareZIndex (Element a, Element b) { return a.getZIndex() < b.getZIndex(); }
-            
-            Element(int16_t x, int16_t y, int16_t height, int16_t width, uint8_t zIndex);
+    bool operator==(const BoxSides &other) const
+    {
+      return (
+          other.top == this->top && other.bottom == this->bottom && other.left == this->left &&
+          other.right == this->right
+      );
+    }
+  };
 
-            virtual int16_t getX();
-            virtual int16_t getY();
-            virtual int16_t getHeight();
-            virtual int16_t getWidth();
-            virtual bool getVisible();
-            virtual uint8_t getZIndex();
-            virtual Homelab::Graphics::Box getBoundingBox();
+  template <typename T>
+  struct DisplayedValue<BoxSides<T>>
+  {
+    BoxSides<T> set;
+    BoxSides<T> displayed;
 
-            virtual void setX(int16_t x);
-            virtual void setY(int16_t y);
-            virtual void setHeight(int16_t height);
-            virtual void setWidth(int16_t width);
-            virtual void setVisible(bool visible = true);
-            virtual void setZIndex(uint8_t zIndex);
+    DisplayedValue(BoxSides<T> _set = {0, 0, 0, 0}, BoxSides<T> _displayed = {0, 0, 0, 0})
+        : set(_set), displayed(_displayed)
+    {
+    }
 
-            virtual void recalculateBoundingBox();
-            
-            virtual bool containsPoint(Homelab::Graphics::Point point);
-            virtual bool intersectsBox(Homelab::Graphics::Box box);
+    bool hasChanged() { return set == displayed; };
+  };
 
-            virtual bool hasChangesToDisplay();
+  class Element
+  {
+   public:
+    DisplayedValue<int16_t> x;
+    DisplayedValue<int16_t> y;
+    DisplayedValue<int16_t> height;
+    DisplayedValue<int16_t> width;
+    Homelab::Graphics::Box boundingBox;
 
-            virtual void clear(TFT_eSPI *tft = nullptr);
-            virtual void draw(TFT_eSPI *tft = nullptr);
-            virtual void loop(TFT_eSPI *tft = nullptr);
-    };
-}
+    bool redraw = true;
+    bool visible = false;
+    uint8_t zIndex = 1;
+
+    static bool compareZIndex(Element *a, Element *b) { return a->getZIndex() < b->getZIndex(); }
+
+    Element(int16_t x, int16_t y, int16_t height, int16_t width, uint8_t zIndex);
+
+    virtual int16_t getX();
+    virtual int16_t getY();
+    virtual int16_t getHeight();
+    virtual int16_t getWidth();
+    virtual bool getVisible();
+    virtual uint8_t getZIndex();
+    virtual Homelab::Graphics::Box getBoundingBox();
+
+    virtual void setX(int16_t x);
+    virtual void setY(int16_t y);
+    virtual void setHeight(int16_t height);
+    virtual void setWidth(int16_t width);
+    virtual void setVisible(bool visible = true);
+    virtual void setZIndex(uint8_t zIndex);
+
+    virtual void recalculateBoundingBox();
+
+    virtual bool containsPoint(Homelab::Graphics::Point point);
+    virtual bool intersectsBox(Homelab::Graphics::Box box);
+
+    virtual bool hasChangesToDisplay();
+
+    virtual void clear(TFT_eSPI *tft = nullptr);
+    virtual void draw(TFT_eSPI *tft = nullptr);
+    virtual void loop(TFT_eSPI *tft = nullptr);
+  };
+}    // namespace Homelab::Graphics::Elements
 
 #endif
