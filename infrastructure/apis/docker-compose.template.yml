@@ -21,10 +21,17 @@ services:
       - ${containers.weather_api}
       - ${containers.portainer}
     volumes:
-      - "${folders.containers.nginx}/apis.conf:/etc/nginx/nginx.conf"
-      - "${folders.containers.nginx}:/etc/nginx"
-      - "${folders.containers.docker_compose.apis.certbot_data.www}:/var/www/certbot/"
-      - "${folders.containers.docker_compose.apis.certbot_data.conf}:/etc/nginx/ssl/"
+      - "${folders.infrastructure.apis.nginx}/authorisation_api.conf:/etc/nginx/authorisation_api.conf"
+      - "${folders.infrastructure.apis.nginx}/iot_api.conf:/etc/nginx/iot_api.conf"
+      - "${folders.infrastructure.apis.nginx}/weather_api.conf:/etc/nginx/weather_api.conf"
+      - "${folders.infrastructure.apis.nginx}/utilities.conf:/etc/nginx/utilities.conf"
+      - "${folders.infrastructure.apis.nginx}/apis.conf:/etc/nginx/nginx.conf"
+      - "${folders.infrastructure.nginx}/http.conf:/etc/nginx/http.conf"
+      - "${folders.infrastructure.nginx}/https.conf:/etc/nginx/https.conf"
+      - "${folders.infrastructure.nginx}/portainer.conf:/etc/nginx/portainer.conf"
+      - "${folders.infrastructure.nginx}/proxy.conf:/etc/nginx/proxy.conf"
+      - "${folders.infrastructure.apis.certbot_data.www}:/var/www/certbot/"
+      - "${folders.infrastructure.apis.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
@@ -35,8 +42,8 @@ services:
   "${containers.certbot}":
     image: certbot/certbot:latest
     volumes:
-      - ${folders.containers.docker_compose.apis.certbot_data.www}:/var/www/certbot/
-      - ${folders.containers.docker_compose.apis.certbot_data.conf}:/etc/letsencrypt/
+      - ${folders.infrastructure.apis.certbot_data.www}:/var/www/certbot/
+      - ${folders.infrastructure.apis.certbot_data.conf}:/etc/letsencrypt/
 
   "${containers.postgres}":
     image: postgres:latest
@@ -166,7 +173,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${folders.containers.docker_compose.apis.portainer_data}:/data
+      - ${folders.infrastructure.apis.portainer_data}:/data
     ports:
       - ${ports.portainer}:${ports.portainer}
     networks:

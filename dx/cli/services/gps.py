@@ -11,7 +11,7 @@ def gps_api() -> None:
 
 
 @gps_api.command()
-def build_config() -> None:
+def build() -> None:
     apply_config_variables(
         input_path=gps_service_folder / "api/config.template.json",
         output_path=gps_service_folder / "api/config.json",

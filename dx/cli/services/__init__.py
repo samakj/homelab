@@ -1,12 +1,12 @@
 import click
 
-from services.authorisation import authorisation_api
-from services.iot import iot_api
-from services.gps import gps_api
-from services.postgres import postgres
-from services.redis import redis
-from services.utilities import utilities_api
-from services.weather import weather_api
+from services.authorisation import authorisation_api, build as build_authorisation
+from services.iot import iot_api, build as build_iot
+from services.gps import gps_api, build as build_gps
+from services.postgres import postgres, build as build_postgres
+from services.redis import redis, build as build_redis
+from services.utilities import utilities_api, build as build_utilities
+from services.weather import weather_api, build as build_weather
 
 
 @click.group()
@@ -21,3 +21,15 @@ services.add_command(cmd=postgres)
 services.add_command(cmd=redis)
 services.add_command(cmd=utilities_api)
 services.add_command(cmd=weather_api)
+
+
+@services.command()
+@click.pass_context
+def build(ctx: click.Context) -> None:
+    build_authorisation.invoke(ctx=ctx)
+    build_iot.invoke(ctx=ctx)
+    build_gps.invoke(ctx=ctx)
+    build_postgres.invoke(ctx=ctx)
+    build_redis.invoke(ctx=ctx)
+    build_utilities.invoke(ctx=ctx)
+    build_weather.invoke(ctx=ctx)

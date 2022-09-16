@@ -5,10 +5,13 @@ from typing import Any
 file = Path(os.path.abspath(__file__))
 root_folder = file.parent.parent.parent
 
-# Containers
-container_folder = root_folder / "containers"
-nginx_folder = container_folder / "nginx"
-docker_compose_folder = container_folder / "docker-compose"
+# Infrastructure
+infrastructure_folder = root_folder / "infrastructure"
+apis_infrastructure_folder = infrastructure_folder / "apis"
+apollo_infrastructure_folder = infrastructure_folder / "apollo"
+frontend_infrastructure_folder = infrastructure_folder / "frontend"
+scrapers_infrastructure_folder = infrastructure_folder / "scrapers"
+nginx_folder = infrastructure_folder / "nginx"
 
 # Config
 config_folder = root_folder / "config"

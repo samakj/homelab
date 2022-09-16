@@ -11,7 +11,7 @@ def weather_api() -> None:
 
 
 @weather_api.command()
-def build_config() -> None:
+def build() -> None:
     apply_config_variables(
         input_path=weather_service_folder / "api/config.template.json",
         output_path=weather_service_folder / "api/config.json",

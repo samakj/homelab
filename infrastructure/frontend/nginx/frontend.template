@@ -3,7 +3,7 @@ include globals.conf;
 
 http {
     include http.conf;
-    include https.conf;
+    # include https.conf;
     
     server {
         listen ${ports.https} default_server ssl http2;

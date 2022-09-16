@@ -11,7 +11,7 @@ def authorisation_api() -> None:
 
 
 @authorisation_api.command()
-def build_config() -> None:
+def build() -> None:
     apply_config_variables(
         input_path=authorisation_service_folder / "api/config.template.json",
         output_path=authorisation_service_folder / "api/config.json",

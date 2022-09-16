@@ -1,0 +1,12 @@
+include globals.conf;
+
+
+http {
+    include http.conf;
+    # include https.conf;
+    include authorisation_api.conf;
+    include iot_api.conf;
+    include utilities_api.conf;
+    include weather_api.conf;
+    include proxy.conf;
+}

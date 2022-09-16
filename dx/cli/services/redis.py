@@ -10,7 +10,7 @@ def redis() -> None:
 
 
 @redis.command()
-def build_conf_file() -> None:
+def build() -> None:
     template_file = redis_service_folder / "redis.template"
     output_file = redis_service_folder / "redis.conf"
     apply_config_variables(

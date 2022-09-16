@@ -11,7 +11,7 @@ def utilities_api() -> None:
 
 
 @utilities_api.command()
-def build_config() -> None:
+def build() -> None:
     apply_config_variables(
         input_path=utilities_service_folder / "api/config.template.json",
         output_path=utilities_service_folder / "api/config.json",

@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  ${containers.nginx}:
+  "${containers.nginx}":
     image: nginx:latest
     container_name: ${containers.nginx}
     depends_on:
@@ -10,21 +10,27 @@ services:
       - ${containers.weather_scraper}
       - ${containers.portainer}
     volumes:
-      - "${folders.containers.nginx}/scrapers.conf:/etc/nginx/nginx.conf"
-      - "${folders.containers.nginx}:/etc/nginx"
-      - "${folders.containers.docker_compose.scrapers.certbot_data.www}:/var/www/certbot/"
-      - "${folders.containers.docker_compose.scrapers.certbot_data.conf}:/etc/nginx/ssl/"
+      - "${folders.infrastructure.scrapers.nginx}/iot_scraper.conf:/etc/nginx/iot_scraper.conf"
+      - "${folders.infrastructure.scrapers.nginx}/utilities_scraper.conf:/etc/nginx/utilities_scraper.conf"
+      - "${folders.infrastructure.scrapers.nginx}/weather_scraper.conf:/etc/nginx/weather_scraper.conf"
+      - "${folders.infrastructure.scrapers.nginx}/scrapers.conf:/etc/nginx/nginx.conf"
+      - "${folders.infrastructure.nginx}/http.conf:/etc/nginx/http.conf"
+      - "${folders.infrastructure.nginx}/https.conf:/etc/nginx/https.conf"
+      - "${folders.infrastructure.nginx}/portainer.conf:/etc/nginx/portainer.conf"
+      - "${folders.infrastructure.nginx}/proxy.conf:/etc/nginx/proxy.conf"
+      - "${folders.infrastructure.scrapers.certbot_data.www}:/var/www/certbot/"
+      - "${folders.infrastructure.scrapers.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
       - "${ports.http}:${ports.http}"
       - "${ports.https}:${ports.https}"
-    
-  ${containers.certbot}:
+
+  "${containers.certbot}":
     image: certbot/certbot:latest
     volumes:
-      - ${folders.containers.docker_compose.scrapers.certbot_data.www}:/var/www/certbot/
-      - ${folders.containers.docker_compose.scrapers.certbot_data.conf}:/etc/letsencrypt/
+      - ${folders.infrastructure.scrapers.certbot_data.www}:/var/www/certbot/
+      - ${folders.infrastructure.scrapers.certbot_data.conf}:/etc/letsencrypt/
 
-  ${containers.iot_scraper}:
+  "${containers.iot_scraper}":
     image: ${containers.iot_scraper}
     container_name: ${containers.iot_scraper}
     build:
@@ -37,7 +43,7 @@ services:
       - "${ports.iot_scraper}:${ports.iot_scraper}"
     restart: on-failure
 
-  ${containers.utilities_scraper}:
+  "${containers.utilities_scraper}":
     image: ${containers.utilities_scraper}
     container_name: ${containers.utilities_scraper}
     build:
@@ -50,7 +56,7 @@ services:
       - "${ports.utilities_scraper}:${ports.utilities_scraper}"
     restart: on-failure
 
-  ${containers.weather_scraper}:
+  "${containers.weather_scraper}":
     image: ${containers.weather_scraper}
     container_name: ${containers.weather_scraper}
     build:
@@ -63,7 +69,7 @@ services:
       - "${ports.weather_scraper}:${ports.weather_scraper}"
     restart: on-failure
 
-  ${containers.portainer}:
+  "${containers.portainer}":
     image: portainer/portainer-ce:latest
     container_name: ${containers.portainer}
     restart: unless-stopped
@@ -72,6 +78,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${folders.containers.docker_compose.scrapers.portainer_data}:/data
+      - ${folders.infrastructure.scrapers.portainer_data}:/data
     ports:
       - ${ports.portainer}:${ports.portainer}

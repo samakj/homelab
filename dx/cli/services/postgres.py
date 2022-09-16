@@ -17,7 +17,7 @@ def postgres() -> None:
 
 
 @postgres.command()
-def build_patch_files() -> None:
+def build() -> None:
     patches_folder = postgres_service_folder / "patches"
     templates_folder = postgres_service_folder / "templates"
     if not os.path.exists(patches_folder):
