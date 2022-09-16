@@ -1,3 +1,4 @@
+import os
 import click
 
 from configs import apply_config_variables
@@ -74,3 +75,17 @@ def build(ctx: click.Context) -> None:
     build_iot.invoke(ctx=ctx)
     build_utilities.invoke(ctx=ctx)
     build_weather.invoke(ctx=ctx)
+
+
+@apis.command()
+@click.pass_context
+def start(ctx: click.Context) -> None:
+    build.invoke(ctx=ctx)
+    os.chdir(apis_infrastructure_folder)
+    os.system(
+        """
+docker-compose down;
+docker-compose build;
+docker-compose up;
+        """
+    )

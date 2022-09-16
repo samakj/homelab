@@ -11,6 +11,7 @@ services:
       - "${folders.infrastructure.frontend.nginx}/frontend.conf:/etc/nginx/nginx.conf"
       - "${folders.infrastructure.nginx}/http.conf:/etc/nginx/http.conf"
       - "${folders.infrastructure.nginx}/https.conf:/etc/nginx/https.conf"
+      - "${folders.infrastructure.nginx}/globals.conf:/etc/nginx/globals.conf"
       - "${folders.infrastructure.nginx}/portainer.conf:/etc/nginx/portainer.conf"
       - "${folders.infrastructure.nginx}/proxy.conf:/etc/nginx/proxy.conf"
       - "${folders.infrastructure.frontend.certbot_data.www}:/var/www/certbot/"

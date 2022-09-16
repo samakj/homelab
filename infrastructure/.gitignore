@@ -3,3 +3,10 @@ docker-compose.yml
 *.conf
 !globals.conf
 !proxy.conf
+
+portainer-data
+!portainer-data/.gitinclude
+postgres-data
+!postgres-data/.gitinclude
+redis-data
+!redis-data/.gitinclude
