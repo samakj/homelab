@@ -17,11 +17,11 @@ Homelab::Sensors::DHT::temperature_t Homelab::Sensors::DHT::getTemperature()
         Homelab::Logger::infof(
             "DHT temperature changed from %s to %s\n",
             Homelab::Utils::string::formatFloat(
-                "%.1f%%", this->temperature, Homelab::Sensors::DHT::TEMPERATURE_NULL_VALUE
+                "%.1fc", this->temperature, Homelab::Sensors::DHT::TEMPERATURE_NULL_VALUE
             )
                 .c_str(),
             Homelab::Utils::string::formatFloat(
-                "%.1f%%", _temperature, Homelab::Sensors::DHT::TEMPERATURE_NULL_VALUE
+                "%.1fc", _temperature, Homelab::Sensors::DHT::TEMPERATURE_NULL_VALUE
             )
                 .c_str()
         );
