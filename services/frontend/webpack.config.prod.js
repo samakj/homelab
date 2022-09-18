@@ -42,6 +42,17 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    }
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'index.html'),
@@ -52,6 +63,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify({
+        ENVIRONMENT: 'prod',
         HOSTNAME: process.env.HOSTNAME,
         IP_ADDRESS: process.env.IP_ADDRESS,
       }),

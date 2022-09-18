@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "lib": ["ES2021.String"],
     "target": "es2017",
     "baseUrl": "./",
     "paths": {
