@@ -5,6 +5,7 @@ import { ThemeType } from './style/theme';
 
 declare var process: {
   env: {
+    ENVIRONMENT: 'dev' | 'prod';
     HOSTNAME: string;
     IP_ADDRESS: string;
   };

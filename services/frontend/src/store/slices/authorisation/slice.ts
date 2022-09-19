@@ -1,0 +1,55 @@
+/** @format */
+
+import { ActionReducerMapBuilder, createSlice } from '@reduxjs/toolkit';
+import { initialRequestMeta } from '../types';
+import { checkToken, login } from './thunks';
+import { AuthorisationSliceType } from './types';
+
+export const initialState: AuthorisationSliceType = {
+  requests: {
+    login: initialRequestMeta,
+    checkToken: initialRequestMeta,
+  },
+  user: undefined,
+  access_token: undefined,
+};
+
+export const authorisationSlice = createSlice({
+  name: 'authorisation',
+  initialState,
+  reducers: {},
+  extraReducers: (builder: ActionReducerMapBuilder<AuthorisationSliceType>): void => {
+    builder
+      .addCase(login.pending, (state, action): void => {
+        state.requests.login.isLoading = true;
+        state.requests.login.started = new Date().toISOString();
+      })
+      .addCase(login.fulfilled, (state, action): void => {
+        state.user = action.payload.user;
+        state.access_token = action.payload.access_token;
+        state.requests.login.isLoading = false;
+        state.requests.login.finished = new Date().toISOString();
+      })
+      .addCase(login.rejected, (state, action): void => {
+        state.requests.login.error = action.payload || action.error;
+        state.requests.login.isLoading = false;
+        state.requests.login.finished = new Date().toISOString();
+      })
+      .addCase(checkToken.pending, (state, action): void => {
+        state.requests.checkToken.isLoading = true;
+        state.requests.checkToken.started = new Date().toISOString();
+      })
+      .addCase(checkToken.fulfilled, (state, action): void => {
+        state.user = action.payload.user;
+        state.session = action.payload.session;
+        state.access_token = action.payload.token;
+        state.requests.login.isLoading = false;
+        state.requests.login.finished = new Date().toISOString();
+      })
+      .addCase(checkToken.rejected, (state, action): void => {
+        state.requests.login.error = action.payload || action.error;
+        state.requests.login.isLoading = false;
+        state.requests.login.finished = new Date().toISOString();
+      });
+  },
+});
