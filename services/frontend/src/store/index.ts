@@ -8,7 +8,6 @@ export const store = configureStore({
   reducer: {
     authorisation: authorisationSlice.reducer,
   },
-  devTools: process.env.ENVIRONMENT === 'dev',
 });
 
 export type RootState = ReturnType<typeof store.getState>;

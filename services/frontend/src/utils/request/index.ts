@@ -77,9 +77,15 @@ export class Request<
   url: Url<PathParamsType, ParamsType>;
   options: RequestOptions;
 
-  constructor(url: Url<PathParamsType, ParamsType>, options?: RequestOptions) {
+  constructor(url: Url<PathParamsType, ParamsType>, options: RequestOptions = {}) {
     this.url = url;
-    this.options = options || {};
+    this.options = {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    };
   }
 
   async fetch(params: NullSafeMerge<PathParamsType, ParamsType>, options: RequestOptions = {}) {
@@ -108,7 +114,7 @@ export class Request<
     params: NullSafeMerge<PathParamsType, ParamsType>,
     options: RequestOptions = {}
   ): Promise<HttpResponse> {
-    return this.fetch(params, options);
+    return this.fetch(params, { ...options, method: 'GET' });
   }
 
   async patch(

@@ -81,7 +81,8 @@ export class Url<
 
     let path = this.template;
     Object.entries(params).forEach(([key, value]): void => {
-      path = path.replaceAll(`:${key}`, Url.buildParamValue(value as PrimitiveParamValueType));
+      const serialisedValue = Url.buildParamValue(value as PrimitiveParamValueType);
+      if (serialisedValue != null) path = path.replace(`:${key}`, serialisedValue);
     });
 
     if (!path.endsWith('/')) path += '/';
@@ -92,9 +93,7 @@ export class Url<
   build(pathParams?: NullSafeMerge<PathParamsType, ParamsType>, params?: ParamsType) {
     const serialisedParams = Url.buildParams(params || pathParams);
     let paramsString = '';
-    if (Array.from(serialisedParams).length) {
-      paramsString = `?${params}`;
-    }
-    return `${this.buildPath(pathParams)}${paramsString.replaceAll('%3A', ':')}`;
+    if (Array.from(serialisedParams).length) paramsString = `?${serialisedParams}`;
+    return `${this.buildPath(pathParams)}${paramsString.replace(/%3A/g, ':')}`;
   }
 }
