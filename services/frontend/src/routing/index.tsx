@@ -1,13 +1,17 @@
 /** @format */
 
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes as RoutesWrapper, Route, Navigate } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import { RouterPropsType } from './types';
-import { AuthorisationProvider } from '../authorisation';
+import { useCookies } from 'react-cookie';
+import { authorisationConfig } from '../configs/authorisation';
+import { checkToken } from '../store/slices/authorisation/thunks';
 
 import { Index } from '../views/index';
 import { Login } from '../views/login';
+import { User } from '../views/user';
+import { useDispatch } from '../store';
 
 export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
   location,
@@ -19,15 +23,35 @@ export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
     <BrowserRouter>{children}</BrowserRouter>
   );
 
-export const Router: React.FunctionComponent<RouterPropsType> = (props) => {
+export const Routes: React.FunctionComponent = () => {
+  const dispatch = useDispatch();
+  const [cookies] = useCookies([authorisationConfig.cookie]);
+  const [checkingToken, setCheckingToken] = useState(true);
+
+  useEffect(() => {
+    dispatch(checkToken({ access_token: cookies[authorisationConfig.cookie] })).then(() =>
+      setCheckingToken(false)
+    );
+  }, [dispatch, cookies]);
+
   return (
-    <ContextualRouter {...props}>
-      <AuthorisationProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </AuthorisationProvider>
-    </ContextualRouter>
+    <RoutesWrapper>
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/user" element={<User isLoading={checkingToken} />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </RoutesWrapper>
+  );
+};
+
+export const Router: React.FunctionComponent<RouterPropsType> = ({ location }) => {
+  return location ? (
+    <StaticRouter location={location}>
+      <Routes />
+    </StaticRouter>
+  ) : (
+    <BrowserRouter>
+      <Routes />
+    </BrowserRouter>
   );
 };
