@@ -1,13 +1,13 @@
 /** @format */
 
-import React, { useContext } from 'react';
-import { AuthorisationContext } from '../../routing/authorise';
-import { useSelector } from '../../store';
+import React from 'react';
+import { useAuthorisation } from '../../routing/authorise';
 import { AsideContentElement, PageAsideElement } from './elements';
 
 export const Aside: React.FunctionComponent = () => {
-  const { checkingToken } = useContext(AuthorisationContext);
-  const user = useSelector((state) => state.authorisation.user);
+  const { checkingToken, user } = useAuthorisation();
+
+  console.log(checkingToken);
 
   if (checkingToken)
     return (

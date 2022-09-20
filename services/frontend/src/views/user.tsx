@@ -1,11 +1,10 @@
 /** @format */
 
 import React from 'react';
-import { Authorise } from '../routing/authorise';
-import { useSelector } from '../store';
+import { Authorise, useAuthorisation } from '../routing/authorise';
 
 const _User: React.FunctionComponent = () => {
-  const user = useSelector((state) => state.authorisation.user);
+  const { user } = useAuthorisation();
   return <pre>{JSON.stringify(user, null, 4)}</pre>;
 };
 

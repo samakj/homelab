@@ -1,9 +1,9 @@
 /** @format */
 
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
-import { AuthorisationContext } from '../../routing/authorise';
+import { useAuthorisation } from '../../routing/authorise';
 import { useDispatch, useSelector } from '../../store';
 import { logout } from '../../store/slices/authorisation/thunks';
 import {
@@ -17,7 +17,7 @@ export const UserArea: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { checkingToken } = useContext(AuthorisationContext);
+  const { checkingToken } = useAuthorisation();
   const [params] = useSearchParams();
   const user = useSelector((state) => state.authorisation.user);
   const access_token = useSelector((state) => state.authorisation.access_token);
