@@ -12,6 +12,7 @@ import { Index } from '../views/index';
 import { Login } from '../views/login';
 import { User } from '../views/user';
 import { useDispatch } from '../store';
+import { PageStructure } from '../components/page-structure';
 
 export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
   location,
@@ -35,12 +36,14 @@ export const Routes: React.FunctionComponent = () => {
   }, [dispatch, cookies]);
 
   return (
-    <RoutesWrapper>
-      <Route path="/" element={<Index />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/user" element={<User isLoading={checkingToken} />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </RoutesWrapper>
+    <PageStructure>
+      <RoutesWrapper>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/user" element={<User isLoading={checkingToken} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </RoutesWrapper>
+    </PageStructure>
   );
 };
 

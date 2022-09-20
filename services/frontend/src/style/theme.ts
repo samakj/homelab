@@ -6,6 +6,11 @@ export const theme = {
     white: '#fff',
     red: '#f00',
   },
+  dimensions: {
+    sidebar: {
+      width: '16rem',
+    },
+  },
 };
 
 export type ThemeType = typeof theme;

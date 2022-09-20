@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { transparentize } from 'polished';
 
 export const LoginFormWrapperElement = styled.div`
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
