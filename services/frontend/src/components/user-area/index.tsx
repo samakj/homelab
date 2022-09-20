@@ -17,10 +17,8 @@ export const UserArea: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { checkingToken } = useAuthorisation();
+  const { checkingToken, user, access_token } = useAuthorisation();
   const [params] = useSearchParams();
-  const user = useSelector((state) => state.authorisation.user);
-  const access_token = useSelector((state) => state.authorisation.access_token);
 
   const next = useMemo(() => {
     return params.get('next') || location.pathname.replace('/login', '/');
