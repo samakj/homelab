@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { useSelector } from '../store';
 import { AuthorisePropsType } from './types';
 
@@ -11,6 +11,7 @@ export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({
   children,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.authorisation.user);
   const session = useSelector((state) => state.authorisation.session);
 
@@ -36,21 +37,21 @@ export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({
     if (!isLoading) {
       if (!isValidSession) {
         console.error('Invalid session');
-        navigate('/login', { replace: true });
+        navigate(`/login?next=${location.pathname}`, { replace: true });
       } else if (!isInScope) {
         console.error('Out of scope');
         navigate('/', { replace: true });
       }
     }
-  }, [isLoading, isValidSession, isInScope]);
+  }, [isLoading, isValidSession, isInScope, navigate, location]);
 
   return (
     <>
       {isLoading ? (
         <div>Loading...</div>
-      ) : isValidSession ? (
+      ) : !isValidSession ? (
         'Invalid session!'
-      ) : isInScope ? (
+      ) : !isInScope ? (
         'Out of scope!'
       ) : (
         children
