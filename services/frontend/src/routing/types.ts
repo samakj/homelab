@@ -5,6 +5,10 @@ export interface RouterPropsType {
 }
 
 export interface AuthorisePropsType {
-  isLoading: boolean;
   scopes: string[];
+}
+
+export interface AuthorisationContextType {
+  checkingToken: boolean;
+  setCheckingToken: (checkingToken: boolean) => void;
 }

@@ -1,17 +1,18 @@
 /** @format */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useSelector } from '../store';
-import { AuthorisePropsType } from './types';
+import { AuthorisationContextType, AuthorisePropsType } from './types';
 
-export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({
-  isLoading,
-  scopes,
-  children,
-}) => {
+export const AuthorisationContext = React.createContext<AuthorisationContextType>(
+  {} as AuthorisationContextType
+);
+
+export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({ scopes, children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { checkingToken } = useContext(AuthorisationContext);
   const user = useSelector((state) => state.authorisation.user);
   const session = useSelector((state) => state.authorisation.session);
 
@@ -34,7 +35,7 @@ export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({
   }, [user]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!checkingToken) {
       if (!isValidSession) {
         console.error('Invalid session');
         navigate(`/login?next=${location.pathname}`, { replace: true });
@@ -43,11 +44,11 @@ export const Authorise: React.FunctionComponent<AuthorisePropsType> = ({
         navigate('/', { replace: true });
       }
     }
-  }, [isLoading, isValidSession, isInScope, navigate, location]);
+  }, [checkingToken, isValidSession, isInScope, navigate, location]);
 
   return (
     <>
-      {isLoading ? (
+      {checkingToken ? (
         <div>Loading...</div>
       ) : !isValidSession ? (
         'Invalid session!'

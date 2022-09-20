@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Authorise } from '../routing/authorise';
-import { AuthorisePropsType } from '../routing/types';
 import { useSelector } from '../store';
 
 const _User: React.FunctionComponent = () => {
@@ -10,10 +9,8 @@ const _User: React.FunctionComponent = () => {
   return <pre>{JSON.stringify(user, null, 4)}</pre>;
 };
 
-export const User: React.FunctionComponent<Pick<AuthorisePropsType, 'isLoading'>> = ({
-  isLoading,
-}) => (
-  <Authorise isLoading={isLoading} scopes={[]}>
+export const User: React.FunctionComponent = () => (
+  <Authorise scopes={[]}>
     <_User />
   </Authorise>
 );
