@@ -16,12 +16,12 @@ export const PageHeaderElement = styled.header`
   grid-area: header;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid ${({ theme }) => transparentize(0.9, theme.colours.white)};
+  border-bottom: 1px solid ${({ theme }) => theme.colours.border.light};
 `;
 
 export const PageAsideElement = styled.aside`
   grid-area: aside;
-  border-right: 1px solid ${({ theme }) => transparentize(0.9, theme.colours.white)};
+  border-right: 1px solid ${({ theme }) => theme.colours.border.light};
 `;
 
 export const PageMainElement = styled.main`

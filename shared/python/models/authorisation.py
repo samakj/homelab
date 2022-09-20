@@ -36,3 +36,10 @@ class LoginResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class LogoutResponse(BaseModel):
+    session: Session
+
+    class Config:
+        orm_mode = True

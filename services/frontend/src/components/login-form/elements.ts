@@ -16,7 +16,7 @@ export const LoginFormContainerElement = styled.div`
   grid-template-rows: auto auto;
   grid-gap: 1rem;
   padding: 1rem;
-  box-shadow: 0 0 1rem 0 ${({ theme }) => transparentize(0.8, theme.colours.white)};
+  box-shadow: 0 0 1rem 0 ${({ theme }) => theme.colours.border.light};
 `;
 
 export const LoginFormElement = styled.form`
@@ -40,8 +40,7 @@ export const ButtonElement = styled.button`
   text-transform: uppercase;
   font-weight: bold;
   padding: 1rem;
-  background-color: ${({ theme }) => theme.colours.white};
-  font-family: 'Roboto', sans-serif;
+  background-color: ${({ theme }) => theme.colours.foreground};
   margin-top: 0.5rem;
   transition: background-color 300ms;
 

@@ -16,8 +16,8 @@ export const LabelElement = styled.span`
 export const InputElement = styled.input`
   appearance: none;
   border: none;
-  border-bottom: 1px solid ${({ theme }) => transparentize(0.75, theme.colours.white)};
-  color: ${({ theme }) => theme.colours.white};
+  border-bottom: 1px solid ${({ theme }) => transparentize(0.75, theme.colours.foreground)};
+  color: ${({ theme }) => theme.colours.foreground};
   padding: 0.25rem;
   font-size: 1rem;
   width: fill-available;
@@ -26,6 +26,6 @@ export const InputElement = styled.input`
   transition: border-color 300ms;
 
   &:focus {
-    border-bottom-color: ${({ theme }) => theme.colours.white};
+    border-bottom-color: ${({ theme }) => theme.colours.foreground};
   }
 `;

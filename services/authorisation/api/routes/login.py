@@ -7,7 +7,7 @@ from auth.jwt import sign_jwt
 from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from shared.python.models.authorisation import LoginResponse
+from shared.python.models.authorisation import LoginResponse, LogoutResponse
 from shared.python.models.session import CreateSession, Session
 from shared.python.models.user import User, UserNoPassword
 
@@ -82,6 +82,24 @@ async def login(
         ),
         session=session,
     )
+
+
+@LOGIN_V0_ROUTER.post("/logout", response_model=LogoutResponse)
+async def logout(
+    user_credentials: UserCredentials = Depends(BearerUser()),
+    sessions_store: SessionsStore = Depends(SessionsStore),
+) -> LoginResponse:
+    session = await sessions_store.update_session(
+        Session(
+            id=user_credentials.session.id,
+            user_id=user_credentials.session.user_id,
+            created=user_credentials.session.created,
+            expires=user_credentials.session.expires,
+            ip=user_credentials.session.ip,
+            disabled=True,
+        )
+    )
+    return LogoutResponse(session=session)
 
 
 @LOGIN_V0_ROUTER.get("/token", response_model=UserCredentials)

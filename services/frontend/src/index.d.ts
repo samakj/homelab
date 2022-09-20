@@ -1,7 +1,7 @@
 /** @format */
 
 import 'styled-components';
-import { ThemeType } from './style/theme';
+import { ThemeType } from './style/types';
 
 declare var process: {
   env: {

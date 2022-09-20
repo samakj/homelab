@@ -3,12 +3,13 @@
 import { ActionReducerMapBuilder, createSlice } from '@reduxjs/toolkit';
 import { authorisationConfig } from '../../../configs/authorisation';
 import { initialRequestMeta } from '../types';
-import { checkToken, login } from './thunks';
+import { checkToken, login, logout } from './thunks';
 import { AuthorisationSliceType } from './types';
 
 export const initialState: AuthorisationSliceType = {
   requests: {
     login: initialRequestMeta,
+    logout: initialRequestMeta,
     checkToken: initialRequestMeta,
   },
   user: undefined,
@@ -41,6 +42,23 @@ export const authorisationSlice = createSlice({
         state.requests.login.error = action.payload || action.error;
         state.requests.login.isLoading = false;
         state.requests.login.finished = new Date().toISOString();
+      })
+      .addCase(logout.pending, (state, action): void => {
+        state.requests.logout.isLoading = true;
+        state.requests.logout.started = new Date().toISOString();
+      })
+      .addCase(logout.fulfilled, (state, action): void => {
+        state.user = undefined;
+        state.access_token = undefined;
+        state.session = undefined;
+        document.cookie = `${authorisationConfig.cookie}=; expires=Sun, 1 Jan 2000 00:00:00 UTC`;
+        state.requests.logout.isLoading = false;
+        state.requests.logout.finished = new Date().toISOString();
+      })
+      .addCase(logout.rejected, (state, action): void => {
+        state.requests.logout.error = action.payload || action.error;
+        state.requests.logout.isLoading = false;
+        state.requests.logout.finished = new Date().toISOString();
       })
       .addCase(checkToken.pending, (state, action): void => {
         state.requests.checkToken.isLoading = true;

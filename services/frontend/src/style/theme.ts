@@ -1,6 +1,9 @@
 /** @format */
 
-export const theme = {
+import { transparentize } from 'polished';
+import { ThemeType } from './types';
+
+const theme = {
   colours: {
     black: '#000',
     white: '#fff',
@@ -11,6 +14,15 @@ export const theme = {
       width: '16rem',
     },
   },
+} as ThemeType;
+
+theme.colours.foreground = theme.colours.white;
+theme.colours.background = theme.colours.black;
+theme.colours.border = {
+  light: transparentize(0.9, theme.colours.foreground),
+};
+theme.colours.placeholder = {
+  light: transparentize(0.9, theme.colours.foreground),
 };
 
-export type ThemeType = typeof theme;
+export { theme };

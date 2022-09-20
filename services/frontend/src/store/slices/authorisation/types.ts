@@ -23,6 +23,16 @@ export interface LoginResponseType {
   session: SessionType;
 }
 
+export interface LogoutUrlParamsType {
+  access_token: string;
+}
+
+export interface LogoutParamsType extends LogoutUrlParamsType {}
+
+export interface LogoutResponseType {
+  session: SessionType;
+}
+
 export interface TokenUrlParamsType {
   access_token: string;
 }
@@ -52,6 +62,7 @@ export interface CheckTokenResponseType {
 export interface AuthorisationSliceType {
   requests: {
     login: RequestMetaType;
+    logout: RequestMetaType;
     checkToken: RequestMetaType;
   };
   user?: UserType;
