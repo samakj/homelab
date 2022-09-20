@@ -80,6 +80,7 @@ async def login(
             name=user.name,
             scopes=user.scopes,
         ),
+        session=session,
     )
 
 

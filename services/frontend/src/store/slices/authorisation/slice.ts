@@ -28,6 +28,7 @@ export const authorisationSlice = createSlice({
       .addCase(login.fulfilled, (state, action): void => {
         state.user = action.payload.user;
         state.access_token = action.payload.access_token;
+        state.session = action.payload.session;
         document.cookie = `${authorisationConfig.cookie}=${action.payload.access_token}`;
         state.requests.login.isLoading = false;
         state.requests.login.finished = new Date().toISOString();
@@ -35,6 +36,7 @@ export const authorisationSlice = createSlice({
       .addCase(login.rejected, (state, action): void => {
         state.user = undefined;
         state.access_token = undefined;
+        state.session = undefined;
         document.cookie = `${authorisationConfig.cookie}=; expires=Sun, 1 Jan 2000 00:00:00 UTC`;
         state.requests.login.error = action.payload || action.error;
         state.requests.login.isLoading = false;

@@ -32,6 +32,7 @@ class PermissionCredentials(UserCredentials):
 class LoginResponse(BaseModel):
     access_token: str
     user: UserNoPassword
+    session: Session
 
     class Config:
         orm_mode = True

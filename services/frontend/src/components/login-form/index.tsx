@@ -31,14 +31,7 @@ export const LoginForm: React.FunctionComponent = () => {
       event.preventDefault();
       if (username && password) {
         const loginAction = await dispatch(login({ username, password }));
-        if (loginAction.type === login.fulfilled.type) {
-          const payload = loginAction.payload as LoginResponseType;
-          const checkTokenAction = await dispatch(
-            checkToken({ access_token: payload.access_token })
-          );
-          if (checkTokenAction.type === checkToken.fulfilled.type)
-            navigate(params.get('next') || '/');
-        }
+        if (loginAction.type === login.fulfilled.type) navigate(params.get('next') || '/');
       }
     },
     [dispatch, username, password, navigate, params]

@@ -20,6 +20,7 @@ export interface LoginParamsType {
 export interface LoginResponseType {
   access_token: string;
   user: UserType;
+  session: SessionType;
 }
 
 export interface TokenUrlParamsType {
