@@ -15,8 +15,9 @@ export const AuthorisationContext = React.createContext<AuthorisationContextType
 export const AuthorisationProvider: React.FunctionComponent = ({ children }) => {
   const dispatch = useDispatch();
   const [cookies] = useCookies([authorisationConfig.cookie]);
-  const access_token = useMemo(() => cookies[authorisationConfig.cookie], [cookies]);
-  const [checkingToken, setCheckingToken] = useState(!!access_token);
+  const cookie_access_token = useMemo(() => cookies[authorisationConfig.cookie], [cookies]);
+  const [access_token, setAccessToken] = useState<string | undefined>(undefined);
+  const [checkingToken, setCheckingToken] = useState(!!cookie_access_token);
 
   const user = useSelector((state) => state.authorisation.user);
   const session = useSelector((state) => state.authorisation.session);
@@ -43,11 +44,14 @@ export const AuthorisationProvider: React.FunctionComponent = ({ children }) => 
   );
 
   useEffect(() => {
-    if (access_token) {
+    if (cookie_access_token) {
       setCheckingToken(true);
-      dispatch(checkToken({ access_token })).then(() => setCheckingToken(false));
+      dispatch(checkToken({ access_token: cookie_access_token })).then((action) => {
+        if (action.type === checkToken.fulfilled.type) setAccessToken(cookie_access_token);
+        setCheckingToken(false);
+      });
     }
-  }, [dispatch, cookies, setCheckingToken]);
+  }, [dispatch, cookie_access_token, setCheckingToken, setAccessToken]);
 
   return (
     <AuthorisationContext.Provider

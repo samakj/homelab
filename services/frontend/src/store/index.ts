@@ -4,10 +4,12 @@ import { configureStore } from '@reduxjs/toolkit';
 import { EqualityFn, useDispatch as _useDispatch, useSelector as _useSelector } from 'react-redux';
 import { isClient } from '../utils';
 import { authorisationSlice } from './slices/authorisation/slice';
+import { locationsSlice } from './slices/locations/slice';
 
 export const store = configureStore({
   reducer: {
     authorisation: authorisationSlice.reducer,
+    locations: locationsSlice.reducer,
   },
   preloadedState: {},
 });

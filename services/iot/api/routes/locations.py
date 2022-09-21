@@ -100,6 +100,6 @@ async def delete_location(
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="locations.delete")
     ),
-) -> Location:
+) -> None:
     await locations_store.delete_location(id=id)
     return None

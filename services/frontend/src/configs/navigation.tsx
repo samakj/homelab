@@ -1,8 +1,8 @@
 /** @format */
 
 import React from 'react';
-import { IconType } from 'react-icons';
-import { MdPerson, MdHomeFilled } from 'react-icons/md';
+import { MdPerson, MdHomeFilled, MdGpsFixed } from 'react-icons/md';
+import { scopesMap } from './scopes';
 
 export const navigationConfig: {
   [key: string]: {
@@ -23,10 +23,10 @@ export const navigationConfig: {
     name: 'User',
     scopes: [],
   },
-  '/metrics': {
-    path: '/metrics',
-    icon: <MdPerson />,
-    name: 'Metrics',
-    scopes: ['metrics.get'],
+  '/locations': {
+    path: '/locations',
+    icon: <MdGpsFixed />,
+    name: 'Locations',
+    scopes: [scopesMap.locations.get],
   },
 };

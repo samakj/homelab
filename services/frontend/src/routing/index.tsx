@@ -4,12 +4,13 @@ import React from 'react';
 import { BrowserRouter, Routes as RoutesWrapper, Route, Navigate } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import { RouterPropsType } from './types';
+import { AuthorisationProvider } from './authorise';
 
+import { PageStructure } from '../components/page-structure';
 import { Index } from '../views/index';
 import { Login } from '../views/login';
 import { User } from '../views/user';
-import { PageStructure } from '../components/page-structure';
-import { AuthorisationProvider } from './authorise';
+import { Locations } from '../views/locations';
 
 export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
   location,
@@ -29,6 +30,7 @@ export const Routes: React.FunctionComponent = () => {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/user" element={<User />} />
+          <Route path="/locations" element={<Locations />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </RoutesWrapper>
       </PageStructure>
