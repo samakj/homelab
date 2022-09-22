@@ -27,6 +27,9 @@ export const PageAsideElement = styled.aside`
 export const PageMainElement = styled.main`
   grid-area: main;
   padding: 1rem;
+  overflow: auto;
+  height: 100%;
+  width: 100%;
 `;
 
 export const HeaderElement = styled.h1`

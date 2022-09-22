@@ -3,7 +3,10 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
 
-export const ModalRootElement = styled.div``;
+export const ModalRootElement = styled.div`
+  height: 0;
+  width: 0;
+`;
 
 export const ModalBackgroundElement = styled.div`
   background-color: ${({ theme }) => transparentize(0.2, theme.colours.background)};
@@ -30,4 +33,18 @@ export const ModalContentElement = styled.div`
 export const ModalTitleElement = styled.h2`
   margin: 0 0 2rem;
   font-size: 1.25rem;
+`;
+
+export const ModalBodyElement = styled.div`
+  margin-bottom: 1rem;
+`;
+
+export const ModalActionsElement = styled.div`
+  * {
+    margin-right: 0.25rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 `;

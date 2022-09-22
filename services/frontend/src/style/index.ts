@@ -9,6 +9,7 @@ body {
   background-color: ${({ theme }) => theme.colours.background};
   color: ${({ theme }) => theme.colours.foreground};
   font-family: 'Roboto', sans-serif;
+  overflow: hidden;
 
   * {
     box-sizing: border-box;
@@ -17,6 +18,11 @@ body {
   button {
     font-family: 'Roboto', sans-serif;
     cursor: pointer;
+    appearance: none;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
 
     &:disabled {
       cursor: auto;
