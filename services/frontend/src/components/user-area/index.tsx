@@ -4,14 +4,10 @@ import React, { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthorisation } from '../../routing/authorise';
-import { useDispatch, useSelector } from '../../store';
+import { useDispatch } from '../../store';
 import { logout } from '../../store/slices/authorisation/thunks';
-import {
-  LoginLinkElement,
-  LogoutButtonElement,
-  UserAreaContainerElement,
-  UserMenuElement,
-} from './elements';
+import { Button } from '../button';
+import { LoginLinkElement, UserAreaContainerElement, UserMenuElement } from './elements';
 
 export const UserArea: React.FunctionComponent = () => {
   const dispatch = useDispatch();
@@ -42,7 +38,7 @@ export const UserArea: React.FunctionComponent = () => {
     <UserAreaContainerElement>
       {user.name}
       <UserMenuElement>
-        <LogoutButtonElement onClick={onLogoutClick}>Log Out</LogoutButtonElement>
+        <Button onClick={onLogoutClick}>Log Out</Button>
       </UserMenuElement>
     </UserAreaContainerElement>
   );

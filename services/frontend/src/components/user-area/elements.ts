@@ -35,16 +35,3 @@ export const LoginLinkElement = styled(Link)`
   font-weight: bold;
   text-transform: uppercase;
 `;
-
-export const LogoutButtonElement = styled.button`
-  background-color: ${({ theme }) => theme.colours.foreground};
-  color: ${({ theme }) => theme.colours.background};
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  border: none;
-  appearance: none;
-  margin: 1rem;
-`;
