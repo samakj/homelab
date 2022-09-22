@@ -49,11 +49,9 @@ export const CreateModal: React.FunctionComponent<CreateModalPropsType> = ({ clo
       <ModalContentElement>
         <ModalTitleElement>Create Location</ModalTitleElement>
         <CreateModalBodyElement>
-          {createError && (
-            <ErrorElement>
-              {createError?.json?.detail || createError?.message || 'Unknown Error'}
-            </ErrorElement>
-          )}
+          {createError?.json?.detail
+            ? JSON.stringify(createError.json.detail)
+            : createError?.message || 'Unknown Error'}
           <Input
             type="text"
             label="Name"

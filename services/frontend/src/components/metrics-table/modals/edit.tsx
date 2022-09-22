@@ -60,7 +60,9 @@ export const EditModal: React.FunctionComponent<EditModalPropsType> = ({ metricI
         <EditModalBodyElement>
           {updateError && (
             <ErrorElement>
-              {updateError?.json?.detail || updateError?.message || 'Unknown Error'}
+              {updateError?.json?.detail
+                ? JSON.stringify(updateError.json.detail)
+                : updateError?.message || 'Unknown Error'}
             </ErrorElement>
           )}
           <Input

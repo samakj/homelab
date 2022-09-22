@@ -12,6 +12,7 @@ import { Login } from '../views/login';
 import { User } from '../views/user';
 import { Locations } from '../views/locations';
 import { Metrics } from '../views/metrics';
+import { Devices } from '../views/devices';
 
 export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
   location,
@@ -29,6 +30,7 @@ export const Routes: React.FunctionComponent = () => {
       <PageStructure>
         <RoutesWrapper>
           <Route path="/" element={<Index />} />
+          <Route path="/devices" element={<Devices />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/login" element={<Login />} />
           <Route path="/metrics" element={<Metrics />} />

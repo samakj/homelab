@@ -9,7 +9,7 @@ export interface DeviceType {
   ip: string;
   websocket_path: string;
   location_id: LocationType['id'];
-  last_message: string;
+  last_message?: string;
 }
 
 export interface DeviceUrlPathParamsType {
