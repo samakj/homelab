@@ -6,6 +6,7 @@ import { isClient } from '../utils';
 import { authorisationSlice } from './slices/authorisation/slice';
 import { devicesSlice } from './slices/devices/slice';
 import { locationsSlice } from './slices/locations/slice';
+import { measurementsSlice } from './slices/measurements/slice';
 import { metricsSlice } from './slices/metrics/slice';
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     devices: devicesSlice.reducer,
     locations: locationsSlice.reducer,
     metrics: metricsSlice.reducer,
+    measurements: measurementsSlice.reducer,
   },
   preloadedState: {},
 });
