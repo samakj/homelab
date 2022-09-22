@@ -30,8 +30,9 @@ export const AuthorisationProvider: React.FunctionComponent = ({ children }) => 
   }, [session]);
 
   const isInScope = useCallback(
-    (scopes: string[]) => {
+    (scopes: string | string[]) => {
       if (!user) return false;
+      if (!Array.isArray(scopes)) scopes = [scopes];
       if (
         scopes.find(
           (routeScope) => !user.scopes.find((userScope) => routeScope.startsWith(userScope))

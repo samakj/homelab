@@ -18,5 +18,5 @@ export interface AuthorisationContextType {
   session?: SessionType;
   access_token?: string;
   isValidSession: boolean;
-  isInScope: (scopes: string[]) => boolean;
+  isInScope: (scopes: string | string[]) => boolean;
 }
