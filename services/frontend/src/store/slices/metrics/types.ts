@@ -6,7 +6,7 @@ export interface MetricType {
   id: number;
   name: string;
   abbreviation: string;
-  unit: string;
+  unit?: string;
 }
 
 export interface MetricUrlPathParamsType {
