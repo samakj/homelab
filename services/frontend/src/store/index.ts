@@ -6,12 +6,14 @@ import { isClient } from '../utils';
 import { authorisationSlice } from './slices/authorisation/slice';
 import { devicesSlice } from './slices/devices/slice';
 import { locationsSlice } from './slices/locations/slice';
+import { metricsSlice } from './slices/metrics/slice';
 
 export const store = configureStore({
   reducer: {
     authorisation: authorisationSlice.reducer,
     devices: devicesSlice.reducer,
     locations: locationsSlice.reducer,
+    metrics: metricsSlice.reducer,
   },
   preloadedState: {},
 });
