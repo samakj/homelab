@@ -3,6 +3,7 @@
 import React from 'react';
 import { Provider as StoreProvider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
+import { ModalRoot } from './components/modal';
 import { Router } from './routing';
 import { RouterPropsType } from './routing/types';
 import { store } from './store';
@@ -15,6 +16,7 @@ export const App: React.FunctionComponent<RouterPropsType> = (props) => {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Router location={props.location} />
+        <ModalRoot />
       </ThemeProvider>
     </StoreProvider>
   );
