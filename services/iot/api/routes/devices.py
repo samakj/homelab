@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, WebSocket
 
 from stores.devices import DevicesStore
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.device import Device, CreateDevice
 from shared.python.helpers.bearer_permission import BearerPermission
+from shared.python.extensions.speedyapi.websockets import Websockets
 
 
 DEVICES_V0_ROUTER = APIRouter(prefix="/v0/devices", tags=["devices"])
@@ -113,3 +114,16 @@ async def delete_device(
 ) -> Device:
     await devices_store.delete_device(id=id)
     return None
+
+
+@DEVICES_V0_ROUTER.websocket("/ws")
+async def devices_websocket(
+    websocket: WebSocket,
+    scope: Optional[str] = Query(default="devices"),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="devices")),
+    websockets: Websockets = Depends(Websockets),
+) -> None:
+    connection = await websockets.add_websocket(
+        scope="devices", session=permissions.session
+    )
+    await connection.listen()
