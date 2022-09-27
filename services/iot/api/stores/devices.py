@@ -96,7 +96,21 @@ class DevicesStore:
                 last_message=to_filter(device.last_message),
             )
         )
-        return await self.get_device(id=row["id"])
+
+        device = await self.get_device(id=row["id"])
+
+        await self.websockets.broadcast_to_scope(
+            "devices.update",
+            json.dumps(
+                {
+                    "action": "UPDATE",
+                    "resource": "device",
+                    "device": device.json(),
+                }
+            ),
+        )
+
+        return device
 
     async def update_device(self, device: Device) -> Optional[Device]:
         await self.connection.execute(
@@ -130,3 +144,14 @@ class DevicesStore:
 
     async def delete_device(self, id: int) -> None:
         await self.connection.execute(DELETE_DEVICE.format(id=to_filter(id)))
+
+        await self.websockets.broadcast_to_scope(
+            "devices.update",
+            json.dumps(
+                {
+                    "action": "UPDATE",
+                    "resource": "device",
+                    "device": {"id": id},
+                }
+            ),
+        )

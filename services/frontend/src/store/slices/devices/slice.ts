@@ -1,6 +1,6 @@
 /** @format */
 
-import { ActionReducerMapBuilder, createSlice } from '@reduxjs/toolkit';
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { initialRequestMeta } from '../types';
 import {
   createDevice,
@@ -11,6 +11,11 @@ import {
   updateDevice,
 } from './thunks';
 import { DevicesSliceType, DeviceType } from './types';
+import {
+  CreateDeviceMessageAction,
+  DeleteDeviceMessageAction,
+  UpdateDeviceMessageAction,
+} from './websocket';
 
 export const initialState: DevicesSliceType = {
   requests: {
@@ -24,16 +29,20 @@ export const initialState: DevicesSliceType = {
   devices: undefined,
 };
 
-export const setDevices = (state: DevicesSliceType, devices: DeviceType | DeviceType[]) => {
+export const setDevices = (
+  state: DevicesSliceType,
+  action: Pick<PayloadAction<DeviceType | DeviceType[]>, 'payload'>
+) => {
   state.devices = state.devices || {};
-  if (Array.isArray(devices)) devices.forEach((device) => setDevices(state, device));
-  else state.devices[devices.id] = devices;
+  if (Array.isArray(action.payload))
+    action.payload.forEach((device) => setDevices(state, { payload: device }));
+  else state.devices[action.payload.id] = action.payload;
 };
 
 export const devicesSlice = createSlice({
   name: 'devices',
   initialState,
-  reducers: {},
+  reducers: { setDevices },
   extraReducers: (builder: ActionReducerMapBuilder<DevicesSliceType>): void => {
     builder
       .addCase(getDevice.pending, (state, action) => {
@@ -41,7 +50,7 @@ export const devicesSlice = createSlice({
         state.requests.getDevice.started = new Date().toISOString();
       })
       .addCase(getDevice.fulfilled, (state, action) => {
-        setDevices(state, action.payload);
+        setDevices(state, action);
         state.requests.getDevice.isLoading = false;
         state.requests.getDevice.finished = new Date().toISOString();
       })
@@ -55,7 +64,7 @@ export const devicesSlice = createSlice({
         state.requests.getDeviceByIPOrMAC.started = new Date().toISOString();
       })
       .addCase(getDeviceByIPOrMAC.fulfilled, (state, action) => {
-        setDevices(state, action.payload);
+        setDevices(state, action);
         state.requests.getDeviceByIPOrMAC.isLoading = false;
         state.requests.getDeviceByIPOrMAC.finished = new Date().toISOString();
       })
@@ -69,7 +78,7 @@ export const devicesSlice = createSlice({
         state.requests.getDevices.started = new Date().toISOString();
       })
       .addCase(getDevices.fulfilled, (state, action) => {
-        setDevices(state, action.payload);
+        setDevices(state, action);
         state.requests.getDevices.isLoading = false;
         state.requests.getDevices.finished = new Date().toISOString();
       })
@@ -83,7 +92,7 @@ export const devicesSlice = createSlice({
         state.requests.createDevice.started = new Date().toISOString();
       })
       .addCase(createDevice.fulfilled, (state, action) => {
-        setDevices(state, action.payload);
+        setDevices(state, action);
         state.requests.createDevice.isLoading = false;
         state.requests.createDevice.finished = new Date().toISOString();
       })
@@ -97,7 +106,7 @@ export const devicesSlice = createSlice({
         state.requests.updateDevice.started = new Date().toISOString();
       })
       .addCase(updateDevice.fulfilled, (state, action) => {
-        setDevices(state, action.payload);
+        setDevices(state, action);
         state.requests.updateDevice.isLoading = false;
         state.requests.updateDevice.finished = new Date().toISOString();
       })
@@ -119,6 +128,15 @@ export const devicesSlice = createSlice({
         state.requests.deleteDevice.error = action.payload || action.error;
         state.requests.deleteDevice.isLoading = false;
         state.requests.deleteDevice.finished = new Date().toISOString();
+      })
+      .addCase(CreateDeviceMessageAction, (state, action) => {
+        setDevices(state, { payload: action.payload.device });
+      })
+      .addCase(UpdateDeviceMessageAction, (state, action) => {
+        setDevices(state, { payload: action.payload.device });
+      })
+      .addCase(DeleteDeviceMessageAction, (state, action) => {
+        if (state.devices) delete state.devices[action.payload.device.id];
       });
   },
 });

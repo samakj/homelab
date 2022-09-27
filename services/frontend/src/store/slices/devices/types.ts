@@ -1,6 +1,6 @@
 /** @format */
 
-import { RequestMetaType } from '../types';
+import { RequestMetaType, WebsocketMessageActionsEnum, WebsocketMessageType } from '../types';
 import { LocationType } from '../locations/types';
 
 export interface DeviceType {
@@ -68,6 +68,57 @@ export type UpdateDeviceResponseType = DeviceType;
 export interface DeleteDeviceParamsType extends DeviceUrlPathParamsType, DeviceUrlParamsType {}
 
 export type DeleteDeviceResponseType = null;
+
+export interface CreateDeviceWebsocketMessageType
+  extends WebsocketMessageType<
+    'device',
+    'device',
+    DeviceType,
+    WebsocketMessageActionsEnum.CREATE
+  > {}
+
+export interface UpdateDeviceWebsocketMessageType
+  extends WebsocketMessageType<
+    'device',
+    'device' | 'oldDevice',
+    DeviceType,
+    WebsocketMessageActionsEnum.UPDATE
+  > {}
+
+export interface DeleteDeviceWebsocketMessageType
+  extends WebsocketMessageType<
+    'device',
+    'device',
+    Pick<DeviceType, 'id'>,
+    WebsocketMessageActionsEnum.DELETE
+  > {}
+
+export type DeviceWebsocketMessageType =
+  | CreateDeviceWebsocketMessageType
+  | UpdateDeviceWebsocketMessageType
+  | DeleteDeviceWebsocketMessageType;
+
+export const isCreateDeviceWebsocketMessageType = (
+  message: DeviceWebsocketMessageType
+): message is CreateDeviceWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.CREATE;
+
+export const isUpdateDeviceWebsocketMessageType = (
+  message: DeviceWebsocketMessageType
+): message is UpdateDeviceWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.UPDATE;
+
+export const isDeleteDeviceWebsocketMessageType = (
+  message: DeviceWebsocketMessageType
+): message is DeleteDeviceWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.DELETE;
+
+export interface UseDevicesWebsocketPropsType {
+  onOpen: (event: Event, websocket: WebSocket | null) => void;
+  onMessage: (event: MessageEvent<DeviceWebsocketMessageType>, websocket: WebSocket | null) => void;
+  onError: (event: Event, websocket: WebSocket | null) => void;
+  onClose: (event: CloseEvent, websocket: WebSocket | null) => void;
+}
 
 export interface DevicesStateType {
   [deviceId: number]: DeviceType;
