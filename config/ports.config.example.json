@@ -15,5 +15,7 @@
     "authorisation_api": 0,
     "iot_api":           0,
     "utilities_api":     0,
-    "weather_api":       0
+    "weather_api":       0,
+    
+    "iot_devices_scraper": 0
 }

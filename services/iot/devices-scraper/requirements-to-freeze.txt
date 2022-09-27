@@ -1,0 +1,8 @@
+asyncio
+black
+click
+fastapi
+flake8
+httpx
+mypy
+uvicorn[standard]

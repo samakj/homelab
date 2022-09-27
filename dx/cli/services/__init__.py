@@ -1,7 +1,7 @@
 import click
 
 from services.authorisation import authorisation_api, build as build_authorisation
-from services.iot import iot_api, build as build_iot
+from services.iot import iot, build as build_iot
 from services.gps import gps_api, build as build_gps
 from services.postgres import postgres, build as build_postgres
 from services.redis import redis, build as build_redis
@@ -15,7 +15,7 @@ def services() -> None:
 
 
 services.add_command(cmd=authorisation_api)
-services.add_command(cmd=iot_api)
+services.add_command(cmd=iot)
 services.add_command(cmd=gps_api)
 services.add_command(cmd=postgres)
 services.add_command(cmd=redis)

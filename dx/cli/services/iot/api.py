@@ -6,11 +6,11 @@ from variables import iot_service_folder, shared_folder
 
 
 @click.group()
-def iot_api() -> None:
+def api() -> None:
     pass
 
 
-@iot_api.command()
+@api.command()
 def build() -> None:
     apply_config_variables(
         input_path=iot_service_folder / "api/config.template.json",
@@ -20,7 +20,7 @@ def build() -> None:
     )
 
 
-@iot_api.command()
+@api.command()
 def freeze_requirements() -> None:
     os.chdir(iot_service_folder / "api")
     os.system(
@@ -34,7 +34,7 @@ deactivate;
     )
 
 
-@iot_api.command()
+@api.command()
 def start_venv_app() -> None:
     host = get_hosts_config()["apis"]
     port = get_ports_config()["iot_api"]
