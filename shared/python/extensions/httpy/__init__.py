@@ -107,7 +107,7 @@ class AsyncInternalClient(AsyncClient):
     ) -> Response:
         response = await super().get(
             url=url,
-            params=params,
+            params={**params, AUTH_NAME: self.token},
             headers={
                 **(headers or {}),
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
@@ -150,7 +150,7 @@ class AsyncInternalClient(AsyncClient):
             data=data,
             files=files,
             json=json,
-            params=params,
+            params={**params, AUTH_NAME: self.token},
             headers={
                 **(headers or {}),
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
@@ -193,7 +193,7 @@ class AsyncInternalClient(AsyncClient):
             data=data,
             files=files,
             json=json,
-            params=params,
+            params={**params, AUTH_NAME: self.token},
             headers={
                 **(headers or {}),
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
@@ -228,7 +228,7 @@ class AsyncInternalClient(AsyncClient):
     ) -> Response:
         response = await super().delete(
             url=url,
-            params=params,
+            params={**params, AUTH_NAME: self.token},
             headers={
                 **(headers or {}),
                 AUTH_NAME: f"{AUTH_SCHEME} {self.token}"
@@ -292,6 +292,9 @@ class AsyncInternalRequestClient:
             headers["x-forwarded-server"] = request_headers["x-forwarded-server"]
         if request_headers.get("x-forwarded-for") is not None:
             headers["x-forwarded-for"] = request_headers["x-forwarded-for"]
+
+        # General
+        headers["accept"] = "application/json"
 
         async with AsyncInternalClient(
             access_token=access_token_cookie
