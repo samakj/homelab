@@ -1,5 +1,5 @@
 from typing import Optional, Mapping, Callable, List, Union, Any
-from fastapi import Query, HTTPException
+from fastapi import Query, HTTPException, Cookie, Header
 from fastapi.requests import HTTPConnection
 
 from httpx import AsyncClient, Response, USE_CLIENT_DEFAULT
@@ -254,16 +254,16 @@ class AsyncInternalRequestClient:
     async def __call__(
         self,
         http_connection: HTTPConnection,
-        # access_token_cookie: Optional[str] = Cookie(default=None, alias=AUTH_NAME),
-        # access_token_header: Optional[str] = Header(default=None, alias=AUTH_NAME),
+        access_token_cookie: Optional[str] = Cookie(default=None, alias=AUTH_NAME),
+        access_token_header: Optional[str] = Header(default=None, alias=AUTH_NAME),
         access_token_param: Optional[str] = Query(defaut=None, alias=AUTH_NAME),
     ) -> AsyncInternalClient:
         request_headers = dict(http_connection.headers)
         headers = {}
 
         #  Client
-        if request_headers.get("host") is not None:
-            headers["host"] = request_headers["host"]
+        # if request_headers.get("host") is not None:
+        #     headers["host"] = request_headers["host"]
         if request_headers.get("origin") is not None:
             headers["origin"] = request_headers["origin"]
         if request_headers.get("user-agent") is not None:
@@ -294,7 +294,9 @@ class AsyncInternalRequestClient:
             headers["x-forwarded-for"] = request_headers["x-forwarded-for"]
 
         async with AsyncInternalClient(
-            access_token=access_token_param,
+            access_token=access_token_cookie
+            or access_token_header
+            or access_token_param,
             headers=headers,
             cookies=http_connection.cookies,
         ) as client:

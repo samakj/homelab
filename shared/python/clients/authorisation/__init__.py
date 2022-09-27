@@ -41,6 +41,8 @@ class AuthorisationClient:
         return LoginResponse.parse_obj(data)
 
     async def check_token(self) -> UserCredentials:
-        response = await self.client.get(f"{self.base_url}/v0/token")
+        response = await self.client.get(
+            f"{self.base_url}/v0/token", params={"access_token": self.client.token}
+        )
         data = response.json()
         return UserCredentials.parse_obj(data)
