@@ -41,7 +41,7 @@ async def login(
         raise HTTPException(status_code=401, detail="Log in failed.")
 
     old_sessions = await sessions_store.get_sessions(
-        expires_gte=datetime.utcnow(), disabled=False
+        expires_gte=datetime.utcnow(), user_id=user.ip, disabled=False
     )
     for session in old_sessions:
         await sessions_store.update_session(
