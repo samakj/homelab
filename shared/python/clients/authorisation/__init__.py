@@ -35,7 +35,7 @@ class AuthorisationClient:
     async def login(self, username: str, password: str) -> LoginResponse:
         response = await self.client.post(
             f"{self.base_url}/v0/login",
-            data={"username": username, "password": password},
+            json={"username": username, "password": password},
         )
         data = response.json()
         return LoginResponse.parse_obj(data)

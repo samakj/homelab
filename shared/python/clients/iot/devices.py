@@ -70,7 +70,7 @@ class DevicesClient:
     ) -> Device:
         response = await self.client.post(
             f"{self.base_url}/v0/devices",
-            data={
+            json={
                 "mac": mac,
                 "ip": ip,
                 "websocket_path": websocket_path,
@@ -87,7 +87,7 @@ class DevicesClient:
     ) -> Device:
         response = await self.client.patch(
             f"{self.base_url}/v0/devices/{device.id}",
-            data=dict(device),
+            json=dict(device),
         )
         data = response.json()
         return Device.parse_obj(data)

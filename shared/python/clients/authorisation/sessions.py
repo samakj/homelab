@@ -51,7 +51,7 @@ class SessionsClient:
     ) -> Session:
         response = await self.client.post(
             f"{self.base_url}/v0/sessions/{id}",
-            data={
+            json={
                 "user_id": user_id,
                 "ip": ip,
             },
@@ -65,7 +65,7 @@ class SessionsClient:
     ) -> Session:
         response = await self.client.patch(
             f"{self.base_url}/v0/sessions/{session.id}",
-            data=dict(session),
+            json=dict(session),
         )
         data = response.json()
         return Session.parse_obj(data)

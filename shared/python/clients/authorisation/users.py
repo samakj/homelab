@@ -66,7 +66,7 @@ class UsersClient:
     ) -> UserNoPassword:
         response = await self.client.post(
             f"{self.base_url}/v0/users/{id}",
-            data={
+            json={
                 "username": username,
                 "password": password,
                 "name": name,
@@ -82,7 +82,7 @@ class UsersClient:
     ) -> UserNoPassword:
         response = await self.client.patch(
             f"{self.base_url}/v0/users/{user.id}",
-            data=dict(user),
+            json=dict(user),
         )
         data = response.json()
         return UserNoPassword.parse_obj(data)

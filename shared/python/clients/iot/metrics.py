@@ -61,7 +61,7 @@ class MetricsClient:
     ) -> Metric:
         response = await self.client.post(
             f"{self.base_url}/v0/metrics",
-            data={
+            json={
                 "name": name,
                 "abbreviation": abbreviation,
                 "unit": unit,
@@ -76,7 +76,7 @@ class MetricsClient:
     ) -> Metric:
         response = await self.client.patch(
             f"{self.base_url}/v0/metrics/{metric.id}",
-            data=dict(metric),
+            json=dict(metric),
         )
         data = response.json()
         return Metric.parse_obj(data)

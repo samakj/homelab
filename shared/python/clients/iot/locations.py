@@ -58,7 +58,7 @@ class LocationsClient:
     ) -> Location:
         response = await self.client.post(
             f"{self.base_url}/v0/locations",
-            data={
+            json={
                 "name": name,
                 "tags": tags,
             },
@@ -72,7 +72,7 @@ class LocationsClient:
     ) -> Location:
         response = await self.client.patch(
             f"{self.base_url}/v0/locations/{location.id}",
-            data=dict(location),
+            json=dict(location),
         )
         data = response.json()
         return Location.parse_obj(data)

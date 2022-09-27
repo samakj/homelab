@@ -94,7 +94,7 @@ class MeasurementsClient:
     ) -> Measurement:
         response = await self.client.post(
             f"{self.base_url}/v0/measurements",
-            data={
+            json={
                 "timestamp": timestamp,
                 "device_id": device_id,
                 "location_id": location_id,
