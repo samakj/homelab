@@ -21,7 +21,7 @@ class UserCredentials(JWTAuthorizationCredentials):
 
 class PermissionCredentials(UserCredentials):
     route_scope: str = Field(description="The required scope for the route")
-    matched_scope: str = Field(
+    matched_scope: list[str] = Field(
         description="The user scope that matched to the route scope"
     )
 

@@ -1,3 +1,4 @@
+from typing import Union
 from fastapi import Depends, HTTPException
 
 from shared.python.models.authorisation import PermissionCredentials
@@ -5,10 +6,10 @@ from shared.python.clients.authorisation import AuthorisationClient
 
 
 class BearerPermission:
-    scope: str
+    scope: list[str]
 
-    def __init__(self, scope: str) -> None:
-        self.scope = scope
+    def __init__(self, scope: Union[str, list[str]]) -> None:
+        self.scope = scope if isinstance(scope, list) else [scope]
 
     async def __call__(
         self,
@@ -16,14 +17,19 @@ class BearerPermission:
     ) -> PermissionCredentials:
         bearer_user = await authorisation_client.check_token()
 
-        match = None
+        full_match = True
+        match = {}
 
-        for scope in bearer_user.user.scopes:
-            if self.scope.startswith(scope):
-                match = scope
+        for route_scope in self.scope:
+            for user_scope in bearer_user.user.scopes:
+                if route_scope.startswith(user_scope):
+                    match[route_scope] = user_scope
+                    break
+            if not match.get(route_scope):
+                full_match = False
                 break
 
-        if match is None:
+        if not full_match:
             raise HTTPException(
                 status_code=403, detail="User does not have access to this resource"
             )
