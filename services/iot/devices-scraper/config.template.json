@@ -1,4 +1,8 @@
 {
+    "auth": {
+        "username": "${auth.users.devices_scraper.username}",
+        "password": "${auth.users.devices_scraper.password}"
+    },
     "urls": {
         "authorisation_api": "http://${subdomains.authorisation_api}.${hosts.apis}",
         "iot_api": "http://${subdomains.iot_api}.${hosts.apis}"

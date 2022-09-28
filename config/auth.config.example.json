@@ -1,4 +1,10 @@
 {
     "secret":     "super_secret",
-    "algorithm":  "algo"
+    "algorithm":  "algo",
+    "users": {
+        "device_scraper": {
+            "username": "device_scraper",
+            "password": "password"
+        }
+    }
 }
