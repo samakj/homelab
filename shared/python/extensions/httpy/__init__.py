@@ -29,12 +29,6 @@ from httpx._transports.base import AsyncBaseTransport
 from shared.python.config.auth import AUTH_NAME, AUTH_SCHEME
 
 
-class AsyncRequestClient:
-    async def __call__(self) -> AsyncClient:
-        async with AsyncClient() as client:
-            yield client
-
-
 class AsyncInternalClient(AsyncClient):
     token: str
 
@@ -250,7 +244,19 @@ class AsyncInternalClient(AsyncClient):
         return response
 
 
-class AsyncInternalRequestClient:
+class AsyncRequestClient:
+    async def __call__(access_token: str = "") -> AsyncInternalClient:
+        headers = {}
+        headers["accept"] = "application/json"
+
+        async with AsyncInternalClient(
+            access_token=access_token,
+            headers=headers,
+        ) as client:
+            yield client
+
+
+class AsyncRequestForwardingClient:
     async def __call__(
         self,
         http_connection: HTTPConnection,

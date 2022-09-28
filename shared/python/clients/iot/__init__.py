@@ -1,9 +1,11 @@
+from typing import Optional
 from fastapi import Depends
 from fastapi.requests import HTTPConnection
 
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
-    AsyncInternalRequestClient,
+    AsyncRequestClient,
+    AsyncRequestForwardingClient,
 )
 from shared.python.extensions.speedyapi.routes.meta import MetaResponse
 from shared.python.extensions.speedyapi.routes.ping import PingResponse
@@ -21,23 +23,30 @@ class IoTClient:
     measurements: MeasurementsClient
     metrics: MetricsClient
 
-    def __init__(
-        self,
-        http_connection: HTTPConnection,
-        client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
-    ) -> None:
-        self.client = client
-
-        self.base_url = http_connection.app.config.get("urls", {}).get("iot_api")
-        if self.base_url is None:
+    @staticmethod
+    def depencency(
+        connection: HTTPConnection,
+        client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
+    ) -> "IoTClient":
+        base_url = connection.app.config.get("urls", {}).get("iot_api")
+        if base_url is None:
             raise ValueError("config.urls.iot_api not set.")
 
-        self.devices = DevicesClient(http_connection=http_connection, client=client)
-        self.locations = LocationsClient(http_connection=http_connection, client=client)
-        self.measurements = MeasurementsClient(
-            http_connection=http_connection, client=client
-        )
-        self.metrics = MetricsClient(http_connection=http_connection, client=client)
+        return IoTClient(base_url=base_url, client=client)
+
+    def __init__(
+        self,
+        base_url: str,
+        access_token: str = "",
+        client: Optional[AsyncInternalClient] = None,
+    ) -> None:
+        self.client = client or AsyncRequestClient(access_token=access_token)
+        self.base_url = base_url
+
+        self.devices = DevicesClient(base_url=base_url, client=client)
+        self.locations = LocationsClient(base_url=base_url, client=client)
+        self.measurements = MeasurementsClient(base_url=base_url, client=client)
+        self.metrics = MetricsClient(base_url=base_url, client=client)
 
     async def meta(self) -> MetaResponse:
         response = await self.client.get(f"{self.base_url}/v0/meta")

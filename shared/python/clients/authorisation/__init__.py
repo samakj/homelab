@@ -1,9 +1,11 @@
+from typing import Optional
 from fastapi import Depends
 from fastapi.requests import HTTPConnection
 
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
-    AsyncInternalRequestClient,
+    AsyncRequestClient,
+    AsyncRequestForwardingClient,
 )
 from shared.python.models.authorisation import UserCredentials, LoginResponse
 from shared.python.clients.authorisation.users import UsersClient
@@ -16,21 +18,28 @@ class AuthorisationClient:
     users: UsersClient
     sessions: SessionsClient
 
+    @staticmethod
+    def depencency(
+        connection: HTTPConnection,
+        client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
+    ) -> "AuthorisationClient":
+        base_url = connection.app.config.get("urls", {}).get("authorisation_api")
+        if base_url is None:
+            raise ValueError("config.urls.authorisation_api not set.")
+
+        return AuthorisationClient(base_url=base_url, client=client)
+
     def __init__(
         self,
-        http_connection: HTTPConnection,
-        client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
+        base_url: str,
+        access_token: str = "",
+        client: Optional[AsyncInternalClient] = None,
     ) -> None:
-        self.client = client
+        self.client = client or AsyncRequestClient(access_token=access_token)
+        self.base_url = base_url
 
-        self.base_url = http_connection.app.config.get("urls", {}).get(
-            "authorisation_api"
-        )
-        if self.base_url is None:
-            raise ValueError("config.urls.auhorisation_api not set.")
-
-        self.users = UsersClient(http_connection=http_connection, client=client)
-        self.sessions = SessionsClient(http_connection=http_connection, client=client)
+        self.users = UsersClient(base_url=base_url, client=client)
+        self.sessions = SessionsClient(base_url=base_url, client=client)
 
     async def login(self, username: str, password: str) -> LoginResponse:
         response = await self.client.post(

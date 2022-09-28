@@ -13,7 +13,9 @@ class BearerPermission:
 
     async def __call__(
         self,
-        authorisation_client: AuthorisationClient = Depends(AuthorisationClient),
+        authorisation_client: AuthorisationClient = Depends(
+            AuthorisationClient.dependency
+        ),
     ) -> PermissionCredentials:
         bearer_user = await authorisation_client.check_token()
 

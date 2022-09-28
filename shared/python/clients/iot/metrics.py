@@ -4,7 +4,8 @@ from fastapi.requests import HTTPConnection
 
 from shared.python.extensions.httpy import (
     AsyncInternalClient,
-    AsyncInternalRequestClient,
+    AsyncRequestClient,
+    AsyncRequestForwardingClient,
 )
 from shared.python.models.metric import Metric
 
@@ -13,16 +14,25 @@ class MetricsClient:
     client: AsyncInternalClient
     base_url: str
 
+    @staticmethod
+    def depencency(
+        connection: HTTPConnection,
+        client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
+    ) -> "MetricsClient":
+        base_url = connection.app.config.get("urls", {}).get("iot_api")
+        if base_url is None:
+            raise ValueError("config.urls.iot_api not set.")
+
+        return MetricsClient(base_url=base_url, client=client)
+
     def __init__(
         self,
-        http_connection: HTTPConnection,
-        client: AsyncInternalRequestClient = Depends(AsyncInternalRequestClient()),
+        base_url: str,
+        access_token: str = "",
+        client: Optional[AsyncInternalClient] = None,
     ) -> None:
-        self.client = client
-
-        self.base_url = http_connection.app.config.get("urls", {}).get("iot_api")
-        if self.base_url is None:
-            raise ValueError("config.urls.iot_api not set.")
+        self.client = client or AsyncRequestClient(access_token=access_token)
+        self.base_url = base_url
 
     async def get_metric(self, id: int) -> Metric:
         response = await self.client.get(f"{self.base_url}/v0/metrics/{id}")
