@@ -16,7 +16,7 @@ class MeasurementsClient:
     base_url: str
 
     @staticmethod
-    def depencency(
+    def dependency(
         connection: HTTPConnection,
         client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
     ) -> "MeasurementsClient":

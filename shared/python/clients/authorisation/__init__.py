@@ -19,7 +19,7 @@ class AuthorisationClient:
     sessions: SessionsClient
 
     @staticmethod
-    def depencency(
+    def dependency(
         connection: HTTPConnection,
         client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
     ) -> "AuthorisationClient":

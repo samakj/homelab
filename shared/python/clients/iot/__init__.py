@@ -24,7 +24,7 @@ class IoTClient:
     metrics: MetricsClient
 
     @staticmethod
-    def depencency(
+    def dependency(
         connection: HTTPConnection,
         client: AsyncInternalClient = Depends(AsyncRequestForwardingClient()),
     ) -> "IoTClient":
