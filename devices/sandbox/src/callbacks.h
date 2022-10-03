@@ -19,8 +19,8 @@ void onWifiSSIDChange(std::string ssid)
 void onWifiStrengthChange(float strength)
 {
   if(strength != Homelab::Wifi::STRENGTH_NULL_VALUE)
-    Homelab::Server::sendReport(strength * 100, "strength", WIFI_STRENGTH_TAGS);
-  else Homelab::Server::sendReport(nullptr, "strength", WIFI_STRENGTH_TAGS);
+    Homelab::Server::sendReport(strength * 100, "percentage", WIFI_STRENGTH_TAGS);
+  else Homelab::Server::sendReport(nullptr, "percentage", WIFI_STRENGTH_TAGS);
 };
 
 void onNTPConnect() {};
