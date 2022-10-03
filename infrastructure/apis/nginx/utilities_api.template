@@ -11,5 +11,7 @@ server {
         proxy_pass $scheme://${containers.utilities_api}:${ports.utilities_api};
 
         include proxy.conf;
+
+        access_log off;
     }
 }

@@ -16,6 +16,10 @@
             "metrics": "${postgres.authorisation.tables.metrics}"
         }
     },
+    "cache": {
+        "host": "${containers.redis}",
+        "port": "${ports.redis}"
+    },
     "urls": {
         "authorisation_api": "http://${containers.authorisation_api}:${ports.authorisation_api}"
     }

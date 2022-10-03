@@ -1,7 +1,9 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 
+from cache import cache
 from stores.locations import LocationsStore
+from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.location import Location, CreateLocation
 from shared.python.helpers.bearer_permission import BearerPermission
@@ -11,6 +13,7 @@ LOCATIONS_V0_ROUTER = APIRouter(prefix="/v0/locations", tags=["locations"])
 
 
 @LOCATIONS_V0_ROUTER.get("/{id:int}", response_model=Location)
+@cache.route(expiry=60)
 async def get_location(
     id: int,
     locations_store: LocationsStore = Depends(LocationsStore),
@@ -27,6 +30,7 @@ async def get_location(
 
 
 @LOCATIONS_V0_ROUTER.get("/{name:str}", response_model=Location)
+@cache.route(expiry=60)
 async def get_location_by_name(
     name: str,
     locations_store: LocationsStore = Depends(LocationsStore),
@@ -43,6 +47,7 @@ async def get_location_by_name(
 
 
 @LOCATIONS_V0_ROUTER.get("/", response_model=list[Location])
+@cache.route(expiry=60)
 async def get_locations(
     id: Optional[list[int]] = Query(default=None),
     name: Optional[list[str]] = Query(default=None),
@@ -63,7 +68,9 @@ async def get_locations(
 @LOCATIONS_V0_ROUTER.post("/", response_model=Location)
 async def create_location(
     location: CreateLocation,
+    request: Request,
     locations_store: LocationsStore = Depends(LocationsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="locations.create")
     ),
@@ -73,6 +80,11 @@ async def create_location(
     if location is None:
         raise HTTPException(status_code=404, detail="Location not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return location
 
 
@@ -80,7 +92,9 @@ async def create_location(
 async def update_location(
     id: int,
     location: Location,
+    request: Request,
     locations_store: LocationsStore = Depends(LocationsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="locations.update")
     ),
@@ -90,16 +104,33 @@ async def update_location(
     if location is None:
         raise HTTPException(status_code=404, detail="Location not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(
+            request=request, include_query_params=False
+        ).replace(f"/{id}", "")
+        + "*"
+    )
+
     return location
 
 
 @LOCATIONS_V0_ROUTER.delete("/{id:int}")
 async def delete_location(
     id: int,
+    request: Request,
     locations_store: LocationsStore = Depends(LocationsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="locations.delete")
     ),
 ) -> None:
     await locations_store.delete_location(id=id)
+
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(
+            request=request, include_query_params=False
+        ).replace(f"/{id}", "")
+        + "*"
+    )
+
     return None

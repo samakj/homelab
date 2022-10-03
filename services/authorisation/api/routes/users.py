@@ -1,8 +1,10 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 
+from cache import cache
 from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.users import UsersStore
+from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.user import User, CreateUser, UserNoPassword
 
 
@@ -10,6 +12,7 @@ USERS_V0_ROUTER = APIRouter(prefix="/v0/users", tags=["users"])
 
 
 @USERS_V0_ROUTER.get("/{id:int}", response_model=UserNoPassword)
+@cache.route(expiry=60)
 async def get_user(
     id: int,
     users_store: UsersStore = Depends(UsersStore),
@@ -37,6 +40,7 @@ async def get_self(
 
 
 @USERS_V0_ROUTER.get("/{username:str}", response_model=UserNoPassword)
+@cache.route(expiry=60)
 async def get_user_by_username(
     username: str,
     users_store: UsersStore = Depends(UsersStore),
@@ -51,6 +55,7 @@ async def get_user_by_username(
 
 
 @USERS_V0_ROUTER.get("/", response_model=list[UserNoPassword])
+@cache.route(expiry=60)
 async def get_users(
     id: Optional[list[int]] = Query(default=None),
     username: Optional[list[str]] = Query(default=None),
@@ -69,7 +74,9 @@ async def get_users(
 @USERS_V0_ROUTER.post("/", response_model=UserNoPassword)
 async def create_user(
     user: CreateUser,
+    request: Request,
     users_store: UsersStore = Depends(UsersStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="users.create")
     ),
@@ -79,6 +86,11 @@ async def create_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return UserNoPassword.parse_obj(dict(user))
 
 
@@ -86,7 +98,9 @@ async def create_user(
 async def update_user(
     id: int,
     user: UserNoPassword,
+    request: Request,
     users_store: UsersStore = Depends(UsersStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="users.update")
     ),
@@ -96,6 +110,11 @@ async def update_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return UserNoPassword.parse_obj(dict(user))
 
 
@@ -103,7 +122,9 @@ async def update_user(
 async def update_user_password(
     id: int,
     user: User,
+    request: Request,
     users_store: UsersStore = Depends(UsersStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="users.update")
     ),
@@ -113,16 +134,29 @@ async def update_user_password(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return UserNoPassword.parse_obj(dict(user))
 
 
 @USERS_V0_ROUTER.delete("/{id:int}")
 async def delete_user(
     id: int,
+    request: Request,
     users_store: UsersStore = Depends(UsersStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="users.delete")
     ),
 ) -> None:
     await users_store.delete_user(id=id)
+
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return None

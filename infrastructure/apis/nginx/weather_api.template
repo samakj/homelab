@@ -11,5 +11,7 @@ server {
         proxy_pass $scheme://${containers.weather_api}:${ports.weather_api};
 
         include proxy.conf;
+
+        access_log off;
     }
 }

@@ -1,4 +1,6 @@
+aioredis==2.0.1
 anyio==3.6.1
+async-timeout==4.0.2
 asyncio==3.4.3
 asyncpg==0.25.0
 black==22.6.0

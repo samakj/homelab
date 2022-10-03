@@ -8,5 +8,9 @@
         "user": "${postgres.authorisation.name}",
         "password": "${postgres.authorisation.password}",
         "tables": {"users": "${postgres.authorisation.tables.users}", "sessions": "${postgres.authorisation.tables.sessions}"}
+    },
+    "cache": {
+        "host": "${containers.redis}",
+        "port": "${ports.redis}"
     }
 }

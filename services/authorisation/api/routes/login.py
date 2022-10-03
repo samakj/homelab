@@ -2,11 +2,13 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from pydantic import BaseModel
 
+from cache import cache
 from shared.python.config.auth import AUTH_NAME, AUTH_SCHEME
 from auth.jwt import sign_jwt
 from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
+from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import LoginResponse, LogoutResponse
 from shared.python.models.session import CreateSession, Session
 from shared.python.models.user import User, UserNoPassword
@@ -72,6 +74,14 @@ async def login(
         httponly=True,
     )
     response.headers.append(key=AUTH_NAME, value=f"{AUTH_SCHEME} {jwt_token}")
+
+    await cache.clear(
+        key=cache.create_route_key(request=request, include_query_params=False).replace(
+            "/logout", "/token"
+        )
+        + f"?access_token={jwt_token}"
+    )
+
     return LoginResponse(
         access_token=jwt_token,
         user=UserNoPassword(
@@ -86,8 +96,10 @@ async def login(
 
 @LOGIN_V0_ROUTER.post("/logout", response_model=LogoutResponse)
 async def logout(
+    request: Request,
     user_credentials: UserCredentials = Depends(BearerUser()),
     sessions_store: SessionsStore = Depends(SessionsStore),
+    cache: Cache = Depends(cache),
 ) -> LoginResponse:
     session = await sessions_store.update_session(
         Session(
@@ -99,10 +111,17 @@ async def logout(
             disabled=True,
         )
     )
+    await cache.clear(
+        key=cache.create_route_key(request=request, include_query_params=False).replace(
+            "/logout", "/token"
+        )
+        + f"?access_token={user_credentials.token}"
+    )
     return LogoutResponse(session=session)
 
 
 @LOGIN_V0_ROUTER.get("/token", response_model=UserCredentials)
+@cache.route(expiry=10)
 async def check_token(
     user_credentials: UserCredentials = Depends(BearerUser()),
 ) -> UserCredentials:

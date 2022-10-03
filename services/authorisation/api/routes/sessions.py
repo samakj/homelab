@@ -1,8 +1,10 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 
+from cache import cache
 from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.sessions import SessionsStore
+from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.session import Session, CreateSession
 
 
@@ -10,6 +12,7 @@ SESSIONS_V0_ROUTER = APIRouter(prefix="/v0/sessions", tags=["sessions"])
 
 
 @SESSIONS_V0_ROUTER.get("/{id:int}", response_model=Session)
+@cache.route(expiry=60)
 async def get_session(
     id: int,
     sessions_store: SessionsStore = Depends(SessionsStore),
@@ -26,6 +29,7 @@ async def get_session(
 
 
 @SESSIONS_V0_ROUTER.get("/", response_model=list[Session])
+@cache.route(expiry=60)
 async def get_sessions(
     id: Optional[list[int]] = Query(default=None),
     user_id: Optional[list[int]] = Query(default=None),
@@ -46,7 +50,9 @@ async def get_sessions(
 @SESSIONS_V0_ROUTER.post("/", response_model=Session)
 async def create_session(
     session: CreateSession,
+    request: Request,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="sessions.create")
     ),
@@ -56,6 +62,11 @@ async def create_session(
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return session
 
 
@@ -63,7 +74,9 @@ async def create_session(
 async def update_session(
     id: int,
     session: Session,
+    request: Request,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="sessions.update")
     ),
@@ -73,16 +86,29 @@ async def update_session(
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return session
 
 
 @SESSIONS_V0_ROUTER.delete("/{id:int}")
 async def delete_session(
     id: int,
+    request: Request,
     sessions_store: SessionsStore = Depends(SessionsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="sessions.delete")
     ),
 ) -> Session:
     await sessions_store.delete_session(id=id)
+
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return None

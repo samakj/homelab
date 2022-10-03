@@ -1,7 +1,11 @@
+import logging
+from typing import Optional
 import asyncpg
 from asyncpg import Connection, Pool
 from fastapi import HTTPException
 from fastapi.requests import HTTPConnection
+
+from shared.python.extensions.speedyapi import Logger
 
 
 class Database:
@@ -11,6 +15,7 @@ class Database:
     port: str
     name: str
     pool: Pool
+    logger: Logger
 
     def __init__(
         self,
@@ -19,14 +24,20 @@ class Database:
         host: str,
         port: str,
         name: str,
+        logger: Optional[Logger] = None,
     ) -> None:
         self.user = user
         self.password = password
         self.host = host
         self.port = port
         self.name = name
+        self.logger = logger or logging.getLogger()
 
     async def initialise(self) -> None:
+        self.logger.info(
+            f"Connecting to db at: postgresql://{self.host}:{self.port}, "
+            + f"username: {self.user if self.user is not None else 'None'}"
+        )
         self.pool = await asyncpg.create_pool(
             dsn=(
                 "postgresql://"
@@ -34,6 +45,10 @@ class Database:
                 + f"{self.host}:{self.port}/"
                 + f"{self.name}"
             )
+        )
+        self.logger.info(
+            f"Connected to db at:  postgresql://{self.host}:{self.port}, "
+            + f"username: {self.user if self.user is not None else 'None'}"
         )
 
     @staticmethod

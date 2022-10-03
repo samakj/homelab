@@ -1,7 +1,9 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 
+from cache import cache
 from stores.metrics import MetricsStore
+from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.metric import Metric, CreateMetric
 from shared.python.helpers.bearer_permission import BearerPermission
@@ -11,6 +13,7 @@ METRICS_V0_ROUTER = APIRouter(prefix="/v0/metrics", tags=["metrics"])
 
 
 @METRICS_V0_ROUTER.get("/{id:int}", response_model=Metric)
+@cache.route(expiry=60)
 async def get_metric(
     id: int,
     metrics_store: MetricsStore = Depends(MetricsStore),
@@ -25,6 +28,7 @@ async def get_metric(
 
 
 @METRICS_V0_ROUTER.get("/{name:str}", response_model=Metric)
+@cache.route(expiry=60)
 async def get_metric_by_name(
     name: str,
     metrics_store: MetricsStore = Depends(MetricsStore),
@@ -42,6 +46,7 @@ async def get_metric_by_name(
 
 
 @METRICS_V0_ROUTER.get("/", response_model=list[Metric])
+@cache.route(expiry=60)
 async def get_metrics(
     id: Optional[list[int]] = Query(default=None),
     name: Optional[list[str]] = Query(default=None),
@@ -63,7 +68,9 @@ async def get_metrics(
 @METRICS_V0_ROUTER.post("/", response_model=Metric)
 async def create_metric(
     metric: CreateMetric,
+    request: Request,
     metrics_store: MetricsStore = Depends(MetricsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="metrics.create")
     ),
@@ -73,6 +80,11 @@ async def create_metric(
     if metric is None:
         raise HTTPException(status_code=404, detail="Metric not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return metric
 
 
@@ -80,7 +92,9 @@ async def create_metric(
 async def update_metric(
     id: int,
     metric: Metric,
+    request: Request,
     metrics_store: MetricsStore = Depends(MetricsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="metrics.update")
     ),
@@ -90,16 +104,29 @@ async def update_metric(
     if metric is None:
         raise HTTPException(status_code=404, detail="Metric not found.")
 
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return metric
 
 
 @METRICS_V0_ROUTER.delete("/{id:int}")
 async def delete_metric(
     id: int,
+    request: Request,
     metrics_store: MetricsStore = Depends(MetricsStore),
+    cache: Cache = Depends(cache),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="metrics.delete")
     ),
 ) -> Metric:
     await metrics_store.delete_metric(id=id)
+
+    await cache.clear_pattern(
+        pattern=cache.create_route_key(request=request, include_query_params=False)
+        + "*"
+    )
+
     return None
