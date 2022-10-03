@@ -17,4 +17,4 @@ iot.add_command(cmd=devices_scraper)
 @click.pass_context
 def build(ctx: click.Context) -> None:
     build_api.invoke(ctx=ctx)
-    build_devices_scraper(ctx=ctx)
+    build_devices_scraper.invoke(ctx=ctx)
