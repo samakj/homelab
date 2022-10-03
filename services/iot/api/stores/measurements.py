@@ -15,7 +15,7 @@ from stores.queries.measurements import (
     CREATE_MEASUREMENT_VALUE,
 )
 from shared.python.extensions.speedyapi.database import Database
-from shared.python.helpers.to_filter import to_filter, to_array_filter
+from shared.python.helpers.to_filter import to_filter, to_array_filter, to_array_value
 
 
 class MeasurementsStore:
@@ -143,7 +143,7 @@ class MeasurementsStore:
                 device_id=to_filter(measurement.device_id),
                 location_id=to_filter(measurement.location_id),
                 metric_id=to_filter(measurement.metric_id),
-                tags=to_array_filter(measurement.tags),
+                tags=to_array_value(measurement.tags),
                 value_type=to_filter(measurement.value_type),
             )
         )

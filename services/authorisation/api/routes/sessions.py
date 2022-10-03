@@ -27,9 +27,9 @@ async def get_session(
 
 @SESSIONS_V0_ROUTER.get("/", response_model=list[Session])
 async def get_sessions(
-    id: Optional[list[int]] = Query(None),
-    user_id: Optional[list[int]] = Query(None),
-    ip: Optional[list[str]] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    user_id: Optional[list[int]] = Query(default=None),
+    ip: Optional[list[str]] = Query(default=None),
     sessions_store: SessionsStore = Depends(SessionsStore),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="sessions.get")

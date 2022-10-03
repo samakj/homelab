@@ -4,7 +4,6 @@ from fastapi import Depends, HTTPException, Query, Request
 from auth.jwt_bearer import JWTBearer
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from shared.python.config.auth import AUTH_NAME
 from shared.python.models.authorisation import UserCredentials
 
 
@@ -15,16 +14,14 @@ class BearerUser(JWTBearer):
     async def __call__(
         self,
         request: Request,
-        access_token: Optional[str] = Query(
-            default=None,
-            alias=AUTH_NAME,
-            description="The access token to authorise the current user",
-        ),
+        access_token: Optional[str] = Query(default=None),
         users_store: UsersStore = Depends(UsersStore),
         sessions_store: SessionsStore = Depends(SessionsStore),
     ) -> UserCredentials:
         jwt_bearer = await super().__call__(
-            request=request, access_token=access_token, sessions_store=sessions_store
+            request=request,
+            access_token=access_token,
+            sessions_store=sessions_store,
         )
         user = await users_store.get_user(id=jwt_bearer.session.user_id)
 

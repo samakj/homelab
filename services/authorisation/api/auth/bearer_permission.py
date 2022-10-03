@@ -4,7 +4,6 @@ from fastapi import Depends, HTTPException, Query, Request
 from auth.bearer_user import BearerUser
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
-from shared.python.config.auth import AUTH_NAME
 from shared.python.models.authorisation import PermissionCredentials
 
 
@@ -18,11 +17,7 @@ class BearerPermission(BearerUser):
     async def __call__(
         self,
         request: Request,
-        access_token: Optional[str] = Query(
-            default=None,
-            alias=AUTH_NAME,
-            description="The access token to authorise the current user",
-        ),
+        access_token: Optional[str] = Query(default=None),
         users_store: UsersStore = Depends(UsersStore),
         sessions_store: SessionsStore = Depends(SessionsStore),
     ) -> PermissionCredentials:

@@ -13,7 +13,7 @@ from stores.queries.locations import (
     DELETE_LOCATION,
 )
 from shared.python.extensions.speedyapi.database import Database
-from shared.python.helpers.to_filter import to_filter, to_array_filter
+from shared.python.helpers.to_filter import to_filter, to_array_filter, to_array_value
 
 
 class LocationsStore:
@@ -62,7 +62,7 @@ class LocationsStore:
         row = await self.connection.fetchrow(
             CREATE_LOCATION.format(
                 name=to_filter(location.name),
-                tags=to_array_filter(location.tags),
+                tags=to_array_value(location.tags),
             )
         )
         return await self.get_location(id=row["id"])
@@ -72,7 +72,7 @@ class LocationsStore:
             UPDATE_LOCATION.format(
                 id=to_filter(location.id),
                 name=to_filter(location.name),
-                tags=to_array_filter(location.tags),
+                tags=to_array_value(location.tags),
             )
         )
         return await self.get_location(id=location.id)

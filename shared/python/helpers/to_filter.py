@@ -20,3 +20,9 @@ def to_array_filter(value: Union[FilterTypes, List[FilterTypes]]) -> str:
     if not isinstance(value, list):
         value = [value]
     return f"({', '.join([to_filter(item) for item in value])})"
+
+
+def to_array_value(value: Union[FilterTypes, List[FilterTypes]]) -> str:
+    if not isinstance(value, list):
+        value = [value]
+    return f"ARRAY[{', '.join([to_filter(item) for item in value])}]"

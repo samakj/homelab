@@ -30,16 +30,16 @@ async def get_measurement(
 
 @MEASUREMENTS_V0_ROUTER.get("/", response_model=list[Measurement])
 async def get_measurements(
-    id: Optional[list[int]] = Query(None),
-    device_id: Optional[list[int]] = Query(None),
-    metric_id: Optional[list[int]] = Query(None),
-    location_id: Optional[list[int]] = Query(None),
-    tags: Optional[list[str]] = Query(None),
-    timestamp_gte: Optional[datetime] = Query(None),
-    timestamp_lte: Optional[datetime] = Query(None),
-    value: Optional[ValueType] = Query(None),
-    value_gte: Optional[ValueType] = Query(None),
-    value_lte: Optional[ValueType] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    device_id: Optional[list[int]] = Query(default=None),
+    metric_id: Optional[list[int]] = Query(default=None),
+    location_id: Optional[list[int]] = Query(default=None),
+    tags: Optional[list[str]] = Query(default=None),
+    timestamp_gte: Optional[datetime] = Query(default=None),
+    timestamp_lte: Optional[datetime] = Query(default=None),
+    value: Optional[ValueType] = Query(default=None),
+    value_gte: Optional[ValueType] = Query(default=None),
+    value_lte: Optional[ValueType] = Query(default=None),
     measurements_store: MeasurementsStore = Depends(MeasurementsStore),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="measurements.get")
@@ -64,11 +64,11 @@ async def get_measurements(
 
 @MEASUREMENTS_V0_ROUTER.get("/latest", response_model=list[Measurement])
 async def get_latest_measurements(
-    id: Optional[list[int]] = Query(None),
-    device_id: Optional[list[int]] = Query(None),
-    metric_id: Optional[list[int]] = Query(None),
-    location_id: Optional[list[int]] = Query(None),
-    tags: Optional[list[str]] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    device_id: Optional[list[int]] = Query(default=None),
+    metric_id: Optional[list[int]] = Query(default=None),
+    location_id: Optional[list[int]] = Query(default=None),
+    tags: Optional[list[str]] = Query(default=None),
     measurements_store: MeasurementsStore = Depends(MeasurementsStore),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="measurements.get")

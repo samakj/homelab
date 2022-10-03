@@ -52,10 +52,10 @@ async def get_user_by_username(
 
 @USERS_V0_ROUTER.get("/", response_model=list[UserNoPassword])
 async def get_users(
-    id: Optional[list[int]] = Query(None),
-    username: Optional[list[str]] = Query(None),
-    name: Optional[list[str]] = Query(None),
-    scopes: Optional[list[str]] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    username: Optional[list[str]] = Query(default=None),
+    name: Optional[list[str]] = Query(default=None),
+    scopes: Optional[list[str]] = Query(default=None),
     users_store: UsersStore = Depends(UsersStore),
     permissions: PermissionCredentials = Depends(BearerPermission(scope="users.get")),
 ) -> UserNoPassword:

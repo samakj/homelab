@@ -45,13 +45,13 @@ async def get_device_by_mac_or_ip(
 
 @DEVICES_V0_ROUTER.get("/", response_model=list[Device])
 async def get_devices(
-    id: Optional[list[int]] = Query(None),
-    mac: Optional[list[str]] = Query(None),
-    ip: Optional[list[str]] = Query(None),
-    location_id: Optional[datetime] = Query(None),
-    last_message_gte: Optional[datetime] = Query(None),
-    last_message_lte: Optional[datetime] = Query(None),
-    last_message_null: Optional[bool] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    mac: Optional[list[str]] = Query(default=None),
+    ip: Optional[list[str]] = Query(default=None),
+    location_id: Optional[datetime] = Query(default=None),
+    last_message_gte: Optional[datetime] = Query(default=None),
+    last_message_lte: Optional[datetime] = Query(default=None),
+    last_message_null: Optional[bool] = Query(default=None),
     devices_store: DevicesStore = Depends(DevicesStore),
     permissions: PermissionCredentials = Depends(BearerPermission(scope="devices.get")),
 ) -> Device:

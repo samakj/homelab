@@ -43,10 +43,10 @@ async def get_metric_by_name(
 
 @METRICS_V0_ROUTER.get("/", response_model=list[Metric])
 async def get_metrics(
-    id: Optional[list[int]] = Query(None),
-    name: Optional[list[str]] = Query(None),
-    abbreviation: Optional[list[str]] = Query(None),
-    unit: Optional[list[str]] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    name: Optional[list[str]] = Query(default=None),
+    abbreviation: Optional[list[str]] = Query(default=None),
+    unit: Optional[list[str]] = Query(default=None),
     metrics_store: MetricsStore = Depends(MetricsStore),
     permissions: PermissionCredentials = Depends(BearerPermission(scope="metrics.get")),
 ) -> Metric:

@@ -44,9 +44,9 @@ async def get_location_by_name(
 
 @LOCATIONS_V0_ROUTER.get("/", response_model=list[Location])
 async def get_locations(
-    id: Optional[list[int]] = Query(None),
-    name: Optional[list[str]] = Query(None),
-    tags: Optional[list[str]] = Query(None),
+    id: Optional[list[int]] = Query(default=None),
+    name: Optional[list[str]] = Query(default=None),
+    tags: Optional[list[str]] = Query(default=None),
     locations_store: LocationsStore = Depends(LocationsStore),
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="locations.get")
