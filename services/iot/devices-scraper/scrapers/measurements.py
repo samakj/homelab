@@ -1,7 +1,11 @@
+import json
 from typing import Optional, Set
 from pydantic import BaseModel
+from fastapi import HTTPException
 from datetime import datetime
 
+from login import login
+from shared.python.extensions.speedyapi import SpeedyAPI, Logger
 from shared.python.clients.iot import IoTClient
 from shared.python.extensions.websocket import (
     Websocket,
@@ -16,38 +20,111 @@ from shared.python.models.metric import Metric
 
 class MeasurementWebsocketMessage(BaseModel):
     metric: str
-    location: str
     message: ValueType
-    tags: list[str]
     mac: str
+    tags: Optional[list[str]] = None
     timestamp: Optional[str] = None
 
 
 class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: ignore
+    app: SpeedyAPI
     iot_client: IoTClient
 
-    def __init__(self, iot_client: IoTClient) -> None:
-        super().__init__()
-        self.iot_client = iot_client
+    def __init__(self, app: SpeedyAPI) -> None:
+        super().__init__(logger=app.logger)
+        self.app = app
+        self.iot_client = app.iot_client
 
     async def __call__(self, raw_message: str) -> None:
-        message = MeasurementWebsocketMessage.parse_obj(raw_message)
-        timestamp = (
-            datetime.fromisoformat(message.timestamp)
-            if message.timestamp is not None
-            else datetime.utcnow()
-        )
-        device = await self.iot_client.devices.get_device_by_mac_or_ip(
-            mac_or_ip=message.mac
-        )
+        try:
+            data = json.loads(raw_message)
+        except Exception as error:
+            self.logger.error("Failed parse json from:")
+            self.logger.error(f"\t{raw_message}")
+            self.logger.error(str(error))
+            return
+
+        try:
+            message = MeasurementWebsocketMessage.parse_obj(data)
+        except Exception as error:
+            self.logger.error("Failed to parse raw message object from:")
+            self.logger.error(f"\t{raw_message}")
+            self.logger.error(str(error))
+            return
+
+        try:
+            timestamp = (
+                datetime.fromisoformat(message.timestamp.replace("Z", ""))
+                if message.timestamp is not None
+                else datetime.utcnow()
+            )
+        except Exception as error:
+            self.logger.error("Failed to parse timestamp from message:")
+            self.logger.error(f"\t{message}")
+            self.logger.error(str(error))
+            return
+
+        try:
+            device = await self.iot_client.devices.get_device_by_mac_or_ip(
+                mac_or_ip=message.mac
+            )
+        except Exception as error:
+            if isinstance(error, HTTPException) and error.status_code in {401, 403}:
+                self.logger.error("Auth failed trying to re log in.")
+                await login(app=self.app)
+                await self.__call__(raw_message=raw_message)
+                return
+
+            self.logger.error("Failed get device for message:")
+            self.logger.error(f"\t{message}")
+            self.logger.error(
+                f"{error.status_code}: {error.detail}"
+                if isinstance(error, HTTPException)
+                else str(error)
+            )
+            return
 
         if message.metric != "ping":
-            metric = await self.iot_client.metrics.get_metric_by_name(
-                name=message.metric
-            )
-            location = await self.iot_client.locations.get_location_by_name(
-                name=message.location
-            )
+            try:
+                metric = await self.iot_client.metrics.get_metric_by_name(
+                    name=message.metric
+                )
+            except Exception as error:
+                if isinstance(error, HTTPException) and error.status_code in {401, 403}:
+                    self.logger.error("Auth failed trying to re log in.")
+                    await login(app=self.app)
+                    await self.__call__(raw_message=raw_message)
+                    return
+
+                self.logger.error("Failed to get metric for message:")
+                self.logger.error(f"\t{message}")
+                self.logger.error(
+                    f"{error.status_code}: {error.detail}"
+                    if isinstance(error, HTTPException)
+                    else str(error)
+                )
+                return
+
+            try:
+                location = await self.iot_client.locations.get_location(
+                    id=device.location_id
+                )
+            except Exception as error:
+                if isinstance(error, HTTPException) and error.status_code in {401, 403}:
+                    self.logger.error("Auth failed trying to re log in.")
+                    await login(app=self.app)
+                    await self.__call__(raw_message=raw_message)
+                    return
+
+                self.logger.error("Failed to get location for message:")
+                self.logger.error(f"\t{message}")
+                self.logger.error(
+                    f"{error.status_code}: {error.detail}"
+                    if isinstance(error, HTTPException)
+                    else str(error)
+                )
+                return
+
             value_type: ValueTypeOptions = "string"
 
             if isinstance(message.message, int):
@@ -57,31 +134,72 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
             if isinstance(message.message, bool):
                 value_type = "boolean"
 
-            measurement = await self.iot_client.measurements.create_measurement(
-                timestamp=timestamp,
-                metric_id=metric.id,
-                device_id=device.id,
-                location_id=location.id,
-                tags=message.tags,
-                value_type=value_type,
-                value=message.message,
-            )
+            try:
+                measurement = await self.iot_client.measurements.create_measurement(
+                    timestamp=timestamp,
+                    metric_id=metric.id,
+                    device_id=device.id,
+                    location_id=location.id,
+                    tags=message.tags,
+                    value_type=value_type,
+                    value=message.message,
+                )
+                self.logger.info(
+                    "{:<18} | {:<12} | {:<32} | {}{}".format(
+                        location.name,
+                        metric.name,
+                        ", ".join(measurement.tags),
+                        measurement.value,
+                        metric.unit or "",
+                    )
+                )
+            except Exception as error:
+                if isinstance(error, HTTPException) and error.status_code in {401, 403}:
+                    self.logger.error("Auth failed trying to re log in.")
+                    await login(app=self.app)
+                    await self.__call__(raw_message=raw_message)
+                    return
 
-        device = await self.iot_client.devices.update_device(
-            device=Device(
-                id=device.id,
-                mac=device.mac,
-                ip=device.ip,
-                websocket_path=device.websocket_path,
-                location_id=device.location_id,
-                last_message=timestamp,
-            )
-        )
+                self.logger.error("Failed to create measurment for message:")
+                self.logger.error(f"\t{message}")
+                self.logger.error(
+                    f"{error.status_code}: {error.detail}"
+                    if isinstance(error, HTTPException)
+                    else str(error)
+                )
+                return
 
-        print(measurement)
+        try:
+            device = await self.iot_client.devices.update_device(
+                device=Device(
+                    id=device.id,
+                    mac=device.mac,
+                    ip=device.ip,
+                    websocket_path=device.websocket_path,
+                    location_id=device.location_id,
+                    last_message=timestamp,
+                )
+            )
+        except Exception as error:
+            if isinstance(error, HTTPException) and error.status_code in {401, 403}:
+                self.logger.error("Auth failed trying to re log in.")
+                await login(app=self.app)
+                await self.__call__(raw_message=raw_message)
+                return
+
+            self.logger.error("Failed to update device for message:")
+            self.logger.error(f"\t{message}")
+            self.logger.error(str(error))
+            self.logger.error(
+                f"{error.status_code}: {error.detail}"
+                if isinstance(error, HTTPException)
+                else str(error)
+            )
+            return
 
 
 class MeasurementScraper:
+    app: SpeedyAPI
     iot_client: IoTClient
     watching: Set[int]
     devices: dict[int, Device]
@@ -89,24 +207,28 @@ class MeasurementScraper:
     metrics: dict[int, Metric]
     websockets: dict[int, Websocket]
     message_handler: MeasurementWebsocketMessageHandler
+    logger: Logger
 
-    def __init__(self, iot_client: IoTClient) -> None:
-        self.iot_client = iot_client
+    def __init__(self, app: SpeedyAPI) -> None:
+        self.app = app
+        self.iot_client = app.iot_client
         self.watching = set()
         self.devices = {}
         self.locations = {}
         self.metrics = {}
         self.websockets = {}
-        self.message_handler = MeasurementWebsocketMessageHandler(iot_client=iot_client)
+        self.message_handler = MeasurementWebsocketMessageHandler(app=app)
+        self.logger = app.logger
 
     async def watch(self, device_id: int) -> WebsocketMeta:
         websocket = self.websockets.get(device_id)
 
         if websocket is None:
-            device = await self.iot_client.get_device(id=device_id)
+            device = await self.iot_client.devices.get_device(id=device_id)
             self.websockets[device.id] = Websocket(
                 url=f"ws://{device.ip}{device.websocket_path}",
                 handler=self.message_handler,
+                logger=self.logger,
             )
             websocket = self.websockets[device.id]
 
@@ -117,7 +239,7 @@ class MeasurementScraper:
         websocket = self.websockets.get(device_id)
 
         if websocket is None:
-            device = await self.iot_client.get_device(id=device_id)
+            device = await self.iot_client.devices.get_device(id=device_id)
             self.websockets[device.id] = Websocket(
                 url=f"ws://{device.ip}{device.websocket_path}",
                 handler=self.message_handler,

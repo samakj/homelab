@@ -1,4 +1,3 @@
-from typing import Optional
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
@@ -22,7 +21,11 @@ async def get_watchlist(
     ),
 ) -> WebsocketMeta:
     return WatchlistResponse(
-        measurements=request.app.measurements_scraper.websockets, logs={}
+        measurements={
+            deviceId: websocket.meta
+            for deviceId, websocket in request.app.measurements_scraper.websockets.items()
+        },
+        logs={},
     )
 
 

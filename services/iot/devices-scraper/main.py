@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from login import login
 from routes.watch import WATCH_V0_ROUTER
 from scrapers.measurements import MeasurementScraper
 from shared.python.extensions.speedyapi import SpeedyAPI
@@ -16,18 +17,14 @@ app.authorisation_client = AuthorisationClient(
     base_url=app.config.get("urls", {}).get("authorisation_api")
 )
 app.iot_client = IoTClient(base_url=app.config.get("urls", {}).get("iot_api"))
-app.measurements_scraper = MeasurementScraper(iot_client=app.iot_client)
+app.measurements_scraper = MeasurementScraper(app=app)
 
 app.include_router(WATCH_V0_ROUTER)
 
 
 @app.on_event("startup")  # type: ignore
 async def startup() -> None:
-    auth = await app.authorisation_client.login(
-        username=app.config.get("auth", {}).get("username"),
-        password=app.config.get("auth", {}).get("password"),
-    )
-    app.iot_client.client.token = auth.access_token
+    await login(app=app)
 
 
 @app.on_event("shutdown")  # type: ignore
