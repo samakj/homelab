@@ -6,15 +6,32 @@ Homelab::Sensors::DS18B20::temperature_t Homelab::Sensors::DS18B20::getTemperatu
 {
   if(Homelab::Time::millisSince(this->lastTemperatureRead) > this->readPeriod)
   {
-    this->client->requestTemperatures();
-    Homelab::Sensors::DS18B20::temperature_t _temperature = sensors.getTempCByIndex(0);
-    this->temperatureReadCount += 1;
     this->lastTemperatureRead = millis();
+    bool addressFound = false;
+    Homelab::Sensors::DS18B20::temperature_t _temperature = this->temperature;
+    int deviceCount = this->client->getDeviceCount();
+    if (!deviceCount)
+        Homelab::Logger::warnf("No DS18B20 on pin %d\n", this->pinNo);
+    else {
+        DeviceAddress _address;
+        this->client->requestTemperatures();
 
-    if(!isnan(_temperature))
+        for(int i=0; i < numberOfDevices; i++)
+            if (client->getAddress(_address, i)) 
+            {
+                std::string address = this->addressToString(_address);
+                if (this->address == nullptr || address == this->address)
+                {
+                    _temperature = this->client->getTempC(_address);
+                    address_found = true;
+                    break;
+                }
+            }
+    }
+    if (!addressFound) 
+        Homelab::Logger::warnf("DS18B20 address not found on pin %d\n", this->pinNo);
+    if(abs(this->temperature - _temperature) > this->temperatureTolerance)
     {
-      if(abs(this->temperature - _temperature) > this->temperatureTolerance)
-      {
         Homelab::Logger::infof(
             "DS18B20 temperature changed from %s to %s\n",
             Homelab::Utils::string::formatFloat(
@@ -28,13 +45,7 @@ Homelab::Sensors::DS18B20::temperature_t Homelab::Sensors::DS18B20::getTemperatu
         );
         this->temperature = _temperature;
         for(Homelab::Sensors::DS18B20::TemperatureCallback callback : this->temperatureCallbacks)
-          callback(this->temperature);
-      }
-    }
-    else
-    {
-      Homelab::Logger::info("null value recieved for temperature.");
-      this->m_nanTemperatureReported = true;
+            callback(this->temperature);
     }
   }
 
@@ -48,6 +59,8 @@ void Homelab::Sensors::DS18B20::setTemperatureTolerance(Homelab::Sensors::DS18B2
   this->temperatureTolerance = tolerance;
 }
 
+void Homelab::Sensors::DS18B20::setAddress(std::string address) { this->address = address; }
+
 void Homelab::Sensors::DS18B20::setHumidityTolerance(Homelab::Sensors::DS18B20::humidity_t tolerance)
 {
   this->humidityTolerance = tolerance;
@@ -58,6 +71,24 @@ void Homelab::Sensors::DS18B20::addTemperatureCallback(
 )
 {
   this->temperatureCallbacks.push_back(callback);
+}
+
+std::string Homelab::Sensors::DS18B20::addressToString(DeviceAddress address)
+{
+    char buffer[32];
+    sprintf(
+        buffer,
+        "%x%x%x%x%x%x%x%x",
+        address[0],
+        address[1],
+        address[2],
+        address[3],
+        address[4],
+        address[5],
+        address[6],
+        address[7]
+    );
+    return (std::string)buffer;
 }
 
 void Homelab::Sensors::DHT::setup()
@@ -71,7 +102,5 @@ void Homelab::Sensors::DHT::setup()
 void Homelab::Sensors::DHT::loop()
 {
   if(!this->client) this->setup();
-
-  getTemperature();
-  getHumidity();
+  this->getTemperature();
 }

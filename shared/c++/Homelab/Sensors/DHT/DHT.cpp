@@ -113,6 +113,6 @@ void Homelab::Sensors::DHT::loop()
 {
   if(!this->client) this->setup();
 
-  getTemperature();
-  getHumidity();
+  this->getTemperature();
+  this->getHumidity();
 }
