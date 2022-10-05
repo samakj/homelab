@@ -97,7 +97,7 @@ class JWTBearer:
         if payload is None:
             request.app.logger.error("Invalid config variables.")
             raise AuthorisationException(
-                status_code=500,
+                status_code=401,
                 message="JWT decode failed",
                 request=request,
             )
