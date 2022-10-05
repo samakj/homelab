@@ -38,7 +38,7 @@ namespace Homelab::Sensors
     bool m_nanTemperatureReported = false;
 
    public:
-    DS18B20(uint8_t pinNo, uint8_t type = DHT22);
+    DS18B20(uint8_t pinNo, std::string address = nullptr);
 
     temperature_t getTemperature();
 

@@ -1,6 +1,6 @@
 #include "DS18B20.h"
 
-Homelab::Sensors::DS18B20::DS18B20(uint8_t _pinNo) : pinNo(_pinNo) {}
+Homelab::Sensors::DS18B20::DS18B20(uint8_t _pinNo, std::string _address) : pinNo(_pinNo), address(_address) {}
 
 Homelab::Sensors::DS18B20::temperature_t Homelab::Sensors::DS18B20::getTemperature()
 {
