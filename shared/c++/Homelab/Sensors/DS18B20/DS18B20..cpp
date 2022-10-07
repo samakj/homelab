@@ -16,14 +16,15 @@ Homelab::Sensors::DS18B20::temperature_t Homelab::Sensors::DS18B20::getTemperatu
         DeviceAddress _address;
         this->client->requestTemperatures();
 
-        for(int i=0; i < numberOfDevices; i++)
+        for(int i=0; i < deviceCount; i++)
             if (client->getAddress(_address, i)) 
             {
+
                 std::string address = this->addressToString(_address);
-                if (this->address == nullptr || address == this->address)
+                if (this->address == Homelab::Sensors::DS18B20::ADDRESS_NULL_VALUE || address == this->address)
                 {
                     _temperature = this->client->getTempC(_address);
-                    address_found = true;
+                    addressFound = true;
                     break;
                 }
             }
@@ -61,11 +62,6 @@ void Homelab::Sensors::DS18B20::setTemperatureTolerance(Homelab::Sensors::DS18B2
 
 void Homelab::Sensors::DS18B20::setAddress(std::string address) { this->address = address; }
 
-void Homelab::Sensors::DS18B20::setHumidityTolerance(Homelab::Sensors::DS18B20::humidity_t tolerance)
-{
-  this->humidityTolerance = tolerance;
-}
-
 void Homelab::Sensors::DS18B20::addTemperatureCallback(
     Homelab::Sensors::DS18B20::TemperatureCallback callback
 )
@@ -91,15 +87,15 @@ std::string Homelab::Sensors::DS18B20::addressToString(DeviceAddress address)
     return (std::string)buffer;
 }
 
-void Homelab::Sensors::DHT::setup()
+void Homelab::Sensors::DS18B20::setup()
 {
   this->oneWireClient = new OneWire(this->pinNo);
-  this->client = new DallasTemperature(this->onWireClient);
+  this->client = new DallasTemperature(this->oneWireClient);
   this->client->begin();
   Homelab::Logger::infof("DS18B20 sensor initialised on pin %d\n", this->pinNo);
 }
 
-void Homelab::Sensors::DHT::loop()
+void Homelab::Sensors::DS18B20::loop()
 {
   if(!this->client) this->setup();
   this->getTemperature();
