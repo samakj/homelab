@@ -1,5 +1,4 @@
 /** @format */
-<<<<<<< HEAD
 
 import styled from 'styled-components';
 import { PageSectionTitle } from '../shared-elements';
@@ -45,10 +44,6 @@ export const LogLineMessage = styled.span`
   grid-area: message;
   font-size: 0.75rem;
 `;
-<<<<<<< HEAD
-=======
->>>>>>> f347110 (fix: Start device ui with simple state view)
-=======
 
 export const LevelSelect = styled.select`
   background: none;
@@ -60,4 +55,3 @@ export const LevelSelect = styled.select`
     background-color: black;
   }
 `;
->>>>>>> dadc84d (fix: Add log level filter)

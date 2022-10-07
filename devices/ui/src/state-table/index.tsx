@@ -19,7 +19,7 @@ const formatMetric = (metric: string, value: string | number | boolean | null): 
 
   if (metric == 'temperature' && typeof value === 'number') return `${value.toFixed(1)}°c`;
   if (metric == 'humidity' && typeof value === 'number') return `${value.toFixed(1)}%`;
-  if (metric == 'strength' && typeof value === 'number') return `${value.toFixed(1)}%`;
+  if (metric == 'percentage' && typeof value === 'number') return `${value.toFixed(1)}%`;
 
   return value.toString();
 };

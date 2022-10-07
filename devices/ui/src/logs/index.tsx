@@ -1,6 +1,5 @@
 /** @format */
 
-<<<<<<< HEAD
 import React, { useCallback, useState } from 'react';
 import { PageSection } from '../shared-elements';
 import { useJsonWebsocket } from '../websocket';
@@ -68,16 +67,6 @@ export const Logs: React.FunctionComponent = () => {
           </LogLine>
         ))}
       </LogsContainer>
-=======
-import React, { useState } from 'react';
-import { PageSection, PageSectionTitle } from '../shared-elements';
-
-export const Logs: React.FunctionComponent = () => {
-  const [closed, setClosed] = useState(false);
-  return (
-    <PageSection closed={closed}>
-      <PageSectionTitle onClick={() => setClosed(!closed)}>Logs</PageSectionTitle>
->>>>>>> f347110 (fix: Start device ui with simple state view)
     </PageSection>
   );
 };
