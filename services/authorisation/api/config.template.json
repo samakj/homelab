@@ -11,6 +11,10 @@
     },
     "cache": {
         "host": "${containers.redis}",
-        "port": "${ports.redis}"
+        "port": "${ports.redis}",
+        "alias": {
+            "${containers.authorisation_api}:${ports.authorisation_api}": "${containers.authorisation_api}",
+            "${subdomains.authorisation_api}.${hosts.apis}": "${containers.authorisation_api}"
+        }
     }
 }

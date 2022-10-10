@@ -18,7 +18,11 @@
     },
     "cache": {
         "host": "${containers.redis}",
-        "port": "${ports.redis}"
+        "port": "${ports.redis}",
+        "alias": {
+            "${containers.iot_api}:${port.iot_api}": "${containers.iot_api}",
+            "${subdomains.iot_api}.${hosts.apis}": "${containers.iot_api}"
+        }
     },
     "urls": {
         "authorisation_api": "http://${containers.authorisation_api}:${ports.authorisation_api}"

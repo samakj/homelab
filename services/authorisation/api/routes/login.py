@@ -121,7 +121,7 @@ async def logout(
 
 
 @LOGIN_V0_ROUTER.get("/token", response_model=UserCredentials)
-@cache.route(expiry=10)
+@cache.route(expiry=10, include_access_token=True)
 async def check_token(
     user_credentials: UserCredentials = Depends(BearerUser()),
 ) -> UserCredentials:

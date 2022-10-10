@@ -16,6 +16,9 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
                 status_code=error.status_code,
             )
         except Exception as error:
+            if await request.is_disconnected():
+                return JSONResponse(status_code=400, content="Client disconnect")
+
             request.app.logger.exception(error)
             return JSONResponse(
                 content={"status_code": 500, "detail": str(error)},

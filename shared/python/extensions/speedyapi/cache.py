@@ -1,10 +1,13 @@
 import inspect
+import json
 import logging
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
+from xml.etree.ElementInclude import include
 from fastapi import Request, Response
 from pydantic import BaseModel
 from aioredis import Redis
+from shared.python.models.authorisation import PermissionCredentials, UserCredentials
 
 from shared.python.extensions.speedyapi import Logger
 from shared.python.json import serialise_json, parse_json
@@ -18,6 +21,7 @@ class Cache:
     password: Optional[str]
     name: Optional[str]
     client: Optional[Redis]
+    alias: Optional[Dict[str, str]]
 
     def __init__(
         self,
@@ -27,6 +31,7 @@ class Cache:
         password: Optional[str] = None,
         name: Optional[str] = None,
         logger: Optional[Logger] = None,
+        alias: Optional[Dict[str, str]] = None,
     ) -> None:
         self.user = user
         self.password = password
@@ -35,6 +40,7 @@ class Cache:
         self.name = name
         self.client = None
         self.logger = logger or logging.getLogger()
+        self.alias = alias
 
     def __call__(self) -> "Cache":
         return self
@@ -68,7 +74,15 @@ class Cache:
         except Exception as error:
             self.logger.error(f"Failed to connect to cache: {error}")
 
+    def alias_key(self, key: str) -> str:
+        if self.alias is not None:
+            for value, alias in self.alias.items():
+                key = key.replace(value, alias)
+
+        return key
+
     async def get(self, key: str) -> Any:
+        key = self.alias_key(key=key)
         value = None
 
         if self.client is not None:
@@ -90,6 +104,7 @@ class Cache:
     async def set(
         self, key: str, value: Optional[Any] = None, expiry: Optional[int] = None
     ) -> Any:
+        key = self.alias_key(key=key)
         if self.client is not None:
             if value is not None:
                 try:
@@ -102,12 +117,14 @@ class Cache:
         return value
 
     async def clear(self, key: str) -> None:
+        key = self.alias_key(key=key)
         if self.client is not None:
             await self.client.delete(key)
 
     async def clear_pattern(
         self, pattern: str, condition: Optional[Callable[[Any], bool]] = None
     ) -> None:
+        key = self.alias_key(key=pattern)
         if self.client is not None:
             for key in await self.client.keys(pattern):
                 clear = (
@@ -119,45 +136,46 @@ class Cache:
                     await self.clear(key=key)
 
     def create_route_key(
-        self, request: Request, include_query_params: bool = True
+        self,
+        request: Request,
+        credentials: Optional[UserCredentials] = None,
+        include_query_params: bool = True,
+        include_access_token: bool = False,
     ) -> str:
         key = ""
         key += request.url.hostname or ""
         key += f":{request.url.port}" if request.url.port else ""
         key += request.url.path
 
+        search: list[str] = []
+
+        if include_access_token and credentials is not None:
+            search.append(f"access_token={credentials.token}")
+
         if include_query_params:
-            search: list[str] = []
+            for param, value in request.query_params.items():
+                if param != "access_token":
+                    search.append(f"{param}={value}")
 
-            for key, value in request.query_params.items():
-                search.append(f"{key}={value}")
-
+        if search:
             search.sort()
-
             key += "?"
             key += "&".join(search)
 
-        return key
+        return self.alias_key(key=key)
 
-    def route(self, expiry: int = 60) -> Any:
+    def route(self, expiry: int = 60, include_access_token: bool = False) -> Any:
         def decorator(func):
             signature = inspect.signature(func)
-            has_request_param = next(
-                (
-                    param
-                    for param in signature.parameters.values()
-                    if param.annotation is Request
-                ),
-                None,
-            )
-            has_response_param = next(
-                (
-                    param
-                    for param in signature.parameters.values()
-                    if param.annotation is Request
-                ),
-                None,
-            )
+            has_request_param = False
+            has_response_param = False
+
+            for param in signature.parameters.values():
+                if param.annotation is Request:
+                    has_request_param = True
+                if param.annotation is Response:
+                    has_response_param = True
+
             parameters = [*signature.parameters.values()]
             if not has_request_param:
                 parameters.append(
@@ -191,6 +209,9 @@ class Cache:
                     if has_request_param
                     else kwargs.pop("response")
                 )
+                user_credentials = kwargs.get(
+                    "user_credentials", kwargs.get("permissions")
+                )
                 if not request:
                     self.logger.info("no-store request not cached")
                     return await func(*args, **kwargs)
@@ -203,7 +224,12 @@ class Cache:
 
                 response.headers["X-Will-Cache"] = "true"
                 response.headers["X-Cache-Duration"] = f"{expiry}"
-                key = self.create_route_key(request=request)
+                key = self.create_route_key(
+                    request=request,
+                    credentials=user_credentials,
+                    include_query_params=True,
+                    include_access_token=include_access_token,
+                )
                 cached_value = await self.get(key=key)
 
                 if cached_value:
