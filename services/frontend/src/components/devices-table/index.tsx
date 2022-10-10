@@ -55,7 +55,9 @@ export const DevicesTable: React.FunctionComponent<DevicesTablePropsType> = ({
               <DevicesTableCellElement>
                 {locations?.[device.location_id]?.name?.replace('-', ' ') || device.location_id}
               </DevicesTableCellElement>
-              <DevicesTableCellElement>{device.last_message}</DevicesTableCellElement>
+              <DevicesTableCellElement>
+                {device?.last_message ? new Date(device?.last_message).toLocaleString() : '-'}
+              </DevicesTableCellElement>
               {hasActions && (
                 <DevicesTableCellElement>
                   {canUpdate && (
