@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 from typing import Any, Callable, Coroutine, Dict, Iterator, Optional
 from uuid import uuid4
-from fastapi import WebSocket, WebSocketDisconnect
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from fastapi.requests import HTTPConnection
 
 from shared.python.models.session import Session
@@ -18,14 +18,14 @@ class WebsocketConnection:
     session: Session
     closed: bool
     close_reason: str
-    logger: Optional[Logger] = None
+    logger: Logger
 
     def __init__(
         self,
         websocket: WebSocket,
         scope: str,
         session: Session,
-        logger: Optional[Logger] = None,
+        logger: Logger,
     ) -> None:
         self.id = uuid4().hex
         self.created = datetime.utcnow()
@@ -43,44 +43,49 @@ class WebsocketConnection:
         return scope.startswith(self.scope)
 
     async def send(self, message: str) -> None:
-        await self.websocket.send_text(data=message)
+        try:
+            if self.websocket.client_state != WebSocketState.DISCONNECTED:
+                await self.websocket.send_text(data=message)
+            else:
+                await self.close("Failed to send")
+        except Exception:  # as error:
+            # self.logger.exception(error)
+            await self.close("Failed to send")
 
-    async def close(self, reason: str) -> None:
-        await self.websocket.send_text(
-            json.dumps({"action": "CLOSE", "reason": reason})
-        )
+    async def close(self, reason: Optional[str] = None) -> None:
+        if self.websocket.client_state != WebSocketState.DISCONNECTED and reason:
+            await self.websocket.send_text(
+                json.dumps({"action": "CLOSE", "reason": reason})
+            )
+            await self.websocket.close(reason=reason)
         self.closed = True
         self.close_reason = reason
 
     async def listen(
         self, on_message: Optional[Callable[[str], Coroutine[Any, Any, None]]] = None
     ) -> None:
-        log = self.logger.warning if self.logger is not None else print
         try:
             while True:
                 if self.session.expires < datetime.utcnow():
                     await self.close("Session has expired.")
-                if self.closed:
-                    await self.websocket.close(reason=self.close_reason)
-                    break
-
                 message = await self.websocket.receive_text()
                 if on_message is not None:
                     await on_message(message)
         except CancelledError:
-            log("Websocket unexpectedly cancelled:")
-            log(
+            self.logger.warning("Websocket unexpectedly cancelled:")
+            self.logger.warning(
                 f"    client={self.websocket.client.host if self.websocket.client else 'unknown'}"
                 + f"    path={self.websocket.url.path}"
             )
             await self.close(reason="Server cancel")
         except WebSocketDisconnect:
-            log("Websocket unexpectedly disconnected:")
-            log(
-                f"    client={self.websocket.client.host if self.websocket.client else 'unknown'}"
-                + f"    path={self.websocket.url.path}"
-            )
-            await self.close(reason="Server disconnect")
+            if not self.closed:
+                self.logger.warning("Websocket unexpectedly disconnected:")
+                self.logger.warning(
+                    f"    client={self.websocket.client.host if self.websocket.client else 'unknown'}"
+                    + f"    path={self.websocket.url.path}"
+                )
+                await self.close(reason="Server disconnect")
 
 
 class WebsocketsStore:
@@ -93,7 +98,10 @@ class WebsocketsStore:
         self, websocket: WebSocket, scope: str, session: Session
     ) -> WebsocketConnection:
         connection = WebsocketConnection(
-            websocket=websocket, scope=scope, session=session
+            websocket=websocket,
+            scope=scope,
+            session=session,
+            logger=websocket.app.logger,
         )
         self.connections[connection.id] = connection
         await connection.initialise()
@@ -108,13 +116,16 @@ class WebsocketsStore:
     def get_connections(
         self,
     ) -> Iterator[WebsocketConnection]:
+        to_delete: list[str] = []
         for connection in self.connections.values():
             # For when socket closes without using store remove function
             if connection.closed:
-                del self.connections[connection.id]
+                to_delete.append(connection.id)
                 continue
 
             yield connection
+        for id in to_delete:
+            del self.connections[connection.id]
 
     def get_scope(
         self,

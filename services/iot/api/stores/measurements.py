@@ -16,6 +16,7 @@ from stores.queries.measurements import (
 )
 from shared.python.extensions.speedyapi.database import Database
 from shared.python.helpers.to_filter import to_filter, to_array_filter, to_array_value
+from shared.python.json import serialise_json
 
 
 class MeasurementsStore:
@@ -162,11 +163,11 @@ class MeasurementsStore:
 
         await self.websockets.broadcast_to_scope(
             "measurements.create",
-            json.dumps(
+            serialise_json(
                 {
                     "action": "CREATE",
                     "resource": "measurement",
-                    "measurement": response.json(),
+                    "measurement": response,
                 }
             ),
         )

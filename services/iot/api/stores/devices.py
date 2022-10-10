@@ -17,6 +17,7 @@ from stores.queries.devices import (
 )
 from shared.python.extensions.speedyapi.database import Database
 from shared.python.extensions.speedyapi.websockets import Websockets
+from shared.python.json import serialise_json
 from shared.python.helpers.to_filter import to_filter, to_array_filter
 
 
@@ -101,11 +102,11 @@ class DevicesStore:
 
         await self.websockets.broadcast_to_scope(
             "devices.update",
-            json.dumps(
+            serialise_json(
                 {
                     "action": "UPDATE",
                     "resource": "device",
-                    "device": device.json(),
+                    "device": device,
                 }
             ),
         )
@@ -130,12 +131,12 @@ class DevicesStore:
 
         await self.websockets.broadcast_to_scope(
             "devices.update",
-            json.dumps(
+            serialise_json(
                 {
                     "action": "UPDATE",
                     "resource": "device",
-                    "device": response.json(),
-                    "oldDevice": device.json(),
+                    "device": response,
+                    "oldDevice": device,
                 }
             ),
         )
@@ -147,7 +148,7 @@ class DevicesStore:
 
         await self.websockets.broadcast_to_scope(
             "devices.update",
-            json.dumps(
+            serialise_json(
                 {
                     "action": "UPDATE",
                     "resource": "device",
