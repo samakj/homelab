@@ -1,8 +1,7 @@
 /** @format */
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { authorisationSlice } from '../../store/slices/authorisation/slice';
-import { checkToken, login } from '../../store/slices/authorisation/thunks';
+import { login } from '../../store/slices/authorisation/thunks';
 import { useDispatch, useSelector } from '../../store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input } from '../input';
@@ -15,9 +14,11 @@ import {
   ErrorElement,
 } from './elements';
 import { LoginResponseType } from '../../store/slices/authorisation/types';
+import { useAuthorisation } from '../../routing/authorise';
 
 export const LoginForm: React.FunctionComponent = () => {
   const dispatch = useDispatch();
+  const { setAccessToken } = useAuthorisation();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -31,10 +32,13 @@ export const LoginForm: React.FunctionComponent = () => {
       event.preventDefault();
       if (username && password) {
         const loginAction = await dispatch(login({ username, password }));
-        if (loginAction.type === login.fulfilled.type) navigate(params.get('next') || '/');
+        if (loginAction.type === login.fulfilled.type) {
+          setAccessToken((loginAction.payload as LoginResponseType).access_token);
+          navigate(params.get('next') || '/');
+        }
       }
     },
-    [dispatch, username, password, navigate, params]
+    [dispatch, username, password, navigate, params, setAccessToken]
   );
 
   const friendlyErrorMessage = useMemo(() => {

@@ -90,31 +90,34 @@ export class Request<
 
   async fetch(params: NullSafeMerge<PathParamsType, ParamsType>, options: RequestOptions = {}) {
     const url = this.url.build(params);
-    const _options: RequestOptions = {
+    const { raiseFor, ..._options } = {
       ...this.options,
       ...options,
       raiseFor: { ...this.options.raiseFor, ...options.raiseFor },
     };
-    const response = (await fetch(url, _options)) as HttpResponse;
-    response.options = _options;
-    response.urlTemplate = this.url.template;
-    response.statusGroup = `${response.status.toString()[0]}xx` as HttpResponseStatusGroups;
+    // @ts-ignore
+    return fetch(url, _options).then((response: HttpResponse) => {
+      response.options = { ..._options, raiseFor };
+      response.urlTemplate = this.url.template;
+      response.statusGroup = `${response.status.toString()[0]}xx` as HttpResponseStatusGroups;
 
-    let raise = !response.ok;
-    if (_options?.raiseFor != null) {
-      if (_options?.raiseFor[response.statusGroup] != null)
-        raise = _options.raiseFor[response.statusGroup];
-      if (_options?.raiseFor[response.status] != null) raise = _options.raiseFor[response.status];
-    }
-    if (raise) throw new HttpError(response);
-    return response;
+      let raise = !response.ok;
+      if (response?.options?.raiseFor != null) {
+        if (response?.options?.raiseFor[response.statusGroup] != null)
+          raise = response?.options.raiseFor[response.statusGroup];
+        if (response?.options?.raiseFor[response.status] != null)
+          raise = response?.options.raiseFor[response.status];
+      }
+      if (raise) throw new HttpError(response);
+      return response;
+    });
   }
 
   async get(
     params: NullSafeMerge<PathParamsType, ParamsType>,
     options: RequestOptions = {}
   ): Promise<HttpResponse> {
-    return this.fetch(params, { ...options, method: 'GET' });
+    return await this.fetch(params, { ...options });
   }
 
   async patch(
@@ -122,7 +125,7 @@ export class Request<
     data: {} = {},
     options: RequestOptions = {}
   ): Promise<HttpResponse> {
-    return this.fetch(params, { ...options, method: 'PATCH', body: JSON.stringify(data) });
+    return await this.fetch(params, { ...options, method: 'PATCH', body: JSON.stringify(data) });
   }
 
   async post(
@@ -130,7 +133,7 @@ export class Request<
     data: {} = {},
     options: RequestOptions = {}
   ): Promise<HttpResponse> {
-    return this.fetch(params, { ...options, method: 'POST', body: JSON.stringify(data) });
+    return await this.fetch(params, { ...options, method: 'POST', body: JSON.stringify(data) });
   }
 
   async delete(
@@ -138,7 +141,7 @@ export class Request<
     data: {} = {},
     options: RequestOptions = {}
   ): Promise<HttpResponse> {
-    return this.fetch(params, { ...options, method: 'DELETE', body: JSON.stringify(data) });
+    return await this.fetch(params, { ...options, method: 'DELETE', body: JSON.stringify(data) });
   }
 }
 

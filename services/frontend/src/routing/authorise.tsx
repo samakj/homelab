@@ -58,6 +58,7 @@ export const AuthorisationProvider: React.FunctionComponent = ({ children }) => 
     <AuthorisationContext.Provider
       value={{
         access_token,
+        setAccessToken,
         checkingToken,
         setCheckingToken,
         user,

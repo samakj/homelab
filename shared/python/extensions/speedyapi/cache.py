@@ -77,7 +77,7 @@ class Cache:
     def alias_key(self, key: str) -> str:
         if self.alias is not None:
             for value, alias in self.alias.items():
-                key = key.replace(value, alias)
+                key = str(key).replace(value, alias)
 
         return key
 

@@ -36,7 +36,7 @@ module.exports = ({target, mode, inputFolder = 'src', outputFolder = 'build'}) =
             rules: [
                 {
                     test: /\.tsx?$/,
-                    exclude: /node_modules/,
+                    include: path.resolve(__dirname, 'src'),
                     use: {
                         loader: 'babel-loader',
                         options: {
@@ -58,6 +58,7 @@ module.exports = ({target, mode, inputFolder = 'src', outputFolder = 'build'}) =
                 }
             },
         },
+        cache: mode === 'development',
         devtool: mode === 'development' ? 'source-map' : undefined,
             plugins: [
             ...(

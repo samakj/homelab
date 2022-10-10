@@ -85,7 +85,8 @@ export class Url<
       if (serialisedValue != null) path = path.replace(`:${key}`, serialisedValue);
     });
 
-    if (!path.endsWith('/')) path += '/';
+    // if (!path.endsWith('/')) path += '/';
+    if (path.endsWith('/')) path = path.slice(0, -1);
 
     return path;
   };

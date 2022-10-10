@@ -17,6 +17,7 @@ export interface AuthorisationContextType {
   user?: UserType;
   session?: SessionType;
   access_token?: string;
+  setAccessToken: (access_token: string) => void;
   isValidSession: boolean;
   isInScope: (scopes: string | string[]) => boolean;
 }
