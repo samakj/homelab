@@ -30,7 +30,7 @@ RETURNING id
 
 UPDATE_DEVICE = """
 UPDATE devices
-SET mac = {mac}, ip = {ip}, websocket_path = {websocket_path}, location_id = {location_id}
+SET mac = {mac}, ip = {ip}, websocket_path = {websocket_path}, location_id = {location_id}, last_message = {last_message}
 WHERE id = {id}
 """
 
