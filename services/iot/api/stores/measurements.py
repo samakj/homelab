@@ -55,7 +55,7 @@ class MeasurementsStore:
         value: Optional[ValueType] = None,
         value_gte: Optional[ValueType] = None,
         value_lte: Optional[ValueType] = None,
-    ) -> Optional[list[Measurement]]:
+    ) -> list[Measurement]:
         where = []
 
         if id is not None:
@@ -96,7 +96,7 @@ class MeasurementsStore:
             ):
                 continue
 
-            rows.push(Measurement.parse_obj(_row))
+            rows.append(Measurement.parse_obj(_row))
 
         return rows
 
@@ -106,7 +106,7 @@ class MeasurementsStore:
         metric_id: Optional[Union[int, list[int]]] = None,
         location_id: Optional[Union[int, list[int]]] = None,
         tags: Optional[Union[str, list[str]]] = None,
-    ) -> Optional[list[Measurement]]:
+    ) -> list[Measurement]:
         where = []
 
         if device_id is not None:
@@ -129,7 +129,7 @@ class MeasurementsStore:
         for row in response:
             _row = dict(row)
             _row["value"] = _row.get(f"{row['value_type']}_value")
-            rows.push(Measurement.parse_obj(_row))
+            rows.append(Measurement.parse_obj(_row))
 
         return rows
 

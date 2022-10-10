@@ -48,7 +48,7 @@ async def get_measurements(
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="measurements.get")
     ),
-) -> Measurement:
+) -> list[Measurement]:
     measurement = await measurements_store.get_measurements(
         id=id,
         device_id=device_id,
@@ -69,7 +69,6 @@ async def get_measurements(
 @MEASUREMENTS_V0_ROUTER.get("/latest", response_model=list[Measurement])
 @cache.route(expiry=10)
 async def get_latest_measurements(
-    id: Optional[list[int]] = Query(default=None),
     device_id: Optional[list[int]] = Query(default=None),
     metric_id: Optional[list[int]] = Query(default=None),
     location_id: Optional[list[int]] = Query(default=None),
@@ -78,9 +77,8 @@ async def get_latest_measurements(
     permissions: PermissionCredentials = Depends(
         BearerPermission(scope="measurements.get")
     ),
-) -> Measurement:
+) -> list[Measurement]:
     measurement = await measurements_store.get_latest_measurements(
-        id=id,
         device_id=device_id,
         metric_id=metric_id,
         location_id=location_id,
