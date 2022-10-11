@@ -9,8 +9,16 @@ import {
 } from './elements';
 import { MeasurementsTablePropsType, MeasurementsTableRowType } from './types';
 import { MetricType } from '../../store/slices/metrics/types';
+import { MeasurementType, ValueTypeEnum } from '../../store/slices/measurements/types';
 
-const formatMeasurementValue = (value: unknown, metric?: MetricType): string => {
+const formatMeasurementValue = (
+  measurement: Pick<MeasurementType, 'value' | 'value_type'>,
+  metric?: MetricType
+): string => {
+  if (!measurement) return '-';
+  let { value, value_type } = measurement;
+  if (value_type === ValueTypeEnum.INTEGER && typeof value == 'string') value = parseInt(value);
+  if (value_type === ValueTypeEnum.FLOAT && typeof value == 'string') value = parseFloat(value);
   if (typeof value === 'number') {
     if (['temperature', 'humidity', 'percentage'].includes(metric?.name || '-'))
       return `${(value as number)?.toFixed(1)}${metric?.unit || ''}`;
@@ -109,7 +117,7 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
                   {device?.mac || measurement?.device_id}
                 </MeasurementsTableCellElement>
                 <MeasurementsTableCellElement>
-                  {formatMeasurementValue(measurement?.value, metric)}
+                  {formatMeasurementValue(measurement, metric)}
                 </MeasurementsTableCellElement>
                 <MeasurementsTableCellElement>
                   {measurement?.timestamp ? new Date(measurement?.timestamp).toLocaleString() : '-'}

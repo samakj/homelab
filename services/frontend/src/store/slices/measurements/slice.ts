@@ -9,7 +9,7 @@ import {
   getMeasurementsLatest,
   getMeasurements,
 } from './thunks';
-import { MeasurementsSliceType, MeasurementType } from './types';
+import { MeasurementsSliceType, MeasurementType, ValueTypeEnum } from './types';
 import {
   CreateMeasurementMessageAction,
   // DeleteMeasurementMessageAction,
@@ -36,7 +36,16 @@ export const setMeasurements = (
   state.measurements = state.measurements || {};
   if (Array.isArray(action.payload))
     action.payload.forEach((measurement) => setMeasurements(state, { payload: measurement }));
-  else state.measurements[action.payload.id] = action.payload;
+  else {
+    state.measurements[action.payload.id] =
+      action.payload.value_type == ValueTypeEnum.FLOAT
+        ? {
+            ...action.payload,
+            // @ts-ignore: floats come though as strings for json safety
+            value: parseFloat(action.payload.value),
+          }
+        : action.payload;
+  }
 };
 
 export const setLatestMeasurements = (

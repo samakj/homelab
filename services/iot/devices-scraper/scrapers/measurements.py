@@ -1,4 +1,5 @@
-import json
+from decimal import Decimal
+import re
 from typing import Optional, Set
 from pydantic import BaseModel
 from fastapi import HTTPException
@@ -16,6 +17,7 @@ from shared.python.models.device import Device
 from shared.python.models.location import Location
 from shared.python.models.measurement import ValueType, ValueTypeOptions
 from shared.python.models.metric import Metric
+from shared.python.json import parse_json
 
 
 class MeasurementWebsocketMessage(BaseModel):
@@ -37,7 +39,7 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
 
     async def __call__(self, raw_message: str) -> None:
         try:
-            data = json.loads(raw_message)
+            data = parse_json(raw_message)
         except Exception as error:
             self.logger.error("Failed parse json from:")
             self.logger.error(f"\t{raw_message}")
@@ -125,14 +127,36 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
                 )
                 return
 
+            value = message.message
             value_type: ValueTypeOptions = "string"
 
             if isinstance(message.message, int):
                 value_type = "integer"
-            if isinstance(message.message, float):
+                value = int(message.message)
+            if isinstance(message.message, str) and re.search(
+                "^[-+]?\d+$", message.message
+            ):
+                value_type = "integer"
+                value = int(message.message)
+            if isinstance(message.message, float) or isinstance(
+                message.message, Decimal
+            ):
                 value_type = "float"
+                value = float(message.message)
+            if isinstance(message.message, str) and re.search(
+                "^[-+]?\d*.\d*$", message.message
+            ):
+                value_type = "float"
+                value = float(message.message)
             if isinstance(message.message, bool):
                 value_type = "boolean"
+                value = bool(message.message)
+            if isinstance(message.message, str) and message.message.lower() in {
+                "true",
+                "false",
+            }:
+                value_type = "boolean"
+                message.message = message.message.lower() == "true"
 
             try:
                 measurement = await self.iot_client.measurements.create_measurement(
@@ -142,7 +166,7 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
                     location_id=location.id,
                     tags=message.tags,
                     value_type=value_type,
-                    value=message.message,
+                    value=value,
                 )
                 self.logger.info(
                     "{:<18} | {:<12} | {:<32} | {}{}".format(

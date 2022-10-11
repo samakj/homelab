@@ -47,8 +47,6 @@ const _Measurements: React.FunctionComponent = () => {
     }
   }, [access_token, dispatch, measurements, locations]);
 
-  console.log(latestMeasurements);
-
   return (
     <>
       <MeasurementsTable
