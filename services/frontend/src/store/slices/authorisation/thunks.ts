@@ -12,8 +12,9 @@ import {
   LogoutUrlParamsType,
   TokenUrlParamsType,
 } from './types';
+import { config } from '../../../config';
 
-export const LoginUrl = new Url('http://authorisation.localhost/v0/login');
+export const LoginUrl = new Url(`${config.urls.apis.authorisation}/v0/login`);
 
 export const login = createRequestThunk<LoginResponseType, LoginParamsType>(
   'login',
@@ -22,7 +23,7 @@ export const login = createRequestThunk<LoginResponseType, LoginParamsType>(
 );
 
 export const LogoutUrl = new Url<null, LogoutUrlParamsType>(
-  'http://authorisation.localhost/v0/logout'
+  `${config.urls.apis.authorisation}/v0/logout`
 );
 
 export const logout = createRequestThunk<LogoutResponseType, LogoutParamsType>(
@@ -32,7 +33,7 @@ export const logout = createRequestThunk<LogoutResponseType, LogoutParamsType>(
 );
 
 export const TokenUrl = new Url<null, TokenUrlParamsType>(
-  'http://authorisation.localhost/v0/token'
+  `${config.urls.apis.authorisation}/v0/token`
 );
 
 export const checkToken = createRequestThunk<CheckTokenResponseType, CheckTokenParamsType>(

@@ -21,9 +21,10 @@ import {
   UpdateLocationParamsType,
   UpdateLocationResponseType,
 } from './types';
+import { config } from '../../../config';
 
 export const LocationUrl = new Url<LocationUrlPathParamsType, LocationUrlParamsType>(
-  'http://iot.localhost/v0/locations/:id'
+  `${config.urls.apis.iot}/v0/locations/:id`
 );
 export const LocationUrlRequest = new Request(LocationUrl);
 
@@ -52,7 +53,7 @@ export const deleteLocation = createRequestThunk<
 export const LocationByNameUrl = new Url<
   LocationByNameUrlPathParamsType,
   LocationByNameUrlParamsType
->('http://iot.localhost/v0/locations/:name');
+>(`${config.urls.apis.iot}/v0/locations/:name`);
 export const LocationByNameUrlRequest = new Request(LocationByNameUrl);
 
 export const getLocationByName = createRequestThunk<
@@ -63,7 +64,7 @@ export const getLocationByName = createRequestThunk<
 );
 
 export const LocationsUrl = new Url<null, LocationsUrlParamsType>(
-  'http://iot.localhost/v0/locations'
+  `${config.urls.apis.iot}/v0/locations`
 );
 export const LocationsUrlRequest = new Request(LocationsUrl);
 

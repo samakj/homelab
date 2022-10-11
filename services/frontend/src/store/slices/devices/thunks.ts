@@ -21,9 +21,10 @@ import {
   UpdateDeviceParamsType,
   UpdateDeviceResponseType,
 } from './types';
+import { config } from '../../../config';
 
 export const DeviceUrl = new Url<DeviceUrlPathParamsType, DeviceUrlParamsType>(
-  'http://iot.localhost/v0/devices/:id'
+  `${config.urls.apis.iot}/v0/devices/:id`
 );
 export const DeviceUrlRequest = new Request(DeviceUrl);
 
@@ -50,7 +51,7 @@ export const deleteDevice = createRequestThunk<DeleteDeviceResponseType, DeleteD
 export const DeviceByIPOrMACUrl = new Url<
   DeviceByIPOrMACUrlPathParamsType,
   DeviceByIPOrMACUrlParamsType
->('http://iot.localhost/v0/devices/:ip_or_mac');
+>(`${config.urls.apis.iot}/v0/devices/:ip_or_mac`);
 export const DeviceByIPOrMACUrlRequest = new Request(DeviceByIPOrMACUrl);
 
 export const getDeviceByIPOrMAC = createRequestThunk<
@@ -60,7 +61,7 @@ export const getDeviceByIPOrMAC = createRequestThunk<
   DeviceByIPOrMACUrlRequest.get({ ip_or_mac, access_token }).then((response) => response.json())
 );
 
-export const DevicesUrl = new Url<null, DevicesUrlParamsType>('http://iot.localhost/v0/devices');
+export const DevicesUrl = new Url<null, DevicesUrlParamsType>(`${config.urls.apis.iot}/v0/devices`);
 export const DevicesUrlRequest = new Request(DevicesUrl);
 
 export const getDevices = createRequestThunk<GetDevicesResponseType, GetDevicesParamsType>(

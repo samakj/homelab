@@ -16,9 +16,10 @@ import {
   MeasurementUrlParamsType,
   MeasurementUrlPathParamsType,
 } from './types';
+import { config } from '../../../config';
 
 export const MeasurementUrl = new Url<MeasurementUrlPathParamsType, MeasurementUrlParamsType>(
-  'http://iot.localhost/v0/measurements/:id'
+  `${config.urls.apis.iot}/v0/measurements/:id`
 );
 export const MeasurementUrlRequest = new Request(MeasurementUrl);
 
@@ -30,7 +31,7 @@ export const getMeasurement = createRequestThunk<
 );
 
 export const MeasurementsLatestUrl = new Url<null, MeasurementsLatestUrlParamsType>(
-  'http://iot.localhost/v0/measurements/latest'
+  `${config.urls.apis.iot}/v0/measurements/latest`
 );
 export const MeasurementsLatestUrlRequest = new Request(MeasurementsLatestUrl);
 
@@ -49,7 +50,7 @@ export const getMeasurementsLatest = createRequestThunk<
 );
 
 export const MeasurementsUrl = new Url<null, MeasurementsUrlParamsType>(
-  'http://iot.localhost/v0/measurements'
+  `${config.urls.apis.iot}/v0/measurements`
 );
 export const MeasurementsUrlRequest = new Request(MeasurementsUrl);
 

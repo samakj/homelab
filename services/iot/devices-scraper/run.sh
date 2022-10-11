@@ -1,1 +1,1 @@
-uvicorn main:app --reload --host=0.0.0.0 --port=$IOT_DEVICE_SCRAPER_PORT
+uvicorn main:app --reload --host=0.0.0.0 --port=$DEVICES_SCRAPER_PORT

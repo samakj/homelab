@@ -3,6 +3,7 @@
 import { createAction } from '@reduxjs/toolkit';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from '../..';
+import { config } from '../../../config';
 import { Url } from '../../../utils/url';
 import {
   CreateDeviceWebsocketMessageType,
@@ -16,7 +17,7 @@ import {
 } from './types';
 
 export const DevicesWebsocketUrl = new Url<null, DevicesWebsocketUrlParamsType>(
-  'ws://iot.localhost/v0/devices/ws'
+  `${config.urls.apis.iot.replace('http', 'ws')}/v0/devices/ws`
 );
 
 export const CreateDeviceMessageAction =

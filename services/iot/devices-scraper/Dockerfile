@@ -1,6 +1,6 @@
 FROM python:3.10-alpine
 
-ARG IOT_DEVICE_SCRAPER_PORT
+ARG DEVICES_SCRAPER_PORT
 
 WORKDIR /app
 
@@ -12,6 +12,6 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-EXPOSE $IOT_DEVICE_SCRAPER_PORT
+EXPOSE $DEVICES_SCRAPER_PORT
 
 CMD ["sh", "/app/run.sh"]

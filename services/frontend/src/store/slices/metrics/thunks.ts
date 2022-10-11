@@ -21,9 +21,10 @@ import {
   UpdateMetricParamsType,
   UpdateMetricResponseType,
 } from './types';
+import { config } from '../../../config';
 
 export const MetricUrl = new Url<MetricUrlPathParamsType, MetricUrlParamsType>(
-  'http://iot.localhost/v0/metrics/:id'
+  `${config.urls.apis.iot}/v0/metrics/:id`
 );
 export const MetricUrlRequest = new Request(MetricUrl);
 
@@ -48,7 +49,7 @@ export const deleteMetric = createRequestThunk<DeleteMetricResponseType, DeleteM
 );
 
 export const MetricByNameUrl = new Url<MetricByNameUrlPathParamsType, MetricByNameUrlParamsType>(
-  'http://iot.localhost/v0/metrics/:name'
+  `${config.urls.apis.iot}/v0/metrics/:name`
 );
 export const MetricByNameUrlRequest = new Request(MetricByNameUrl);
 
@@ -59,7 +60,7 @@ export const getMetricByName = createRequestThunk<
   MetricByNameUrlRequest.get({ name, access_token }).then((response) => response.json())
 );
 
-export const MetricsUrl = new Url<null, MetricsUrlParamsType>('http://iot.localhost/v0/metrics');
+export const MetricsUrl = new Url<null, MetricsUrlParamsType>(`${config.urls.apis.iot}/v0/metrics`);
 export const MetricsUrlRequest = new Request(MetricsUrl);
 
 export const getMetrics = createRequestThunk<GetMetricsResponseType, GetMetricsParamsType>(
