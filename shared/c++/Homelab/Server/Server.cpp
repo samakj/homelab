@@ -404,7 +404,7 @@ void Homelab::Server::loop()
       Homelab::Logger::debug("Hearbeat");
       Homelab::Server::lastLog = millis();
     }
-    if(Homelab::Time::millisSince(Homelab::Server::lastReport) > 1000)
+    if(Homelab::Time::millisSince(Homelab::Server::lastReport) > 15000)
     {
       Homelab::Server::sendPing();
       Homelab::Server::lastReport = millis();
