@@ -1,6 +1,7 @@
 /** @format */
 
-import { ActionReducerMapBuilder, createSlice } from '@reduxjs/toolkit';
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { deepSetIfNullish } from '../../../utils/deep';
 import { initialRequestMeta } from '../types';
 import {
   createMeasurement,
@@ -9,6 +10,11 @@ import {
   getMeasurements,
 } from './thunks';
 import { MeasurementsSliceType, MeasurementType } from './types';
+import {
+  CreateMeasurementMessageAction,
+  // DeleteMeasurementMessageAction,
+  // UpdateMeasurementMessageAction,
+} from './websocket';
 
 export const initialState: MeasurementsSliceType = {
   requests: {
@@ -17,23 +23,61 @@ export const initialState: MeasurementsSliceType = {
     getMeasurements: initialRequestMeta,
     createMeasurement: initialRequestMeta,
   },
+  latest: undefined,
   measurements: undefined,
 };
 
+const serialiseTags = (tags: string[]): string => [...tags].sort().join(',');
+
 export const setMeasurements = (
   state: MeasurementsSliceType,
-  measurements: MeasurementType | MeasurementType[]
+  action: Pick<PayloadAction<MeasurementType | MeasurementType[]>, 'payload'>
 ) => {
   state.measurements = state.measurements || {};
-  if (Array.isArray(measurements))
-    measurements.forEach((measurement) => setMeasurements(state, measurement));
-  else state.measurements[measurements.id] = measurements;
+  if (Array.isArray(action.payload))
+    action.payload.forEach((measurement) => setMeasurements(state, { payload: measurement }));
+  else state.measurements[action.payload.id] = action.payload;
+};
+
+export const setLatestMeasurements = (
+  state: MeasurementsSliceType,
+  action: Pick<PayloadAction<MeasurementType | MeasurementType[]>, 'payload'>
+) => {
+  const measurements = Array.isArray(action.payload) ? action.payload : [action.payload];
+  measurements.forEach((measurement) => {
+    state.latest = state.latest || {};
+    const serialisedTags = serialiseTags(measurement.tags);
+    deepSetIfNullish(state.latest, [measurement.location_id], { count: 0, children: {} });
+    deepSetIfNullish(state.latest, [measurement.location_id, 'children', measurement.metric_id], {
+      count: 0,
+      children: {},
+    });
+    deepSetIfNullish(
+      state.latest,
+      [measurement.location_id, 'children', measurement.metric_id, 'children', serialisedTags],
+      { count: 0, children: {} }
+    );
+
+    if (
+      state.latest[measurement.location_id].children[measurement.metric_id].children[serialisedTags]
+        .children[measurement.device_id] === undefined
+    ) {
+      state.latest[measurement.location_id].count += 1;
+      state.latest[measurement.location_id].children[measurement.metric_id].count += 1;
+      state.latest[measurement.location_id].children[measurement.metric_id].children[
+        serialisedTags
+      ].count += 1;
+    }
+    state.latest[measurement.location_id].children[measurement.metric_id].children[
+      serialisedTags
+    ].children[measurement.device_id] = measurement.id;
+  });
 };
 
 export const measurementsSlice = createSlice({
   name: 'measurements',
   initialState,
-  reducers: {},
+  reducers: { setMeasurements, setLatestMeasurements },
   extraReducers: (builder: ActionReducerMapBuilder<MeasurementsSliceType>): void => {
     builder
       .addCase(getMeasurement.pending, (state, action) => {
@@ -41,7 +85,7 @@ export const measurementsSlice = createSlice({
         state.requests.getMeasurement.started = new Date().toISOString();
       })
       .addCase(getMeasurement.fulfilled, (state, action) => {
-        setMeasurements(state, action.payload);
+        setMeasurements(state, action);
         state.requests.getMeasurement.isLoading = false;
         state.requests.getMeasurement.finished = new Date().toISOString();
       })
@@ -55,7 +99,8 @@ export const measurementsSlice = createSlice({
         state.requests.getMeasurementsLatest.started = new Date().toISOString();
       })
       .addCase(getMeasurementsLatest.fulfilled, (state, action) => {
-        setMeasurements(state, action.payload);
+        setMeasurements(state, action);
+        setLatestMeasurements(state, action);
         state.requests.getMeasurementsLatest.isLoading = false;
         state.requests.getMeasurementsLatest.finished = new Date().toISOString();
       })
@@ -69,7 +114,7 @@ export const measurementsSlice = createSlice({
         state.requests.getMeasurements.started = new Date().toISOString();
       })
       .addCase(getMeasurements.fulfilled, (state, action) => {
-        setMeasurements(state, action.payload);
+        setMeasurements(state, action);
         state.requests.getMeasurements.isLoading = false;
         state.requests.getMeasurements.finished = new Date().toISOString();
       })
@@ -83,7 +128,7 @@ export const measurementsSlice = createSlice({
         state.requests.createMeasurement.started = new Date().toISOString();
       })
       .addCase(createMeasurement.fulfilled, (state, action) => {
-        setMeasurements(state, action.payload);
+        setMeasurements(state, action);
         state.requests.createMeasurement.isLoading = false;
         state.requests.createMeasurement.finished = new Date().toISOString();
       })
@@ -91,6 +136,17 @@ export const measurementsSlice = createSlice({
         state.requests.createMeasurement.error = action.payload || action.error;
         state.requests.createMeasurement.isLoading = false;
         state.requests.createMeasurement.finished = new Date().toISOString();
+      })
+      .addCase(CreateMeasurementMessageAction, (state, action) => {
+        setMeasurements(state, { payload: action.payload.measurement });
+        setLatestMeasurements(state, { payload: action.payload.measurement });
       });
+    // Don't currently exist as possibilities
+    // .addCase(UpdateMeasurementMessageAction, (state, action) => {
+    //   setMeasurements(state, { payload: action.payload.measurement });
+    // })
+    // .addCase(DeleteMeasurementMessageAction, (state, action) => {
+    //   if (state.measurements) delete state.measurements[action.payload.measurement.id];
+    // });
   },
 });

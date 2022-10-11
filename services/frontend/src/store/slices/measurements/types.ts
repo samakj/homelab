@@ -1,6 +1,6 @@
 /** @format */
 
-import { RequestMetaType } from '../types';
+import { RequestMetaType, WebsocketMessageActionsEnum, WebsocketMessageType } from '../types';
 import { LocationType } from '../locations/types';
 import { MetricType } from '../metrics/types';
 import { DeviceType } from '../devices/types';
@@ -100,8 +100,85 @@ export interface CreateMeasurementParamsType extends MeasurementsUrlParamsType {
 
 export type CreateMeasurementResponseType = MeasurementType;
 
+export interface DevicesWebsocketUrlParamsType {
+  access_token: string;
+}
+
+export interface CreateMeasurementWebsocketMessageType
+  extends WebsocketMessageType<
+    'measurement',
+    'measurement',
+    MeasurementType,
+    WebsocketMessageActionsEnum.CREATE
+  > {}
+
+export interface UpdateMeasurementWebsocketMessageType
+  extends WebsocketMessageType<
+    'measurement',
+    'measurement' | 'oldMeasurement',
+    MeasurementType,
+    WebsocketMessageActionsEnum.UPDATE
+  > {}
+
+export interface DeleteMeasurementWebsocketMessageType
+  extends WebsocketMessageType<
+    'measurement',
+    'measurement',
+    Pick<MeasurementType, 'id'>,
+    WebsocketMessageActionsEnum.DELETE
+  > {}
+
+export type MeasurementWebsocketMessageType =
+  | CreateMeasurementWebsocketMessageType
+  | UpdateMeasurementWebsocketMessageType
+  | DeleteMeasurementWebsocketMessageType;
+
+export const isCreateMeasurementWebsocketMessageType = (
+  message: MeasurementWebsocketMessageType
+): message is CreateMeasurementWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.CREATE;
+
+export const isUpdateMeasurementWebsocketMessageType = (
+  message: MeasurementWebsocketMessageType
+): message is UpdateMeasurementWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.UPDATE;
+
+export const isDeleteMeasurementWebsocketMessageType = (
+  message: MeasurementWebsocketMessageType
+): message is DeleteMeasurementWebsocketMessageType =>
+  message.action === WebsocketMessageActionsEnum.DELETE;
+
+export interface UseMeasurementsWebsocketPropsType {
+  onOpen?: (event: Event, websocket: WebSocket | null) => void;
+  onMessage?: (
+    event: MessageEvent<string>,
+    data: MeasurementWebsocketMessageType,
+    websocket: WebSocket | null
+  ) => void;
+  onError?: (event: Event, websocket: WebSocket | null) => void;
+  onClose?: (event: CloseEvent, websocket: WebSocket | null) => void;
+  access_token?: string;
+}
+
 export interface MeasurementsStateType {
   [measurementId: number]: MeasurementType;
+}
+
+export interface LatestMeasurementsStateType {
+  [locationId: string | number]: {
+    count: number;
+    children: {
+      [metricId: string | number]: {
+        count: number;
+        children: {
+          [tags: string]: {
+            count: number;
+            children: { [deviceId: string | number]: MeasurementType['id'] };
+          };
+        };
+      };
+    };
+  };
 }
 
 export interface MeasurementsSliceType {
@@ -111,5 +188,6 @@ export interface MeasurementsSliceType {
     getMeasurements: RequestMetaType;
     createMeasurement: RequestMetaType;
   };
+  latest?: LatestMeasurementsStateType;
   measurements?: MeasurementsStateType;
 }

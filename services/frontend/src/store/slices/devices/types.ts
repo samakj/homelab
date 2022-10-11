@@ -69,6 +69,10 @@ export interface DeleteDeviceParamsType extends DeviceUrlPathParamsType, DeviceU
 
 export type DeleteDeviceResponseType = null;
 
+export interface DevicesWebsocketUrlParamsType {
+  access_token: string;
+}
+
 export interface CreateDeviceWebsocketMessageType
   extends WebsocketMessageType<
     'device',
@@ -114,10 +118,15 @@ export const isDeleteDeviceWebsocketMessageType = (
   message.action === WebsocketMessageActionsEnum.DELETE;
 
 export interface UseDevicesWebsocketPropsType {
-  onOpen: (event: Event, websocket: WebSocket | null) => void;
-  onMessage: (event: MessageEvent<DeviceWebsocketMessageType>, websocket: WebSocket | null) => void;
-  onError: (event: Event, websocket: WebSocket | null) => void;
-  onClose: (event: CloseEvent, websocket: WebSocket | null) => void;
+  onOpen?: (event: Event, websocket: WebSocket | null) => void;
+  onMessage?: (
+    event: MessageEvent<string>,
+    data: DeviceWebsocketMessageType,
+    websocket: WebSocket | null
+  ) => void;
+  onError?: (event: Event, websocket: WebSocket | null) => void;
+  onClose?: (event: CloseEvent, websocket: WebSocket | null) => void;
+  access_token?: string;
 }
 
 export interface DevicesStateType {

@@ -8,12 +8,15 @@ import { useDispatch, useSelector } from '../store';
 import { getDevices } from '../store/slices/devices/thunks';
 import { getLocations } from '../store/slices/locations/thunks';
 import { DeviceType } from '../store/slices/devices/types';
+import { useDeviceWebsocket } from '../store/slices/devices/websocket';
 
 const _Devices: React.FunctionComponent = () => {
   const { access_token } = useAuthorisation();
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.devices);
   const locations = useSelector((state) => state.locations.locations);
+
+  useDeviceWebsocket({ access_token });
 
   useEffect(() => {
     if (access_token) dispatch(getDevices({ access_token }));

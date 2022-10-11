@@ -10,14 +10,18 @@ import { getLocations } from '../store/slices/locations/thunks';
 import { MeasurementType } from '../store/slices/measurements/types';
 import { getDevices } from '../store/slices/devices/thunks';
 import { getMetrics } from '../store/slices/metrics/thunks';
+import { useMeasurementWebsocket } from '../store/slices/measurements/websocket';
 
 const _Measurements: React.FunctionComponent = () => {
   const { access_token } = useAuthorisation();
   const dispatch = useDispatch();
   const measurements = useSelector((state) => state.measurements.measurements);
+  const latestMeasurements = useSelector((state) => state.measurements.latest);
   const devices = useSelector((state) => state.devices.devices);
   const locations = useSelector((state) => state.locations.locations);
   const metrics = useSelector((state) => state.metrics.metrics);
+
+  useMeasurementWebsocket({ access_token });
 
   useEffect(() => {
     if (access_token) dispatch(getMeasurementsLatest({ access_token }));
@@ -43,10 +47,13 @@ const _Measurements: React.FunctionComponent = () => {
     }
   }, [access_token, dispatch, measurements, locations]);
 
+  console.log(latestMeasurements);
+
   return (
     <>
       <MeasurementsTable
         measurements={measurements}
+        latestMeasurements={latestMeasurements}
         devices={devices}
         locations={locations}
         metrics={metrics}
