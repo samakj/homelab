@@ -2,7 +2,7 @@
     "secret": "${auth.secret}",
     "algorithm": "${auth.algorithm}",
     "db": {
-        "host": "${containers.postgres}",
+        "host": "${containers.apis.postgres}",
         "port": "${ports.postgres}",
         "name": "${postgres.authorisation.name}",
         "user": "${postgres.authorisation.name}",
@@ -10,11 +10,11 @@
         "tables": {"users": "${postgres.authorisation.tables.users}", "sessions": "${postgres.authorisation.tables.sessions}"}
     },
     "cache": {
-        "host": "${containers.redis}",
+        "host": "${containers.apis.redis}",
         "port": "${ports.redis}",
         "alias": {
-            "${containers.authorisation_api}:${ports.authorisation_api}": "${containers.authorisation_api}",
-            "${subdomains.authorisation_api}.${hosts.apis}": "${containers.authorisation_api}"
+            "${containers.apis.authorisation}:${ports.apis.authorisation}": "${containers.apis.authorisation}",
+            "${subdomains.apis.authorisation}.${hosts.apis}": "${containers.apis.authorisation}"
         }
     }
 }

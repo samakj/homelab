@@ -4,12 +4,16 @@
     "postgres":  "postgres",
     "portainer": "portainer",
 
-    "iot_devices_scraper": "devices",
-    "utilities_scraper":   "utilities",
-    "weather_scraper":     "weather",
+    "scrapers": {
+        "devices":   "devices",
+        "utilities": "utilities",
+        "weather":   "weather"
+    },
 
-    "authorisation_api": "authorisation",
-    "iot_api":           "iot",
-    "utilities_api":     "utilities",
-    "weather_api":       "weather"
+    "apis": {
+        "authorisation": "authorisation",
+        "iot":           "iot",
+        "utilities":     "utilities",
+        "weather":       "weather"
+    }
 }

@@ -37,7 +37,7 @@ deactivate;
 @devices_scraper.command()
 def start_venv_app() -> None:
     host = get_hosts_config()["scrapers"]
-    port = get_ports_config()["iot_devices_scraper"]
+    port = get_ports_config()["devices_scraper"]
 
     os.chdir(iot_service_folder / "devices-scraper")
     os.system(

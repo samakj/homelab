@@ -4,6 +4,7 @@ import click
 from configs import apply_config_variables
 from variables import apis_infrastructure_folder
 from infrastructure.nginx import build as build_nginx_common
+from infrastructure.docker import create_external_network
 from services.authorisation import build as build_authorisation
 from services.iot import build as build_iot
 from services.utilities import build as build_utilities
@@ -81,6 +82,7 @@ def build(ctx: click.Context) -> None:
 @click.pass_context
 def start(ctx: click.Context) -> None:
     build.invoke(ctx=ctx)
+    create_external_network.invoke(ctx=ctx)
     os.chdir(apis_infrastructure_folder)
     os.system(
         """

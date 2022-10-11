@@ -4,11 +4,11 @@ server {
     # listen ${ports.https} ssl http2;
     # listen [::]:${ports.https} ssl http2;
 
-    server_name ~^${subdomains.authorisation_api}.*$;
+    server_name ~^${subdomains.apis.authorisation}.*$;
     resolver 127.0.0.11;
 
     location / {
-        proxy_pass $scheme://${containers.authorisation_api}:${ports.authorisation_api};
+        proxy_pass $scheme://${containers.apis.authorisation}:${ports.apis.authorisation};
 
         include proxy.conf;
 

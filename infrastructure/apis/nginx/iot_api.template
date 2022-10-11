@@ -4,11 +4,11 @@ server {
     # listen ${ports.https} ssl http2;
     # listen [::]:${ports.https} ssl http2;
 
-    server_name ~^${subdomains.iot_api}.*$;
+    server_name ~^${subdomains.apis.iot}.*$;
     resolver 127.0.0.11;
 
     location / {
-        proxy_pass $scheme://${containers.iot_api}:${ports.iot_api};
+        proxy_pass $scheme://${containers.apis.iot}:${ports.apis.iot};
 
         include proxy.conf;
 

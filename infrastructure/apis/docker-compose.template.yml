@@ -8,18 +8,19 @@ networks:
     driver: bridge
 
   external:
+    external: true
     driver: bridge
 
 services:
-  "${containers.nginx}":
+  "${containers.apis.nginx}":
     image: nginx:latest
-    container_name: ${containers.nginx}
+    container_name: ${containers.apis.nginx}
     depends_on:
-      - ${containers.certbot}
-      - ${containers.iot_api}
-      - ${containers.utilities_api}
-      - ${containers.weather_api}
-      - ${containers.portainer}
+      - ${containers.apis.certbot}
+      - ${containers.apis.iot}
+      - ${containers.apis.utilities}
+      - ${containers.apis.weather}
+      - ${containers.apis.portainer}
     volumes:
       - "${folders.infrastructure.apis.nginx}/authorisation_api.conf:/etc/nginx/authorisation_api.conf"
       - "${folders.infrastructure.apis.nginx}/iot_api.conf:/etc/nginx/iot_api.conf"
@@ -34,21 +35,22 @@ services:
       - "${folders.infrastructure.apis.certbot_data.www}:/var/www/certbot/"
       - "${folders.infrastructure.apis.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
-      - "${ports.http}:${ports.http}"
-      - "${ports.https}:${ports.https}"
+      - "${ports.apis.nginx}:${ports.http}"
+      # - "${ports.https}:${ports.https}"
     networks:
       - internal
       - external
 
-  "${containers.certbot}":
+  "${containers.apis.certbot}":
     image: certbot/certbot:latest
+    container_name: ${containers.apis.certbot}
     volumes:
       - ${folders.infrastructure.apis.certbot_data.www}:/var/www/certbot/
       - ${folders.infrastructure.apis.certbot_data.conf}:/etc/letsencrypt/
 
-  "${containers.postgres}":
+  "${containers.apis.postgres}":
     image: postgres:latest
-    container_name: ${containers.postgres}
+    container_name: ${containers.apis.postgres}
     environment:
       - POSTGRES_USER=${postgres.root.user}
       - POSTGRES_PASSWORD=${postgres.root.password}
@@ -70,9 +72,9 @@ services:
     networks:
       - internal
 
-  "${containers.redis}":
+  "${containers.apis.redis}":
     image: redis:latest
-    container_name: ${containers.redis}
+    container_name: ${containers.apis.redis}
     command: redis-server --port ${ports.redis}
     volumes:
       - ./redis-data:/var/lib/redis
@@ -81,93 +83,97 @@ services:
     networks:
       - internal
 
-  "${containers.authorisation_api}":
-    image: ${containers.authorisation_api}
-    container_name: ${containers.authorisation_api}
+  "${containers.apis.authorisation}":
+    image: ${containers.apis.authorisation}
+    container_name: ${containers.apis.authorisation}
     depends_on:
-      - ${containers.postgres}
-      - ${containers.redis}
+      - ${containers.apis.postgres}
+      - ${containers.apis.redis}
     build:
       context: "${folders.services.authorisation.api}"
       args:
-        AUTHORISATION_API_PORT: ${ports.authorisation_api}
+        AUTHORISATION_API_PORT: ${ports.apis.authorisation}
     environment:
-      AUTHORISATION_API_PORT: ${ports.authorisation_api}
+      AUTHORISATION_API_PORT: ${ports.apis.authorisation}
     volumes:
       - "${folders.services.authorisation.api}:/app"
       - "${folders.shared}:/app/shared"
     ports:
-      - "${ports.authorisation_api}:${ports.authorisation_api}"
+      - "${ports.apis.authorisation}:${ports.apis.authorisation}"
     restart: on-failure
     networks:
       - internal
+      - external
 
-  "${containers.iot_api}":
-    image: ${containers.iot_api}
-    container_name: ${containers.iot_api}
+  "${containers.apis.iot}":
+    image: ${containers.apis.iot}
+    container_name: ${containers.apis.iot}
     depends_on:
-      - ${containers.postgres}
-      - ${containers.redis}
+      - ${containers.apis.postgres}
+      - ${containers.apis.redis}
     build:
       context: "${folders.services.iot.api}"
       args:
-        IOT_API_PORT: ${ports.iot_api}
+        IOT_API_PORT: ${ports.apis.iot}
     environment:
-      IOT_API_PORT: ${ports.iot_api}
+      IOT_API_PORT: ${ports.apis.iot}
     volumes:
       - "${folders.services.iot.api}:/app"
       - "${folders.shared}:/app/shared"
     ports:
-      - "${ports.iot_api}:${ports.iot_api}"
+      - "${ports.apis.iot}:${ports.apis.iot}"
     restart: on-failure
     networks:
       - internal
+      - external
 
-  "${containers.utilities_api}":
-    image: ${containers.utilities_api}
-    container_name: ${containers.utilities_api}
+  "${containers.apis.utilities}":
+    image: ${containers.apis.utilities}
+    container_name: ${containers.apis.utilities}
     depends_on:
-      - ${containers.postgres}
-      - ${containers.redis}
+      - ${containers.apis.postgres}
+      - ${containers.apis.redis}
     build:
       context: "${folders.services.utilities}/api"
       args:
-        UTILITIES_API_PORT: ${ports.utilities_api}
+        UTILITIES_API_PORT: ${ports.apis.utilities}
     environment:
-      UTILITIES_API_PORT: ${ports.utilities_api}
+      UTILITIES_API_PORT: ${ports.apis.utilities}
     volumes:
       - "${folders.services.utilities.api}:/app"
       - "${folders.shared}:/app/shared"
     ports:
-      - "${ports.utilities_api}:${ports.utilities_api}"
+      - "${ports.apis.utilities}:${ports.apis.utilities}"
     restart: on-failure
     networks:
       - internal
+      - external
 
-  "${containers.weather_api}":
-    image: ${containers.weather_api}
-    container_name: ${containers.weather_api}
+  "${containers.apis.weather}":
+    image: ${containers.apis.weather}
+    container_name: ${containers.apis.weather}
     depends_on:
-      - ${containers.postgres}
-      - ${containers.redis}
+      - ${containers.apis.postgres}
+      - ${containers.apis.redis}
     build:
       context: "${folders.services.weather}/api"
       args:
-        WEATHER_API_PORT: ${ports.weather_api}
+        WEATHER_API_PORT: ${ports.apis.weather}
     environment:
-      WEATHER_API_PORT: ${ports.weather_api}
+      WEATHER_API_PORT: ${ports.apis.weather}
     volumes:
       - "${folders.services.weather.api}:/app"
       - "${folders.shared}:/app/shared"
     ports:
-      - "${ports.weather_api}:${ports.weather_api}"
+      - "${ports.apis.weather}:${ports.apis.weather}"
     restart: on-failure
     networks:
       - internal
+      - external
 
-  "${containers.portainer}":
+  "${containers.apis.portainer}":
     image: portainer/portainer-ce:latest
-    container_name: ${containers.portainer}
+    container_name: ${containers.apis.portainer}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true

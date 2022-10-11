@@ -4,11 +4,11 @@ server {
     # listen ${ports.https} ssl http2;
     # listen [::]:${ports.https} ssl http2;
 
-    server_name ~^${subdomains.scrapers.weather}.*$;
+    server_name ~^${subdomains.scrapers.devices}.*$;
     resolver 127.0.0.11;
 
     location / {
-        proxy_pass $scheme://${containers.scrapers.weather}:${ports.scrapers.weather};
+        proxy_pass $scheme://${containers.scrapers.devices}:${ports.scrapers.devices};
 
         include proxy.conf;
     }

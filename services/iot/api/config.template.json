@@ -1,6 +1,6 @@
 {
     "db": {
-        "host": "${containers.postgres}",
+        "host": "${containers.apis.postgres}",
         "port": "${ports.postgres}",
         "name": "${postgres.iot.name}",
         "user": "${postgres.iot.name}",
@@ -17,14 +17,14 @@
         }
     },
     "cache": {
-        "host": "${containers.redis}",
+        "host": "${containers.apis.redis}",
         "port": "${ports.redis}",
         "alias": {
-            "${containers.iot_api}:${port.iot_api}": "${containers.iot_api}",
-            "${subdomains.iot_api}.${hosts.apis}": "${containers.iot_api}"
+            "${containers.apis.iot}:${port.apis.iot}": "${containers.apis.iot}",
+            "${subdomains.apis.iot}.${hosts.apis}": "${containers.apis.iot}"
         }
     },
     "urls": {
-        "authorisation_api": "http://${containers.authorisation_api}:${ports.authorisation_api}"
+        "authorisation_api": "http://${containers.apis.authorisation}:${ports.apis.authorisation}"
     }
 }

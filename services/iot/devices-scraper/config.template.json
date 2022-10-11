@@ -4,7 +4,7 @@
         "password": "${auth.users.devices_scraper.password}"
     },
     "urls": {
-        "authorisation_api": "http://${subdomains.authorisation_api}.${hosts.apis}",
-        "iot_api": "http://${subdomains.iot_api}.${hosts.apis}"
+        "authorisation_api": "http://${containers.apis.authorisation}:${ports.apis.authorisation}",
+        "iot_api": "http://${containers.apis.iot}:${ports.apis.iot}"
     }
 }

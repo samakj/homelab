@@ -1,18 +1,28 @@
 version: "3"
 
+networks:
+  internal:
+    internal: true
+    driver: bridge
+
+  external:
+    external: true
+    driver: bridge
+
 services:
-  "${containers.nginx}":
+  "${containers.scrapers.nginx}":
     image: nginx:latest
-    container_name: ${containers.nginx}
+    container_name: ${containers.scrapers.nginx}
     depends_on:
-      - ${containers.iot_scraper}
-      - ${containers.utilities_scraper}
-      - ${containers.weather_scraper}
-      - ${containers.portainer}
+      - ${containers.scrapers.certbot}
+      - ${containers.scrapers.devices}
+      # - ${containers.scrapers.utilities}
+      # - ${containers.scrapers.weather}
+      - ${containers.scrapers.portainer}
     volumes:
-      - "${folders.infrastructure.scrapers.nginx}/iot_scraper.conf:/etc/nginx/iot_scraper.conf"
-      - "${folders.infrastructure.scrapers.nginx}/utilities_scraper.conf:/etc/nginx/utilities_scraper.conf"
-      - "${folders.infrastructure.scrapers.nginx}/weather_scraper.conf:/etc/nginx/weather_scraper.conf"
+      - "${folders.infrastructure.scrapers.nginx}/devices_scraper.conf:/etc/nginx/devices_scraper.conf"
+      # - "${folders.infrastructure.scrapers.nginx}/utilities_scraper.conf:/etc/nginx/utilities_scraper.conf"
+      # - "${folders.infrastructure.scrapers.nginx}/weather_scraper.conf:/etc/nginx/weather_scraper.conf"
       - "${folders.infrastructure.scrapers.nginx}/scrapers.conf:/etc/nginx/nginx.conf"
       - "${folders.infrastructure.nginx}/http.conf:/etc/nginx/http.conf"
       - "${folders.infrastructure.nginx}/https.conf:/etc/nginx/https.conf"
@@ -22,57 +32,72 @@ services:
       - "${folders.infrastructure.scrapers.certbot_data.www}:/var/www/certbot/"
       - "${folders.infrastructure.scrapers.certbot_data.conf}:/etc/nginx/ssl/"
     ports:
-      - "${ports.http}:${ports.http}"
-      - "${ports.https}:${ports.https}"
+      - "${ports.scrapers.nginx}:${ports.http}"
+      # - "${ports.https}:${ports.https}"
+    networks:
+      - internal
+      - external
 
-  "${containers.certbot}":
+  "${containers.scrapers.certbot}":
     image: certbot/certbot:latest
+    container_name: ${containers.scrapers.certbot}
     volumes:
       - ${folders.infrastructure.scrapers.certbot_data.www}:/var/www/certbot/
       - ${folders.infrastructure.scrapers.certbot_data.conf}:/etc/letsencrypt/
+    networks:
+      - internal
 
-  "${containers.iot_scraper}":
-    image: ${containers.iot_scraper}
-    container_name: ${containers.iot_scraper}
+  "${containers.scrapers.devices}":
+    image: ${containers.scrapers.devices}
+    container_name: ${containers.scrapers.devices}
     build:
-      context: "${folders.services.iot.scraper}"
+      context: "${folders.services.iot.devices_scraper}"
       args:
-        iot_scraper_PORT: ${ports.iot_scraper}
+        DEVICES_SCRAPER_PORT: ${ports.scrapers.devices}
+    environment:
+      DEVICES_SCRAPER_PORT: ${ports.scrapers.devices}
     volumes:
-      - "${folders.services.iot.scraper}:/app"
+      - "${folders.services.iot.devices_scraper}:/app"
     ports:
-      - "${ports.iot_scraper}:${ports.iot_scraper}"
+      - "${ports.scrapers.devices}:${ports.scrapers.devices}"
     restart: on-failure
+    networks:
+      - internal
+      - external
 
-  "${containers.utilities_scraper}":
-    image: ${containers.utilities_scraper}
-    container_name: ${containers.utilities_scraper}
-    build:
-      context: "${folders.services.utilities.scraper}"
-      args:
-        UTILITIES_SCRAPER_PORT: ${ports.utilities_scraper}
-    volumes:
-      - "${folders.services.utilities.scraper}:/app"
-    ports:
-      - "${ports.utilities_scraper}:${ports.utilities_scraper}"
-    restart: on-failure
+  # "${containers.scrapers.utilities}":
+  #   image: ${containers.scrapers.utilities}
+  #   container_name: ${containers.scrapers.utilities}
+  #   build:
+  #     context: "${folders.services.utilities.scraper}"
+  #     args:
+  #       UTILITIES_SCRAPER_PORT: ${ports.scrapers.utilities}
+  #   volumes:
+  #     - "${folders.services.utilities.scraper}:/app"
+  #   ports:
+  #     - "${ports.scrapers.utilities}:${ports.scrapers.utilities}"
+  #   restart: on-failure
+  #   networks:
+  #     - internal
 
-  "${containers.weather_scraper}":
-    image: ${containers.weather_scraper}
-    container_name: ${containers.weather_scraper}
-    build:
-      context: "${folders.services.weather.scraper}"
-      args:
-        WEATHER_SCRAPER_PORT: ${ports.weather_scraper}
-    volumes:
-      - "${folders.services.weather.scraper}:/app"
-    ports:
-      - "${ports.weather_scraper}:${ports.weather_scraper}"
-    restart: on-failure
+  # "${containers.scrapers.weather}":
+  #   image: ${containers.scrapers.weather}
+  #   container_name: ${containers.scrapers.weather}
+  #   build:
+  #     context: "${folders.services.weather.scraper}"
+  #     args:
+  #       WEATHER_SCRAPER_PORT: ${ports.scrapers.weather}
+  #   volumes:
+  #     - "${folders.services.weather.scraper}:/app"
+  #   ports:
+  #     - "${ports.scrapers.weather}:${ports.scrapers.weather}"
+  #   restart: on-failure
+  #   networks:
+  #     - internal
 
-  "${containers.portainer}":
+  "${containers.scrapers.portainer}":
     image: portainer/portainer-ce:latest
-    container_name: ${containers.portainer}
+    container_name: ${containers.scrapers.portainer}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -82,3 +107,5 @@ services:
       - ${folders.infrastructure.scrapers.portainer_data}:/data
     ports:
       - ${ports.portainer}:${ports.portainer}
+    networks:
+      - internal

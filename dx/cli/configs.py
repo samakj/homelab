@@ -116,6 +116,7 @@ def apply_config_variables(
     output_path: Union[Path, str],
     template_prefix: str = "",
     template_suffix: str = "",
+    extra_config: dict[str, any] = {},
 ) -> None:
     flat_auth_config = flattern_dict(obj=get_auth_config(), prefix="auth")
     flat_containers_config = flattern_dict(
@@ -188,6 +189,10 @@ def apply_config_variables(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )
     for key, value in flat_wifi_config.items():
+        output_text = output_text.replace(
+            f"{template_prefix}{key}{template_suffix}", str(value)
+        )
+    for key, value in extra_config.items():
         output_text = output_text.replace(
             f"{template_prefix}{key}{template_suffix}", str(value)
         )

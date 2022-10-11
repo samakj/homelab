@@ -8,14 +8,19 @@
 
     "frontend": 0,
 
-    "iot_scraper":   0,
-    "utilities_scraper": 0,
-    "weather_scraper":   0,
+    "scrapers": {
+        "nginx":         0,
+        "authorisation": 0,
+        "iot":           0,
+        "gps":           0,
+        "utilities":     0,
+        "weather":       0
+    },
 
-    "authorisation_api": 0,
-    "iot_api":           0,
-    "utilities_api":     0,
-    "weather_api":       0,
-    
-    "iot_devices_scraper": 0
+    "apis": {
+        "nginx":     0,
+        "devices":   0,
+        "utilities": 0,
+        "weather":   0
+    }
 }

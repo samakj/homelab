@@ -1,18 +1,24 @@
 {
-    "redis":     "redis",
-    "postgres":  "postgres",
-    "portainer": "portainer",
-    "nginx":     "nginx",
-    "certbot":   "certbot",
-
     "frontend": "frontend",
 
-    "iot_scraper":   "iot_scraper",
-    "utilities_scraper": "utilities_scraper",
-    "weather_scraper":   "weather_scraper",
-
-    "authorisation_api": "authorisation_api",
-    "iot_api":       "iot_api",
-    "utilities_api": "utilities_api",
-    "weather_api":   "weather_api"
+    "scrapers": {
+        "redis":     "scrapers-redis",
+        "devices":   "scrapers-devices",
+        "utilities": "scrapers-utilities",
+        "weather":   "scrapers-weather",
+        "portainer": "scrapers-portainer",
+        "certbot":   "scrapers-certbot"
+    },
+    
+    "apis": {
+        "nginx":         "apis-nginx",
+        "redis":         "apis-redis",
+        "postgres":      "apis-postgres",
+        "authorisation": "apis-authorisation",
+        "iot":           "apis-iot",
+        "utilities":     "apis-utilities",
+        "weather":       "apis-weather",
+        "portainer":     "apis-portainer",
+        "certbot":       "apis-certbot"
+    }
 }

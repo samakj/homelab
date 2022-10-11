@@ -2,8 +2,8 @@
     "secret":     "super_secret",
     "algorithm":  "algo",
     "users": {
-        "device_scraper": {
-            "username": "device_scraper",
+        "devices_scraper": {
+            "username": "devices_scraper",
             "password": "password"
         }
     }
