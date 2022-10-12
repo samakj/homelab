@@ -1,10 +1,12 @@
-from fastapi import Depends, Request
 from pydantic import BaseModel
+from typing import Optional
+from fastapi import Query, Depends, WebSocket, Request
 
 from shared.python.extensions.speedyapi import APIRouter
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.helpers.bearer_permission import BearerPermission
 from shared.python.extensions.websocket import WebsocketMeta
+from shared.python.extensions.speedyapi.websockets import Websockets
 
 WATCH_V0_ROUTER = APIRouter(prefix="/v0/watch", tags=["watch"])
 
@@ -50,3 +52,16 @@ async def unwatch_device_measurements(
     ),
 ) -> WebsocketMeta:
     return await request.app.measurements_scraper.unwatch(device_id=device_id)
+
+
+@WATCH_V0_ROUTER.websocket("/ws")
+async def watchlist_websocket(
+    websocket: WebSocket,
+    scope: Optional[str] = Query(default="devices"),
+    permissions: PermissionCredentials = Depends(BearerPermission(scope="devices")),
+    websockets: Websockets = Depends(Websockets),
+) -> None:
+    connection = await websockets.add_websocket(
+        scope="devices", session=permissions.session
+    )
+    await connection.listen()

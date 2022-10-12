@@ -6,6 +6,7 @@ export const scopesMap = {
     create: 'devices.create',
     update: 'devices.update',
     delete: 'devices.delete',
+    watch: 'devices.watch',
   },
   locations: {
     get: 'locations.get',

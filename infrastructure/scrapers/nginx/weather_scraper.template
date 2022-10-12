@@ -11,5 +11,7 @@ server {
         proxy_pass $scheme://${containers.scrapers.weather}:${ports.scrapers.weather};
 
         include proxy.conf;
+
+        access_log off;
     }
 }

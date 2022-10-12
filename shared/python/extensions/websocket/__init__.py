@@ -76,17 +76,17 @@ class Websocket:
                 self.logger.error(
                     f"Failed to connect to websocket at '{self.meta.url}': {error}"
                 )
-                self.meta.connection_error = error
+                self.meta.connection_error = str(error)
             except websockets.InvalidHandshake as error:
                 self.logger.error(
                     f"Failed to connect to websocket at '{self.meta.url}': {error}"
                 )
-                self.meta.connection_error = error
+                self.meta.connection_error = str(error)
             except asyncio.TimeoutError as error:
                 self.logger.error(
                     f"Failed to connect to websocket at '{self.meta.url}': {error}"
                 )
-                self.meta.connection_error = error
+                self.meta.connection_error = str(error)
 
         return self.socket
 
@@ -115,12 +115,12 @@ class Websocket:
                     await self._listen()
                 except websockets.ConnectionClosedError as error:
                     self.logger.error(f"Websocket at '{self.meta.url}' closed: {error}")
-                    self.meta.listen_error = error
+                    self.meta.listen_error = str(error)
                 except asyncio.CancelledError as error:
                     self.logger.error(
                         f"Websocket at '{self.meta.url}' task cancelled: {error}"
                     )
-                    self.meta.listen_error = error
+                    self.meta.listen_error = str(error)
                     disconnect = True
 
                 if self.socket is not None:

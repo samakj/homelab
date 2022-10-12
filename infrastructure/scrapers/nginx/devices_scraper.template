@@ -11,5 +11,7 @@ server {
         proxy_pass $scheme://${containers.scrapers.devices}:${ports.scrapers.devices};
 
         include proxy.conf;
+
+        access_log off;
     }
 }

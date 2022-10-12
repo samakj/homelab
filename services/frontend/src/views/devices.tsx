@@ -9,17 +9,24 @@ import { getDevices } from '../store/slices/devices/thunks';
 import { getLocations } from '../store/slices/locations/thunks';
 import { DeviceType } from '../store/slices/devices/types';
 import { useDeviceWebsocket } from '../store/slices/devices/websocket';
+import { getWatchedDevices } from '../store/slices/watched-devices/thunks';
+import { useWatchedDevicesWebsocket } from '../store/slices/watched-devices/websocket';
 
 const _Devices: React.FunctionComponent = () => {
   const { access_token } = useAuthorisation();
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.devices);
+  const watchedDeviceMeasurements = useSelector((state) => state.watchedDevices.measurements);
   const locations = useSelector((state) => state.locations.locations);
 
   useDeviceWebsocket({ access_token });
+  useWatchedDevicesWebsocket({ access_token });
 
   useEffect(() => {
-    if (access_token) dispatch(getDevices({ access_token }));
+    if (access_token) {
+      dispatch(getDevices({ access_token }));
+      dispatch(getWatchedDevices({ access_token }));
+    }
   }, [access_token, dispatch]);
 
   useEffect(() => {
@@ -36,7 +43,11 @@ const _Devices: React.FunctionComponent = () => {
 
   return (
     <>
-      <DevicesTable devices={devices} locations={locations} />
+      <DevicesTable
+        devices={devices}
+        watchedDeviceMeasurements={watchedDeviceMeasurements}
+        locations={locations}
+      />
     </>
   );
 };

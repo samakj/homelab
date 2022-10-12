@@ -8,6 +8,7 @@ import { devicesSlice } from './slices/devices/slice';
 import { locationsSlice } from './slices/locations/slice';
 import { measurementsSlice } from './slices/measurements/slice';
 import { metricsSlice } from './slices/metrics/slice';
+import { watchedDevicesSlice } from './slices/watched-devices/slice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     locations: locationsSlice.reducer,
     metrics: metricsSlice.reducer,
     measurements: measurementsSlice.reducer,
+    watchedDevices: watchedDevicesSlice.reducer,
   },
   preloadedState: {},
 });
