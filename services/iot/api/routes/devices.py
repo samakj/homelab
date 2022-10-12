@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Any, Callable, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, WebSocket, Request
+from fastapi import HTTPException, Query, Depends, WebSocket, Request
 
 from cache import cache
 from stores.devices import DevicesStore
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.device import Device, CreateDevice

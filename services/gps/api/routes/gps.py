@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Any, Dict, Optional
-from fastapi import Query, Request, APIRouter, Response
+from fastapi import Query, Request, Response
 
+
+from shared.python.extensions.speedyapi import APIRouter
 from gps_watcher import Position, Device, Satellite
 
 GPS_V0_ROUTER = APIRouter(prefix="/v0", tags=["GPS"])

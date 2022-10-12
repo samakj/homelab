@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Depends, Response, Request
+from fastapi import HTTPException, Depends, Response, Request
 from pydantic import BaseModel
 
 from cache import cache
@@ -8,6 +8,7 @@ from auth.jwt import sign_jwt
 from auth.bearer_user import BearerUser, UserCredentials
 from stores.users import UsersStore
 from stores.sessions import SessionsStore
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import LoginResponse, LogoutResponse
 from shared.python.models.session import CreateSession, Session

@@ -1,8 +1,9 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi import HTTPException, Query, Depends, Request
 
 from cache import cache
 from stores.metrics import MetricsStore
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.metric import Metric, CreateMetric

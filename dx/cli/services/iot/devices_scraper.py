@@ -44,6 +44,7 @@ def start_venv_app() -> None:
         f"""
 python3 -m venv .;
 . bin/activate;
+rm -rf shared;
 cp -r {shared_folder} ./;
 pip install -r requirements.txt;
 uvicorn main:app --reload --host={host} --port={port};

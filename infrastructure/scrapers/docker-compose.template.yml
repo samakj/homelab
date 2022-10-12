@@ -58,6 +58,7 @@ services:
       DEVICES_SCRAPER_PORT: ${ports.scrapers.devices}
     volumes:
       - "${folders.services.iot.devices_scraper}:/app"
+      - "${folders.shared}:/app/shared"
     ports:
       - "${ports.scrapers.devices}:${ports.scrapers.devices}"
     restart: on-failure

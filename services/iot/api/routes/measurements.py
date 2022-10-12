@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, WebSocket, Request
+from fastapi import HTTPException, Query, Depends, WebSocket, Request
 
 from cache import cache
 from stores.measurements import MeasurementsStore
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.models.measurement import Measurement, CreateMeasurement, ValueType

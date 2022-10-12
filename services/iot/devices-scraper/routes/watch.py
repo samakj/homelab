@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import Depends, Request
 from pydantic import BaseModel
 
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.models.authorisation import PermissionCredentials
 from shared.python.helpers.bearer_permission import BearerPermission
 from shared.python.extensions.websocket import WebsocketMeta

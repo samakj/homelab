@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Callable, Coroutine, Optional, List, Dict, Sequence, Type, Union
 
 from fastapi import (
@@ -11,7 +12,8 @@ from fastapi.utils import generate_unique_id
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.routing import APIRoute
+from fastapi.routing import APIRoute, APIRouter as FastAPIRouter
+from fastapi.types import DecoratedCallable
 from starlette.responses import JSONResponse
 from starlette.routing import BaseRoute
 
@@ -123,3 +125,28 @@ class SpeedyAPI(FastAPI):
 
         self.include_router(META_ROUTER)
         self.include_router(PING_ROUTER)
+
+        self.router.redirect_slashes = False
+
+
+class APIRouter(FastAPIRouter):
+    def api_route(
+        self, path: str, *, include_in_schema: bool = True, **kwargs: Any
+    ) -> Callable[[DecoratedCallable], DecoratedCallable]:
+        if path.endswith("/"):
+            path = path[:-1]
+
+        add_path = super().api_route(
+            path, include_in_schema=include_in_schema, **kwargs
+        )
+
+        alternate_path = path + "/"
+        add_alternate_path = super().api_route(
+            alternate_path, include_in_schema=False, **kwargs
+        )
+
+        def decorator(func: DecoratedCallable) -> DecoratedCallable:
+            add_alternate_path(func)
+            return add_path(func)
+
+        return decorator

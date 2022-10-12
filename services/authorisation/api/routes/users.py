@@ -1,9 +1,10 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi import HTTPException, Query, Depends, Request
 
 from cache import cache
 from auth.bearer_permission import BearerPermission, PermissionCredentials
 from stores.users import UsersStore
+from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.user import User, CreateUser, UserNoPassword
 

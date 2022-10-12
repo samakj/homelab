@@ -147,6 +147,9 @@ class Cache:
         key += f":{request.url.port}" if request.url.port else ""
         key += request.url.path
 
+        if key.endswith("/"):
+            key = key[:-1]
+
         search: list[str] = []
 
         if include_access_token and credentials is not None:
