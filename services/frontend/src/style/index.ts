@@ -28,5 +28,12 @@ body {
       cursor: auto;
     }
   }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    padding-bottom: 0.125rem;
+    border-bottom: 1px dashed ${({ theme }) => theme.colours.white}
+  }
 }
 `;

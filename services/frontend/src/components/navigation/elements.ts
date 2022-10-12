@@ -27,6 +27,7 @@ export const NavLinkElement = styled(Link)`
   grid-gap: 0.5rem;
   align-items: center;
   color: inherit;
+  border-bottom: none;
 `;
 
 export const NavLinkText = styled.span``;

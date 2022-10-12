@@ -92,7 +92,11 @@ export const DevicesTable: React.FunctionComponent<DevicesTablePropsType> = ({
           {Object.values(devices || {}).map((device: DeviceType) => (
             <tr key={device.id}>
               <DevicesTableCellElement>{device.mac}</DevicesTableCellElement>
-              <DevicesTableCellElement>{device.ip}</DevicesTableCellElement>
+              <DevicesTableCellElement>
+                <a href={`http://${device.ip}`} target="_blank">
+                  {device.ip}
+                </a>
+              </DevicesTableCellElement>
               <DevicesTableCellElement>{device.websocket_path}</DevicesTableCellElement>
               <DevicesTableCellElement>
                 {locations?.[device.location_id]?.name?.replace('-', ' ') || device.location_id}
