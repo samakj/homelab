@@ -1,15 +1,21 @@
 /** @format */
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
+  FiltersContainerElement,
   MeasurementsTableCellElement,
   MeasurementsTableElement,
   MeasurementsTableHeaderCellElement,
   MeasurementTagElement,
 } from './elements';
+import { useSearchParams } from 'react-router-dom';
+import { MultiValue } from 'react-select';
 import { MeasurementsTablePropsType, MeasurementsTableRowType } from './types';
 import { MetricType } from '../../store/slices/metrics/types';
 import { MeasurementType, ValueTypeEnum } from '../../store/slices/measurements/types';
+import { LocationType } from '../../store/slices/locations/types';
+import { Select } from '../select';
+import { ExtendedSet } from '../../utils/set';
 
 const formatMeasurementValue = (
   measurement: Pick<MeasurementType, 'value' | 'value_type'>,
@@ -33,11 +39,18 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
   devices,
   locations,
   metrics,
+  filters = true,
 }) => {
-  // const theme = useTheme();
-  // const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-  // const [measurementToEdit, setMeasurementToEdit] = useState<number>();
-  // const [measurementToDelete, setMeasurementToDelete] = useState<number>();
+  const [searchParams, setSeachParams] = useSearchParams();
+  const [locationFilters, setLocationsFilter] = useState<ExtendedSet<LocationType['id']>>(
+    new ExtendedSet(searchParams.getAll('location').map((param) => parseInt(param)))
+  );
+  const [metricFilters, setMetricsFilter] = useState<ExtendedSet<MetricType['id']>>(
+    new ExtendedSet(searchParams.getAll('metric').map((param) => parseInt(param)))
+  );
+  const [tagsFilters, setTagsFilter] = useState<ExtendedSet<MeasurementType['tags'][number]>>(
+    new ExtendedSet(searchParams.getAll('tag'))
+  );
 
   const rows = useMemo(() => {
     const _rows: MeasurementsTableRowType[] = [];
@@ -45,38 +58,160 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
     if (latestMeasurements)
       Object.keys(latestMeasurements).forEach((locationId) => {
         const locationChildren = latestMeasurements[locationId].children;
-        Object.keys(locationChildren).forEach((metricId, metricIndex) => {
+        let metricIndex = 0;
+        let locationSpan = 0;
+        Object.keys(locationChildren).forEach((metricId) => {
           const metricsChildren = locationChildren[metricId].children;
-          Object.keys(metricsChildren).forEach((tags, tagsIndex) => {
+          let tagsIndex = 0;
+          let metricsSpan = 0;
+          Object.keys(metricsChildren).forEach((tags) => {
             const tagsChildren = metricsChildren[tags].children;
-            Object.keys(tagsChildren).forEach((deviceId, deviceIndex) => {
+            let deviceIndex = 0;
+            Object.keys(tagsChildren).forEach((deviceId) => {
+              if (locationFilters.size && !locationFilters.has(parseInt(locationId))) return;
+              if (metricFilters.size && !metricFilters.has(parseInt(metricId))) return;
+              if (tagsFilters.size && !tags.split(',').some((tag) => tagsFilters.has(tag))) return;
               _rows.push({
-                locationsSpan:
-                  !metricIndex && !tagsIndex && !deviceIndex
-                    ? latestMeasurements[locationId].count
-                    : 0,
-                metricsSpan: !tagsIndex && !deviceIndex ? locationChildren[metricId].count : 0,
-                tagsSpan: !deviceIndex ? metricsChildren[tags].count : 0,
+                locationsSpan: !metricIndex && !tagsIndex && !deviceIndex ? 1 : 0,
+                metricsSpan: !tagsIndex && !deviceIndex ? 1 : 0,
+                tagsSpan: !deviceIndex ? 1 : 0,
                 metricIndex,
                 tagsIndex,
                 deviceIndex,
                 measurementId: tagsChildren[deviceId],
               });
+              metricIndex += 1;
+              tagsIndex += 1;
+              deviceIndex += 1;
             });
+            if (deviceIndex) _rows[_rows.length - deviceIndex].tagsSpan = deviceIndex;
+            metricsSpan += deviceIndex;
+            locationSpan += deviceIndex;
           });
+          if (tagsIndex) _rows[_rows.length - tagsIndex].metricsSpan = metricsSpan;
         });
+        if (metricIndex) _rows[_rows.length - metricIndex].locationsSpan = locationSpan;
       });
 
     return _rows;
-  }, [latestMeasurements]);
+  }, [latestMeasurements, locationFilters, metricFilters, tagsFilters]);
 
-  // const canCreate = useMemo(() => isInScope(scopesMap.measurements.create), [isInScope]);
-  // const canUpdate = useMemo(() => isInScope(scopesMap.measurements.update), [isInScope]);
-  // const canDelete = useMemo(() => isInScope(scopesMap.measurements.delete), [isInScope]);
-  // const hasActions = useMemo(() => canUpdate || canDelete, [canUpdate, canDelete]);
+  const locationOptions = useMemo(
+    () =>
+      Object.values(locations || {}).map((location: LocationType) => ({
+        value: location.id,
+        label: location.name,
+      })),
+    [locations]
+  );
+
+  const selectedLocations = useMemo(
+    () => locationOptions.filter((option) => locationFilters.has(option.value)),
+    [locationOptions, locationFilters]
+  );
+
+  const selectLocations = useCallback(
+    (options?: MultiValue<typeof locationOptions[number]>) => {
+      const locations =
+        options?.reduce((acc, option) => {
+          acc.add(option.value);
+          return acc;
+        }, new ExtendedSet<LocationType['id']>()) || new ExtendedSet<LocationType['id']>();
+      setLocationsFilter(locations);
+      setSeachParams({ location: locations.map((id) => id.toString()).toArray() });
+    },
+    [setLocationsFilter]
+  );
+
+  const metricOptions = useMemo(
+    () =>
+      Object.values(metrics || {}).map((metric: MetricType) => ({
+        value: metric.id,
+        label: metric.name,
+      })),
+    [metrics]
+  );
+
+  const selectedMetrics = useMemo(
+    () => metricOptions.filter((option) => metricFilters.has(option.value)),
+    [metricOptions, metricFilters]
+  );
+
+  const selectMetrics = useCallback(
+    (options?: MultiValue<typeof metricOptions[number]>) => {
+      const metrics =
+        options?.reduce((acc, option) => {
+          acc.add(option.value);
+          return acc;
+        }, new ExtendedSet<MetricType['id']>()) || new ExtendedSet<MetricType['id']>();
+      setMetricsFilter(metrics);
+      setSeachParams({ metric: metrics.map((id) => id.toString()).toArray() });
+    },
+    [setMetricsFilter]
+  );
+
+  const tagOptions = useMemo(
+    () =>
+      (
+        Object.values(measurements || {}).reduce((acc, measurement: MeasurementType) => {
+          measurement.tags.forEach((tag) => acc.add(tag));
+          return acc;
+        }, new ExtendedSet()) as ExtendedSet<MeasurementType['tags'][number]>
+      )
+        .map((tag: MeasurementType['tags'][number]) => ({
+          value: tag,
+          label: tag,
+        }))
+        .toArray(),
+    [measurements]
+  );
+
+  const selectedTags = useMemo(
+    () => tagOptions.filter((option) => tagsFilters.has(option.value)),
+    [tagOptions, tagsFilters]
+  );
+
+  const selectTags = useCallback(
+    (options?: MultiValue<typeof tagOptions[number]>) => {
+      const tags =
+        options?.reduce((acc, option) => {
+          acc.add(option.value);
+          return acc;
+        }, new ExtendedSet<MeasurementType['tags'][number]>()) ||
+        new ExtendedSet<MeasurementType['tags'][number]>();
+      setTagsFilter(tags);
+      setSeachParams({ tag: tags.toArray() });
+    },
+    [setTagsFilter]
+  );
 
   return (
     <>
+      {filters && (
+        <FiltersContainerElement>
+          <Select
+            label="Location"
+            value={selectedLocations}
+            options={locationOptions}
+            onChange={selectLocations}
+            isMulti
+          />
+          <Select
+            label="Metric"
+            value={selectedMetrics}
+            options={metricOptions}
+            onChange={selectMetrics}
+            isMulti
+          />
+          <Select
+            label="Tags"
+            value={selectedTags}
+            options={tagOptions}
+            onChange={selectTags}
+            isMulti
+          />
+        </FiltersContainerElement>
+      )}
       <MeasurementsTableElement>
         <thead>
           <tr>

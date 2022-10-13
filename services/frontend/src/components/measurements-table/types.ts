@@ -16,6 +16,7 @@ export interface MeasurementsTablePropsType {
   devices?: DevicesStateType;
   locations?: LocationsStateType;
   metrics?: MetricsStateType;
+  filters?: boolean;
 }
 
 export interface DeleteModalPropsType {

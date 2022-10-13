@@ -68,3 +68,10 @@ export const ErrorElement = styled.pre`
   font-size: 0.875rem;
   color: ${({ theme }) => theme.colours.red};
 `;
+
+export const FiltersContainerElement = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 16rem);
+  grid-gap: 1rem;
+  margin-bottom: 1rem;
+`;
