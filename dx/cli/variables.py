@@ -31,6 +31,7 @@ wifi_config_path = config_folder / "wifi.config.json"
 devices_folder = root_folder / "devices"
 sandbox_folder = devices_folder / "sandbox"
 hot_water_tank_folder = devices_folder / "hot-water-tank"
+conservatory_folder = devices_folder / "conservatory"
 device_ui_folder = devices_folder / "ui"
 
 #  DX
