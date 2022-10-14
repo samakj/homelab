@@ -1,6 +1,7 @@
 /** @format */
 
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { forceUTCTimestamp } from '../../../utils';
 import { initialRequestMeta } from '../types';
 import {
   createDevice,
@@ -36,7 +37,11 @@ export const setDevices = (
   state.devices = state.devices || {};
   if (Array.isArray(action.payload))
     action.payload.forEach((device) => setDevices(state, { payload: device }));
-  else state.devices[action.payload.id] = action.payload;
+  else
+    state.devices[action.payload.id] = {
+      ...action.payload,
+      last_message: action.payload.last_message && forceUTCTimestamp(action.payload.last_message),
+    };
 };
 
 export const devicesSlice = createSlice({

@@ -1,6 +1,7 @@
 /** @format */
 
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { forceUTCTimestamp } from '../../../utils';
 import { deepSetIfNullish } from '../../../utils/deep';
 import { initialRequestMeta } from '../types';
 import {
@@ -45,6 +46,9 @@ export const setMeasurements = (
             value: parseFloat(action.payload.value),
           }
         : action.payload;
+    state.measurements[action.payload.id].timestamp = forceUTCTimestamp(
+      state.measurements[action.payload.id].timestamp
+    );
   }
 };
 

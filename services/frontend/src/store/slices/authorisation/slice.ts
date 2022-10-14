@@ -2,6 +2,7 @@
 
 import { ActionReducerMapBuilder, createSlice } from '@reduxjs/toolkit';
 import { authorisationConfig } from '../../../configs/authorisation';
+import { forceUTCTimestamp } from '../../../utils';
 import { initialRequestMeta } from '../types';
 import { checkToken, login, logout } from './thunks';
 import { AuthorisationSliceType } from './types';
@@ -30,6 +31,8 @@ export const authorisationSlice = createSlice({
         state.user = action.payload.user;
         state.access_token = action.payload.access_token;
         state.session = action.payload.session;
+        state.session.created = forceUTCTimestamp(state.session.created);
+        state.session.expires = forceUTCTimestamp(state.session.expires);
         document.cookie = `${authorisationConfig.cookie}=${action.payload.access_token}`;
         state.requests.login.isLoading = false;
         state.requests.login.finished = new Date().toISOString();
@@ -67,6 +70,8 @@ export const authorisationSlice = createSlice({
       .addCase(checkToken.fulfilled, (state, action): void => {
         state.user = action.payload.user;
         state.session = action.payload.session;
+        state.session.created = forceUTCTimestamp(state.session.created);
+        state.session.expires = forceUTCTimestamp(state.session.expires);
         state.access_token = action.payload.token;
         document.cookie = `${authorisationConfig.cookie}=${action.payload.token}`;
         state.requests.checkToken.isLoading = false;

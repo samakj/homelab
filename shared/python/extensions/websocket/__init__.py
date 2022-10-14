@@ -101,8 +101,10 @@ class Websocket:
         self.disconnecting = False
 
     async def listen(self) -> asyncio.Task:
-        if self.task is None:
-            self.task = asyncio.create_task(self._reconnector())
+        if self.task is not None:
+            await self.disconnect()
+
+        self.task = asyncio.create_task(self._reconnector())
 
         return self.task
 
