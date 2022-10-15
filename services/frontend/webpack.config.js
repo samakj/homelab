@@ -13,7 +13,7 @@ module.exports = ({target, mode, inputFolder = 'src', outputFolder = 'build'}) =
         output: {
             path: path.resolve(__dirname, `${outputFolder}`),
             filename: `${target}/[name].js`,
-            publicPath: '',
+            publicPath: '/',
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.json'],

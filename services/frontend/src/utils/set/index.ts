@@ -25,6 +25,14 @@ export class ExtendedSet<T> extends Set<T> {
     return set;
   };
 
+  find = <S extends T>(
+    predicate: (value: T, index: number, set: ExtendedSet<T>) => value is S
+  ): T | undefined => {
+    let index = 0;
+    for (const value of this) if (predicate(value, index, this)) return value;
+    return undefined;
+  };
+
   reduce = <U>(
     callbackfn: (previousValue: U, currentValue: T, currentIndex: number, set: ExtendedSet<T>) => U,
     initialValue: U

@@ -3,12 +3,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FiltersContainerElement,
+  IconButtonContainerElement,
   MeasurementsTableCellElement,
   MeasurementsTableElement,
   MeasurementsTableHeaderCellElement,
   MeasurementTagElement,
 } from './elements';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MultiValue } from 'react-select';
 import { MeasurementsTablePropsType, MeasurementsTableRowType } from './types';
 import { MetricType } from '../../store/slices/metrics/types';
@@ -16,6 +17,7 @@ import { MeasurementType, ValueTypeEnum } from '../../store/slices/measurements/
 import { LocationType } from '../../store/slices/locations/types';
 import { Select } from '../select';
 import { ExtendedSet } from '../../utils/set';
+import { MdShowChart } from 'react-icons/md';
 
 const formatMeasurementValue = (
   measurement: Pick<MeasurementType, 'value' | 'value_type'>,
@@ -42,6 +44,7 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
   filters = true,
 }) => {
   const [searchParams, setSeachParams] = useSearchParams();
+  const navigate = useNavigate();
   const [locationFilters, setLocationsFilter] = useState<ExtendedSet<LocationType['id']>>(
     new ExtendedSet(searchParams.getAll('location').map((param) => parseInt(param)))
   );
@@ -185,6 +188,28 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
     [setTagsFilter]
   );
 
+  const goToChartGenerator = useCallback(
+    (row: MeasurementsTableRowType) => () => {
+      const measurement = measurements?.[row.measurementId];
+      const path = `/measurements/chart`;
+      const search = new URLSearchParams();
+
+      if (measurement) {
+        search.set('locationId', measurement.location_id.toString());
+        search.set('metricId', measurement.metric_id.toString());
+        search.set('deviceId', measurement.device_id.toString());
+        measurement.tags.forEach((tag) => search.set('tags', tag));
+
+        const now = new Date(new Date().toISOString().slice(0, 17) + '00Z');
+        search.set('from', new Date(+now - 1000 * 60 * 60 * 24).toISOString());
+        search.set('to', now.toISOString());
+
+        navigate(`${path}?${search}`);
+      }
+    },
+    [navigate, measurements]
+  );
+
   return (
     <>
       {filters && (
@@ -221,6 +246,7 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
             <MeasurementsTableHeaderCellElement>Device</MeasurementsTableHeaderCellElement>
             <MeasurementsTableHeaderCellElement>Value</MeasurementsTableHeaderCellElement>
             <MeasurementsTableHeaderCellElement>Time</MeasurementsTableHeaderCellElement>
+            <MeasurementsTableHeaderCellElement />
           </tr>
         </thead>
         <tbody>
@@ -256,6 +282,11 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
                 </MeasurementsTableCellElement>
                 <MeasurementsTableCellElement>
                   {measurement?.timestamp ? new Date(measurement?.timestamp).toLocaleString() : '-'}
+                </MeasurementsTableCellElement>
+                <MeasurementsTableCellElement>
+                  <IconButtonContainerElement onClick={goToChartGenerator(row)}>
+                    <MdShowChart />
+                  </IconButtonContainerElement>
                 </MeasurementsTableCellElement>
               </tr>
             );

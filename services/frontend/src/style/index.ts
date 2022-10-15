@@ -15,25 +15,29 @@ body {
     box-sizing: border-box;
   }
 
-  button {
-    font-family: 'Roboto', sans-serif;
-    cursor: pointer;
-    appearance: none;
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 0;
-
-    &:disabled {
-      cursor: auto;
-    }
-  }
-
   a {
     color: inherit;
     text-decoration: none;
     padding-bottom: 0.125rem;
     border-bottom: 1px dashed ${({ theme }) => theme.colours.white}
   }
+
+button {
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    cursor: auto;
+  }
+
+  input {
+    font-family: 'Roboto', sans-serif;
+  }
+}
 }
 `;

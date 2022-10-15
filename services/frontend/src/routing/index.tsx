@@ -15,6 +15,7 @@ import { Metrics } from '../views/metrics';
 import { Devices } from '../views/devices';
 import { WebData } from '../views/web-data';
 import { Measurements } from '../views/measurements';
+import { MeasurementsChart } from '../views/measurements-chart';
 
 export const ContextualRouter: React.FunctionComponent<RouterPropsType> = ({
   location,
@@ -37,6 +38,7 @@ export const Routes: React.FunctionComponent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/metrics" element={<Metrics />} />
           <Route path="/measurements" element={<Measurements />} />
+          <Route path="/measurements/chart" element={<MeasurementsChart />} />
           <Route path="/user" element={<User />} />
           <Route path="/web-data" element={<WebData />} />
           <Route path="*" element={<Navigate to="/" replace />} />
