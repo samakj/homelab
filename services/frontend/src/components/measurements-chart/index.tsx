@@ -5,9 +5,12 @@ import { MultiValue } from 'react-select';
 import { DeviceType } from '../../store/slices/devices/types';
 import { LocationType } from '../../store/slices/locations/types';
 import {
-  MeasurementsStateType,
+  ChartMeasurementsStateType,
+  MeasurementsChartLinePointType,
+  MeasurementsChartLinesType,
+  MeasurementsChartLineType,
+  MeasurementsChartMetricsType,
   MeasurementType,
-  ValueTypeEnum,
 } from '../../store/slices/measurements/types';
 import { MetricType } from '../../store/slices/metrics/types';
 import { ExtendedSet } from '../../utils/set';
@@ -16,33 +19,23 @@ import {
   FiltersContainerElement,
   ChartContainerElement,
   LayoutGridElement,
-  DateTooltip,
-  PointValueTooltip,
+  MainTooltip,
+  LocationHeaderElement,
+  DateHeaderElement,
+  MetricELement,
 } from './elements';
-import {
-  LinesType,
-  MeasurementChartPropsType,
-  MetricRangesType,
-  NearestPointsType,
-  RangesType,
-  ScalesType,
-} from './types';
+import { MeasurementChartPropsType, NearestPointsType } from './types';
 import { Input } from '../input';
 import { scaleTime, scaleLinear } from '@visx/scale';
-import { GridRows, GridColumns } from '@visx/grid';
-import { AxisLeft, AxisBottom } from '@visx/axis';
-import { curveBasis } from '@visx/curve';
-import { LinePath, Line, Polygon } from '@visx/shape';
+import { GridColumns } from '@visx/grid';
+import { AxisBottom } from '@visx/axis';
+import { LinePath, Line } from '@visx/shape';
 import { Group } from '@visx/group';
 import { RectClipPath } from '@visx/clip-path';
-import { Text } from '@visx/text';
+import { curveNatural } from '@visx/curve';
 import { useTheme } from 'styled-components';
-
-const generateLineKey = (measurement: MeasurementType): string =>
-  `${measurement.location_id}:${measurement.metric_id}:` +
-  `${measurement.tags.join(',')}:${measurement.device_id}`;
-
-const getMetricIdFromKey = (key: string): number => parseInt(key.split(':')[1]);
+import { DAY_IN_MS, toLocaleISOString } from '../../utils';
+import { DateLike } from '../../types';
 
 export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsType> = ({
   locationIds,
@@ -57,42 +50,14 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   setFrom,
   to,
   setTo,
-  measurements,
+  measurementsChart,
   locations,
   devices,
   metrics,
   filters = true,
+  yAxisPadding = 0.1,
 }) => {
   const theme = useTheme();
-  const filteredMeasurements: MeasurementsStateType = useMemo(
-    () =>
-      Object.values(measurements || {}).reduce(
-        (acc: MeasurementsStateType, measurement: MeasurementType) => {
-          if (locationIds.size && !locationIds.has(measurement.location_id)) return acc;
-          if (metricIds.size && !metricIds.has(measurement.metric_id)) return acc;
-          if (deviceIds.size && !deviceIds.has(measurement.device_id)) return acc;
-          if (tags.size && tags.find((tag) => !measurement.tags.includes(tag))) return acc;
-          if (from != null && new Date(measurement.timestamp) < from) return acc;
-          if (to != null && new Date(measurement.timestamp) > to) return acc;
-          acc[measurement.id] = measurement;
-          return acc;
-        },
-        {}
-      ),
-    [measurements, locationIds, metricIds, deviceIds, tags, from, to]
-  );
-
-  const sortedMeasurements: MeasurementType[] = useMemo(
-    () =>
-      Object.values(filteredMeasurements).sort(
-        (measurementA: MeasurementType, measurementB: MeasurementType) => {
-          if (measurementA.timestamp > measurementB.timestamp) return 1;
-          if (measurementA.timestamp < measurementB.timestamp) return -1;
-          return 0;
-        }
-      ),
-    [filteredMeasurements]
-  );
 
   const locationOptions = useMemo(
     () =>
@@ -104,7 +69,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   );
 
   const selectedLocations = useMemo(
-    () => locationOptions.filter((option) => locationIds.has(option.value)),
+    () => locationOptions.filter((option) => locationIds?.has(option.value)),
     [locationOptions, locationIds]
   );
 
@@ -115,7 +80,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
           acc.add(option.value);
           return acc;
         }, new ExtendedSet<LocationType['id']>()) || new ExtendedSet<LocationType['id']>();
-      setLocationIds(locations);
+      setLocationIds?.(locations);
     },
     [setLocationIds]
   );
@@ -130,7 +95,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   );
 
   const selectedDevices = useMemo(
-    () => deviceOptions.filter((option) => deviceIds.has(option.value)),
+    () => deviceOptions.filter((option) => deviceIds?.has(option.value)),
     [deviceOptions, deviceIds]
   );
 
@@ -141,7 +106,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
           acc.add(option.value);
           return acc;
         }, new ExtendedSet<LocationType['id']>()) || new ExtendedSet<LocationType['id']>();
-      setDeviceIds(locations);
+      setDeviceIds?.(locations);
     },
     [setDeviceIds]
   );
@@ -156,7 +121,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   );
 
   const selectedMetrics = useMemo(
-    () => metricOptions.filter((option) => metricIds.has(option.value)),
+    () => metricOptions.filter((option) => metricIds?.has(option.value)),
     [metricOptions, metricIds]
   );
 
@@ -167,7 +132,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
           acc.add(option.value);
           return acc;
         }, new ExtendedSet<MetricType['id']>()) || new ExtendedSet<MetricType['id']>();
-      setMetricIds(metrics);
+      setMetricIds?.(metrics);
     },
     [setMetricIds]
   );
@@ -175,21 +140,24 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   const tagOptions = useMemo(
     () =>
       (
-        Object.values(measurements || {}).reduce((acc, measurement: MeasurementType) => {
-          measurement.tags.forEach((tag) => acc.add(tag));
-          return acc;
-        }, new ExtendedSet()) as ExtendedSet<MeasurementType['tags'][number]>
+        Object.values(measurementsChart?.lines || {}).reduce(
+          (acc, line: ChartMeasurementsStateType['lines'][string]) => {
+            line.tags?.forEach((tag) => acc.add(tag));
+            return acc;
+          },
+          new ExtendedSet()
+        ) as ExtendedSet<MeasurementType['tags'][number]>
       )
         .map((tag: MeasurementType['tags'][number]) => ({
           value: tag,
           label: tag,
         }))
         .toArray(),
-    [measurements]
+    [measurementsChart]
   );
 
   const selectedTags = useMemo(
-    () => tagOptions.filter((option) => tags.has(option.value)),
+    () => tagOptions.filter((option) => tags?.has(option.value)),
     [tagOptions, tags]
   );
 
@@ -201,7 +169,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
           return acc;
         }, new ExtendedSet<MeasurementType['tags'][number]>()) ||
         new ExtendedSet<MeasurementType['tags'][number]>();
-      setTags(tags);
+      setTags?.(tags);
     },
     [setTags]
   );
@@ -229,8 +197,8 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
     new ResizeObserver(([element]) => {
       clearTimeout(resizeRef.current);
       resizeRef.current = setTimeout(() => {
-        setChartHeight(element.contentRect.height - 1);
-        setChartWidth(element.contentRect.width - 1);
+        setChartHeight(element.contentRect.height);
+        setChartWidth(element.contentRect.width);
       }, 100);
     })
   );
@@ -241,81 +209,69 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
     return () => observer.disconnect();
   }, [chartContainerRef, observerRef]);
 
-  const { dateRange, metricRanges }: RangesType = useMemo(() => {
-    const dateRange = [from ? from.toISOString() : '9999', to ? to.toISOString() : '2000'];
-    const metricRanges: MetricRangesType = {};
+  const dateRange = useMemo(
+    () => [
+      new Date(from ? from.toISOString() : measurementsChart?.timestamp?.min || '2000'),
+      new Date(to ? to.toISOString() : measurementsChart?.timestamp?.max || '2050'),
+    ],
+    [measurementsChart, from, to]
+  );
 
-    sortedMeasurements.forEach((measurement) => {
-      if (typeof measurement.value !== 'number') return;
-      if (measurement.timestamp < dateRange[0]) dateRange[0] = measurement.timestamp;
-      if (measurement.timestamp > dateRange[1]) dateRange[1] = measurement.timestamp;
-      if (!metricRanges[measurement.metric_id])
-        metricRanges[measurement.metric_id] = [measurement.value, measurement.value];
-      else if (measurement.value < metricRanges[measurement.metric_id][0])
-        metricRanges[measurement.metric_id][0] = measurement.value;
-      else if (measurement.value > metricRanges[measurement.metric_id][1])
-        metricRanges[measurement.metric_id][1] = measurement.value;
-    });
+  const dateScale = useMemo(
+    () => scaleTime({ range: [0, chartBoundingBox.innerWidth], domain: dateRange }),
+    [dateRange, chartBoundingBox.innerWidth]
+  );
 
-    return {
-      dateRange: [+new Date(dateRange[0]), +new Date(dateRange[1])],
-      metricRanges: Object.entries(metricRanges).reduce((acc, [metricId, metricRange]) => {
-        acc[metricId] = [
-          metricRange[1] * (1 + 0.1 * Math.sign(metricRange[1])),
-          metricRange[0] * (1 - 0.1 * Math.sign(metricRange[0])),
-        ];
-        return acc;
-      }, {}),
-    };
-  }, [sortedMeasurements, from, to]);
+  const metricsRanges = useMemo(
+    () =>
+      Object.entries(measurementsChart?.metrics || ({} as MeasurementsChartMetricsType)).reduce(
+        (acc, [metricId, metricRange]) => {
+          if (metricRange.max != null && metricRange.min != null)
+            acc[metricId] = [
+              metricRange.max + (metricRange.max - metricRange.min) * yAxisPadding,
+              metricRange.min - (metricRange.max - metricRange.min) * yAxisPadding,
+            ];
+          return acc;
+        },
+        {}
+      ),
+    [measurementsChart, from, to]
+  );
 
-  const { dateScale, metricScales }: ScalesType = useMemo(
-    () => ({
-      dateScale: scaleTime({ range: [0, chartBoundingBox.innerWidth], domain: dateRange }),
-      metricScales: Object.entries(metricRanges).reduce((acc, [metricId, metricRange]) => {
+  const metricsScales = useMemo(
+    () =>
+      Object.entries(metricsRanges).reduce((acc, [metricId, metricRange]) => {
         acc[metricId] = scaleLinear({
           range: [0, chartBoundingBox.innerHeight],
-          domain: metricRange,
+          domain: metricRange as [number, number],
         });
         return acc;
       }, {}),
-    }),
-    [dateRange, metricRanges]
+    [dateRange, metricsRanges, chartBoundingBox.innerHeight]
   );
 
   const dateFormatter = useCallback(
-    (date: unknown) => {
-      if (
-        dateRange[0] !== dateRange[1] &&
-        new Date(+(date as Date)).toISOString().slice(11, 19) === '00:00:00'
-      )
-        return new Date(+(date as Date)).toLocaleDateString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          timeZone: 'UTC',
-        });
-      return new Date(+(date as Date)).toLocaleTimeString(undefined, {
+    (date: DateLike) => {
+      const _date = new Date(+date);
+      if (dateRange[1].getDate() !== dateRange[0].getDate())
+        return (
+          _date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) +
+          ` ` +
+          _date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+        );
+      return _date.toLocaleTimeString(undefined, {
         hour: '2-digit',
         minute: '2-digit',
-        timeZone: 'UTC',
       });
     },
     [dateRange, from, to]
   );
 
-  const getDate = useCallback((data: MeasurementType) => new Date(data.timestamp), []);
-  const getValue = useCallback((data: MeasurementType) => data.value, []);
-
-  const lines: LinesType = useMemo(
-    () =>
-      sortedMeasurements.reduce((acc, measurement) => {
-        const key = generateLineKey(measurement);
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(measurement);
-        return acc;
-      }, {}),
-    [sortedMeasurements]
+  const getDate = useCallback(
+    (data: MeasurementsChartLinePointType) => new Date(data.timestamp),
+    []
   );
+  const getValue = useCallback((data: MeasurementsChartLinePointType) => data.value, []);
 
   const { mouseChartX } = useMemo(() => {
     let mouseChartX: number | null = null;
@@ -341,10 +297,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   }, [mouseX, mouseY]);
 
   const getLabelPosition = useCallback(
-    (
-      points: MeasurementType<ValueTypeEnum.FLOAT | ValueTypeEnum.INTEGER>[],
-      index: number
-    ): 'above' | 'below' => {
+    (points: MeasurementsChartLineType['points'], index: number): 'above' | 'below' => {
       const m1 = points[index - 1]?.value
         ? (points[index]?.value - points[index - 1]?.value) /
           (+new Date(points[index]?.timestamp) - +new Date(points[index - 1]?.timestamp))
@@ -374,13 +327,23 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
 
     if (mouseChartX != null) {
       const date: string = dateScale.invert(mouseChartX).toISOString();
-      Object.entries(lines).forEach(([key, points]) => {
+      Object.entries(
+        measurementsChart?.lines || ({} as ChartMeasurementsStateType['lines'])
+      ).forEach(([key, line]) => {
         let index = 0;
-        for (const point of points) {
+        for (const point of line.points) {
           if (point.timestamp > date) {
             nearestPoints[key] = {
-              above: { ...point, position: getLabelPosition(points, index) },
-              below: { ...points[index - 1], position: getLabelPosition(points, index - 1) },
+              above: {
+                ...point,
+                line: key,
+                position: getLabelPosition(line.points, index),
+              },
+              below: {
+                ...line.points[index - 1],
+                line: key,
+                position: getLabelPosition(line.points, index - 1),
+              },
             };
             return;
           }
@@ -388,68 +351,81 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
         }
         nearestPoints[key] = {
           below: {
-            ...points[points.length - 1],
-            position: getLabelPosition(points, points.length - 1),
+            ...line.points[line.points.length - 1],
+            line: key,
+            position: getLabelPosition(line.points, line.points.length - 1),
           },
         };
       });
     }
 
     return nearestPoints;
-  }, [lines, mouseChartX, dateScale]);
+  }, [measurementsChart, mouseChartX, dateScale]);
 
   return (
     <LayoutGridElement>
-      {filters && (
+      {filters && (setLocationIds || setMetricIds || setDeviceIds || setTags || setFrom || setTo) && (
         <FiltersContainerElement>
-          <Select
-            label="Location"
-            value={selectedLocations}
-            options={locationOptions}
-            onChange={selectLocations}
-            isMulti
-          />
-          <Select
-            label="Metric"
-            value={selectedMetrics}
-            options={metricOptions}
-            onChange={selectMetrics}
-            isMulti
-          />
-          <Select
-            label="Device"
-            value={selectedDevices}
-            options={deviceOptions}
-            onChange={selectDevices}
-            isMulti
-          />
-          <Select
-            label="Tags"
-            value={selectedTags}
-            options={tagOptions}
-            onChange={selectTags}
-            isMulti
-          />
-          <Input
-            type="datetime-local"
-            label="From"
-            value={from?.toISOString()?.slice(0, 16) || ''}
-            onChange={(event) =>
-              setFrom(event.currentTarget.value ? new Date(event.currentTarget.value) : undefined)
-            }
-          />
-          <Input
-            type="datetime-local"
-            label="To"
-            value={to?.toISOString()?.slice(0, 16) || ''}
-            onChange={(event) =>
-              setTo(event.currentTarget.value ? new Date(event.currentTarget.value) : undefined)
-            }
-          />
+          {setLocationIds && (
+            <Select
+              label="Location"
+              value={selectedLocations}
+              options={locationOptions}
+              onChange={selectLocations}
+              isMulti
+            />
+          )}
+          {setMetricIds && (
+            <Select
+              label="Metric"
+              value={selectedMetrics}
+              options={metricOptions}
+              onChange={selectMetrics}
+              isMulti
+            />
+          )}
+          {setDeviceIds && (
+            <Select
+              label="Device"
+              value={selectedDevices}
+              options={deviceOptions}
+              onChange={selectDevices}
+              isMulti
+            />
+          )}
+          {setTags && (
+            <Select
+              label="Tags"
+              value={selectedTags}
+              options={tagOptions}
+              onChange={selectTags}
+              isMulti
+            />
+          )}
+          {setFrom && (
+            <Input
+              type="datetime-local"
+              label="From"
+              value={from ? toLocaleISOString(from)?.slice(0, 16) : ''}
+              onChange={(event) =>
+                setFrom(event.currentTarget.value ? new Date(event.currentTarget.value) : undefined)
+              }
+            />
+          )}
+          {setTo && (
+            <Input
+              type="datetime-local"
+              label="To"
+              value={to ? toLocaleISOString(to)?.slice(0, 16) : ''}
+              onChange={(event) =>
+                setTo(event.currentTarget.value ? new Date(event.currentTarget.value) : undefined)
+              }
+            />
+          )}
         </FiltersContainerElement>
       )}
       <ChartContainerElement ref={chartContainerRef}>
-        {!!chartHeight && !!chartWidth && (
+        {chartContainerRef.current && !!chartHeight && !!chartWidth && (
           <svg
             height={chartHeight}
             width={chartWidth}
@@ -467,6 +443,42 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
               height={chartBoundingBox.innerHeight}
               width={chartBoundingBox.innerWidth}
             />
+            <Group key="data-lines" clipPath="url(#graph-area)">
+              {Object.entries(measurementsChart?.lines || ({} as MeasurementsChartLinesType)).map(
+                ([key, line]) => (
+                  <React.Fragment key={key}>
+                    <LinePath<MeasurementsChartLinePointType>
+                      data={line.points}
+                      //   curve={curveBasis}
+                      x={(data) => dateScale(getDate(data))}
+                      y={(data) => metricsScales[line.metric_id](getValue(data))}
+                      curve={curveNatural}
+                      stroke={theme.colours.chartLines[line.index]}
+                      strokeWidth={2}
+                      strokeOpacity={1}
+                      defined={(data) => getValue(data) != null}
+                      pointerEvents="none"
+                    />
+                    {/* Need to think about how I want to show points */}
+                    {/* {line.points.map(
+                        (point, index) =>
+                          getValue(point) && (
+                            <circle
+                              key={`${key}:${point.timestamp}${
+                                line.points?.[index - 1]?.timestamp === point.timestamp ? ':1' : ''
+                              }`}
+                              r={2}
+                              cx={dateScale(getDate(point))}
+                              cy={metricsScales[line.metric_id](getValue(point))}
+                              stroke={theme.colours.foreground}
+                              fill="transparent"
+                            />
+                          )
+                      )} */}
+                  </React.Fragment>
+                )
+              )}
+            </Group>
             <Group left={chartPadding.left} top={chartPadding.top} key="graph">
               <Group key="grid-lines">
                 <GridColumns
@@ -480,49 +492,33 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
               </Group>
               <Group key="tooltips">
                 {mouseChartX != null && (
-                  <>
-                    <Line
-                      from={{ x: mouseChartX, y: 0 }}
-                      to={{ x: mouseChartX, y: chartBoundingBox.innerHeight }}
-                      stroke={theme.colours.foreground}
-                      strokeDasharray="1,3"
-                      strokeWidth={1}
-                      strokeOpacity={1}
-                    />
-                  </>
+                  <Line
+                    from={{ x: mouseChartX, y: 0 }}
+                    to={{ x: mouseChartX, y: chartBoundingBox.innerHeight }}
+                    stroke={theme.colours.foreground}
+                    strokeDasharray="1,3"
+                    strokeWidth={1}
+                    strokeOpacity={1}
+                  />
                 )}
-              </Group>
-              <Group key="data-lines" clipPath="url(#graph-area)">
-                {Object.entries(lines).map(([key, points]) => (
-                  <React.Fragment key={key}>
-                    <LinePath<MeasurementType>
-                      data={points}
-                      //   curve={curveBasis}
-                      x={(data) => dateScale(getDate(data))}
-                      y={(data) => metricScales[getMetricIdFromKey(key)](getValue(data))}
-                      stroke={theme.colours.foreground}
-                      strokeWidth={1}
-                      strokeOpacity={1}
-                      defined={(data) => getValue(data) != null}
-                      pointerEvents="none"
+                {Object.values(nearestPoints).map((nearest) => {
+                  const nearestPoint = nearest.below?.value ? nearest.below : nearest.above;
+                  return (
+                    <circle
+                      key={nearestPoint.line}
+                      r={5}
+                      cx={dateScale(new Date(nearestPoint.timestamp))}
+                      cy={metricsScales[measurementsChart?.lines[nearestPoint.line].metric_id](
+                        nearestPoint.value
+                      )}
+                      stroke={theme.colours.background}
+                      strokeWidth={3}
+                      fill={
+                        theme.colours.chartLines[measurementsChart?.lines[nearestPoint.line].index]
+                      }
                     />
-                    {points.map(
-                      (measurement, index) =>
-                        getValue(measurement) && (
-                          <circle
-                            key={`${key}:${measurement.timestamp}${
-                              points?.[index - 1]?.timestamp === measurement.timestamp ? ':1' : ''
-                            }`}
-                            r={2}
-                            cx={dateScale(getDate(measurement))}
-                            cy={metricScales[getMetricIdFromKey(key)](getValue(measurement))}
-                            stroke={theme.colours.foreground}
-                            fill="transparent"
-                          />
-                        )
-                    )}
-                  </React.Fragment>
-                ))}
+                  );
+                })}
               </Group>
               <Group key="axes">
                 <AxisBottom
@@ -537,46 +533,58 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                     textAnchor: 'middle',
                   })}
                 />
-                {/* <AxisLeft scale={priceScale} /> */}
               </Group>
             </Group>
           </svg>
         )}
-        {mouseChartX != null && (
-          <DateTooltip style={{ top: 0, left: mouseChartX + chartPadding.left }}>
-            {dateScale.invert(mouseChartX).toLocaleString()}
-          </DateTooltip>
+        {mouseChartX && (
+          <MainTooltip
+            style={{
+              top: 0,
+              left:
+                mouseChartX <= 0.5 * chartBoundingBox.innerWidth
+                  ? mouseChartX + chartPadding.left + 8
+                  : undefined,
+              right:
+                mouseChartX > 0.5 * chartBoundingBox.innerWidth
+                  ? chartBoundingBox.innerWidth - mouseChartX + 8
+                  : undefined,
+            }}
+          >
+            <DateHeaderElement style={{ top: 0, left: mouseChartX + chartPadding.left }}>
+              {dateScale.invert(mouseChartX).toLocaleString()}
+            </DateHeaderElement>
+            {Object.entries(nearestPoints).map(([key, nearest], index, items) => {
+              const line = measurementsChart?.lines[nearest.below?.line];
+              const location = locations?.[line?.location_id];
+              const metric = metrics?.[line?.metric_id];
+
+              const [_, previousNearest] = items[index - 1] || [];
+              const previousLine = measurementsChart?.lines[previousNearest?.below?.line];
+              const previousLocation = locations?.[previousLine?.location_id];
+
+              return (
+                line && (
+                  <React.Fragment key={key}>
+                    {location?.id != previousLocation?.id && (
+                      <LocationHeaderElement>
+                        {location?.name?.replace('-', '') || line?.location_id}
+                      </LocationHeaderElement>
+                    )}
+                    <MetricELement>
+                      {metric?.name || line?.metric_id}: {line?.tags?.join(',')}{' '}
+                    </MetricELement>
+                    <span>
+                      {nearest.below?.value && nearest.below.value.toFixed(1) + metric?.unit}
+                      {nearest.above?.value && nearest.below?.value && ' - '}
+                      {nearest.above?.value && nearest.above.value.toFixed(1) + metric?.unit}
+                    </span>
+                  </React.Fragment>
+                )
+              );
+            })}
+          </MainTooltip>
         )}
-        {Object.entries(nearestPoints).map(([key, nearest]) => (
-          <React.Fragment key={key}>
-            {nearest.below && metricScales[nearest.below.metric_id] && (
-              <PointValueTooltip
-                style={{
-                  top:
-                    metricScales[nearest.below.metric_id](nearest.below.value) + chartPadding.top,
-                  left: dateScale(new Date(nearest.below.timestamp)) + chartPadding.left,
-                }}
-                position={nearest.below.position}
-              >
-                {nearest.below.value}
-                {metrics?.[nearest.below.metric_id]?.unit}
-              </PointValueTooltip>
-            )}
-            {nearest.above && metricScales[nearest.above.metric_id] && (
-              <PointValueTooltip
-                style={{
-                  top:
-                    metricScales[nearest.above.metric_id](nearest.above.value) + chartPadding.top,
-                  left: dateScale(new Date(nearest.above.timestamp)) + chartPadding.left,
-                }}
-                position={nearest.above.position}
-              >
-                {nearest.above.value}
-                {metrics?.[nearest.above.metric_id]?.unit}
-              </PointValueTooltip>
-            )}
-          </React.Fragment>
-        ))}
       </ChartContainerElement>
     </LayoutGridElement>
   );

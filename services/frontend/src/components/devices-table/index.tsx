@@ -23,6 +23,7 @@ import {
   unwatchDeviceMeasurements,
   watchDeviceMeasurements,
 } from '../../store/slices/watched-devices/thunks';
+import { HOUR_IN_MS } from '../../utils';
 
 export const DevicesTable: React.FunctionComponent<DevicesTablePropsType> = ({
   devices,
@@ -108,7 +109,7 @@ export const DevicesTable: React.FunctionComponent<DevicesTablePropsType> = ({
                 <DevicesTableCellElement>
                   {watchedDeviceMeasurements?.[device?.id]?.first_connect
                     ? (
-                        (1000 * 60 * 60 * watchedDeviceMeasurements[device.id].message_count) /
+                        (HOUR_IN_MS * watchedDeviceMeasurements[device.id].message_count) /
                         (+new Date() -
                           +new Date(watchedDeviceMeasurements[device.id].first_connect))
                       ).toFixed(0)
@@ -119,7 +120,7 @@ export const DevicesTable: React.FunctionComponent<DevicesTablePropsType> = ({
                 <DevicesTableCellElement>
                   {watchedDeviceMeasurements?.[device?.id]?.first_connect
                     ? (
-                        (1000 * 60 * 60 * watchedDeviceMeasurements[device.id].reconnect_count) /
+                        (HOUR_IN_MS * watchedDeviceMeasurements[device.id].reconnect_count) /
                         (+new Date() -
                           +new Date(watchedDeviceMeasurements[device.id].first_connect))
                       ).toFixed(2)

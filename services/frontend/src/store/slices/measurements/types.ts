@@ -49,6 +49,43 @@ export const isBooleanMeasurementType = (
 ): measurement is MeasurementType<ValueTypeEnum.BOOLEAN> =>
   measurement.value_type === ValueTypeEnum.BOOLEAN;
 
+export interface MinMaxType<T> {
+  min?: T;
+  max?: T;
+}
+
+export interface MeasurementsChartLinePointType {
+  timestamp: string;
+  value: number;
+}
+
+export interface MeasurementsChartLineType {
+  index: number;
+  location_id: LocationType['id'];
+  metric_id: MetricType['id'];
+  device_id: DeviceType['id'];
+  points: MeasurementsChartLinePointType[];
+  tags?: MeasurementType['tags'];
+  min?: number;
+  max?: number;
+  timestamp_min?: string;
+  timestamp_max?: string;
+}
+
+export interface MeasurementsChartLinesType {
+  [key: string]: MeasurementsChartLineType;
+}
+
+export interface MeasurementsChartMetricsType {
+  [metricId: number]: MinMaxType<MeasurementsChartLinePointType['value']>;
+}
+
+export interface MeasurementsChartType {
+  lines: MeasurementsChartLinesType;
+  metrics: MeasurementsChartMetricsType;
+  timestamp: MinMaxType<MeasurementsChartLinePointType['timestamp']>;
+}
+
 export interface MeasurementUrlPathParamsType {
   id: MeasurementType['id'];
 }
@@ -80,6 +117,17 @@ export interface MeasurementsLatestUrlParamsType {
   tags?: MeasurementType['tags'] | MeasurementType['tags'][];
 }
 
+export interface MeasurementsChartUrlParamsType {
+  access_token: string;
+  device_id?: MeasurementType['device_id'] | MeasurementType['device_id'][];
+  metric_id?: MeasurementType['metric_id'] | MeasurementType['metric_id'][];
+  location_id?: MeasurementType['location_id'] | MeasurementType['location_id'][];
+  tags?: MeasurementType['tags'] | MeasurementType['tags'][];
+  timestamp_gte?: MeasurementType['timestamp'];
+  timestamp_lte?: MeasurementType['timestamp'];
+  point_count?: number;
+}
+
 export interface GetMeasurementParamsType
   extends MeasurementUrlPathParamsType,
     MeasurementUrlParamsType {}
@@ -93,6 +141,9 @@ export type GetMeasurementsResponseType = MeasurementType[];
 export interface GetMeasurementsLatestParamsType extends MeasurementsLatestUrlParamsType {}
 
 export type GetMeasurementsLatestResponseType = MeasurementType[];
+
+export interface GetMeasurementsChartParamsType extends MeasurementsChartUrlParamsType {}
+export interface GetMeasurementsChartResponseType extends MeasurementsChartType {}
 
 export interface CreateMeasurementParamsType extends MeasurementsUrlParamsType {
   measurement: Omit<MeasurementType, 'id'>;
@@ -181,13 +232,17 @@ export interface LatestMeasurementsStateType {
   };
 }
 
+export interface ChartMeasurementsStateType extends GetMeasurementsChartResponseType {}
+
 export interface MeasurementsSliceType {
   requests: {
     getMeasurement: RequestMetaType;
     getMeasurementsLatest: RequestMetaType;
+    getMeasurementsChart: RequestMetaType;
     getMeasurements: RequestMetaType;
     createMeasurement: RequestMetaType;
   };
   latest?: LatestMeasurementsStateType;
   measurements?: MeasurementsStateType;
+  chart?: ChartMeasurementsStateType;
 }

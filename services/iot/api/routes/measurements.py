@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import HTTPException, Query, Depends, WebSocket, Request
 
 from cache import cache
-from stores.measurements import MeasurementsStore
+from stores.measurements import ChartMeasurements, MeasurementsStore
 from shared.python.extensions.speedyapi import APIRouter
 from shared.python.extensions.speedyapi.cache import Cache
 from shared.python.models.authorisation import PermissionCredentials
@@ -66,6 +66,8 @@ async def get_measurements(
     if measurement is None:
         raise HTTPException(status_code=404, detail="Measurement not found.")
 
+    return measurement
+
 
 @MEASUREMENTS_V0_ROUTER.get("/latest", response_model=list[Measurement])
 @cache.route(expiry=10)
@@ -90,6 +92,34 @@ async def get_latest_measurements(
         raise HTTPException(status_code=404, detail="Measurement not found.")
 
     return measurement
+
+
+@MEASUREMENTS_V0_ROUTER.get("/chart", response_model=ChartMeasurements)
+@cache.route(expiry=10)
+async def get_chart_measurements(
+    device_id: Optional[list[int]] = Query(default=None),
+    metric_id: Optional[list[int]] = Query(default=None),
+    location_id: Optional[list[int]] = Query(default=None),
+    tags: Optional[list[str]] = Query(default=None),
+    timestamp_gte: Optional[datetime] = Query(default=None),
+    timestamp_lte: Optional[datetime] = Query(default=None),
+    point_count: Optional[int] = Query(default=None),
+    measurements_store: MeasurementsStore = Depends(MeasurementsStore),
+    permissions: PermissionCredentials = Depends(
+        BearerPermission(scope="measurements.get")
+    ),
+) -> ChartMeasurements:
+    chart = await measurements_store.chart_measurements(
+        device_id=device_id,
+        metric_id=metric_id,
+        location_id=location_id,
+        tags=tags,
+        timestamp_gte=timestamp_gte,
+        timestamp_lte=timestamp_lte,
+        point_count=point_count,
+    )
+
+    return chart
 
 
 @MEASUREMENTS_V0_ROUTER.post("/", response_model=Measurement)

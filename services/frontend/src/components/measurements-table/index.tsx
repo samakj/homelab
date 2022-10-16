@@ -18,6 +18,7 @@ import { LocationType } from '../../store/slices/locations/types';
 import { Select } from '../select';
 import { ExtendedSet } from '../../utils/set';
 import { MdShowChart } from 'react-icons/md';
+import { DAY_IN_MS } from '../../utils';
 
 const formatMeasurementValue = (
   measurement: Pick<MeasurementType, 'value' | 'value_type'>,
@@ -197,12 +198,10 @@ export const MeasurementsTable: React.FunctionComponent<MeasurementsTablePropsTy
       if (measurement) {
         search.set('locationId', measurement.location_id.toString());
         search.set('metricId', measurement.metric_id.toString());
-        search.set('deviceId', measurement.device_id.toString());
         measurement.tags.forEach((tag) => search.set('tags', tag));
 
         const now = new Date(new Date().toISOString().slice(0, 17) + '00Z');
-        search.set('from', new Date(+now - 1000 * 60 * 60 * 24).toISOString());
-        search.set('to', now.toISOString());
+        search.set('from', new Date(+now - DAY_IN_MS).toISOString().slice(0, 16));
 
         navigate(`${path}?${search}`);
       }

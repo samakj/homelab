@@ -9,6 +9,7 @@ import {
   getMeasurement,
   getMeasurementsLatest,
   getMeasurements,
+  getMeasurementsChart,
 } from './thunks';
 import { MeasurementsSliceType, MeasurementType, ValueTypeEnum } from './types';
 import {
@@ -21,11 +22,13 @@ export const initialState: MeasurementsSliceType = {
   requests: {
     getMeasurement: initialRequestMeta,
     getMeasurementsLatest: initialRequestMeta,
+    getMeasurementsChart: initialRequestMeta,
     getMeasurements: initialRequestMeta,
     createMeasurement: initialRequestMeta,
   },
   latest: undefined,
   measurements: undefined,
+  chart: undefined,
 };
 
 const serialiseTags = (tags: string[]): string => [...tags].sort().join(',');
@@ -135,6 +138,33 @@ export const measurementsSlice = createSlice({
         state.requests.getMeasurements.error = action.payload || action.error;
         state.requests.getMeasurements.isLoading = false;
         state.requests.getMeasurements.finished = new Date().toISOString();
+      })
+      .addCase(getMeasurementsChart.pending, (state, action) => {
+        state.requests.getMeasurementsChart.isLoading = true;
+        state.requests.getMeasurementsChart.started = new Date().toISOString();
+      })
+      .addCase(getMeasurementsChart.fulfilled, (state, action) => {
+        state.chart = action.payload;
+        state.chart.timestamp.min =
+          state.chart.timestamp.min && forceUTCTimestamp(state.chart.timestamp.min);
+        state.chart.timestamp.max =
+          state.chart.timestamp.max && forceUTCTimestamp(state.chart.timestamp.max);
+        Object.keys(state.chart.lines).forEach((lineKey) =>
+          state.chart?.lines[lineKey].points.forEach(
+            (_, index) =>
+              state.chart &&
+              (state.chart.lines[lineKey].points[index].timestamp = forceUTCTimestamp(
+                state.chart.lines[lineKey].points[index].timestamp
+              ))
+          )
+        );
+        state.requests.getMeasurementsChart.isLoading = false;
+        state.requests.getMeasurementsChart.finished = new Date().toISOString();
+      })
+      .addCase(getMeasurementsChart.rejected, (state, action) => {
+        state.requests.getMeasurementsChart.error = action.payload || action.error;
+        state.requests.getMeasurementsChart.isLoading = false;
+        state.requests.getMeasurementsChart.finished = new Date().toISOString();
       })
       .addCase(createMeasurement.pending, (state, action) => {
         state.requests.createMeasurement.isLoading = true;

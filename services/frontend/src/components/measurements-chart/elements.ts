@@ -19,24 +19,46 @@ export const FiltersContainerElement = styled.div`
 export const ChartContainerElement = styled.div`
   position: relative;
   height: 100%;
+  overflow: hidden;
 
   svg {
     display: block;
   }
 `;
 
-export const DateTooltip = styled.div`
+export const DateHeaderElement = styled.div`
+  grid-column: span 2;
+  margin-bottom: 0.25rem;
+  width: fill-available;
+  text-align: center;
+  font-weight: bold;
+`;
+
+export const PointValueTooltip = styled.div<{ position: 'above' | 'below' }>`
   position: absolute;
-  border: 1px solid ${({ theme }) => theme.colours.border.light};
-  background: ${({ theme }) => theme.colours.background};
   padding: 0.125rem;
-  transform: translateX(-50%);
+  transform: translate(-50%, ${({ position }) => (position == 'above' ? '-125%' : '25%')});
   font-size: 0.75rem;
 `;
 
-export const PointValueTooltip = styled.div<{position: 'above' | 'below'}>`
+export const MainTooltip = styled.div`
   position: absolute;
-  padding: 0.125rem;
-  transform: translate(-50%, ${({position}) => position == 'above' ? '-125%' : '25%'});
+  border: 1px solid ${({ theme }) => theme.colours.border.light};
+  background: ${({ theme }) => theme.colours.background};
+  padding: 0.5rem;
   font-size: 0.75rem;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-row-gap: 0.25rem;
+  grid-column-gap: 0.375rem;
+`;
+
+export const LocationHeaderElement = styled.div`
+  grid-column: span 2;
+  font-weight: bold;
+  text-transform: capitalize;
+`;
+
+export const MetricELement = styled.div`
+  padding-left: 0.25rem;
 `;

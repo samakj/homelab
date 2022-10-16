@@ -6,6 +6,8 @@ export type NullSafeMerge<A extends {} | null, B extends {} | null> = A extends 
   ? A
   : A & B;
 
+export type DateLike = Date | number | string | { valueOf: () => number };
+
 export enum PermissionName {
   ACCELEROMETER = 'accelerometer',
   ACCESSIBILITY_EVENTS = 'accessibility-events',

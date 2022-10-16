@@ -15,6 +15,9 @@ import {
   MeasurementsUrlParamsType,
   MeasurementUrlParamsType,
   MeasurementUrlPathParamsType,
+  MeasurementsChartUrlParamsType,
+  GetMeasurementsChartParamsType,
+  GetMeasurementsChartResponseType,
 } from './types';
 import { config } from '../../../config';
 
@@ -84,6 +87,38 @@ export const getMeasurements = createRequestThunk<
       value_gte,
       value_lte,
       value,
+    }).then((response) => response.json())
+);
+
+export const MeasurementsChartUrl = new Url<null, MeasurementsChartUrlParamsType>(
+  `${config.urls.apis.iot}/v0/measurements/chart`
+);
+export const MeasurementsChartUrlRequest = new Request(MeasurementsChartUrl);
+
+export const getMeasurementsChart = createRequestThunk<
+  GetMeasurementsChartResponseType,
+  GetMeasurementsChartParamsType
+>(
+  'getMeasurementsChart',
+  async ({
+    access_token,
+    device_id,
+    metric_id,
+    location_id,
+    tags,
+    timestamp_gte,
+    timestamp_lte,
+    point_count,
+  }) =>
+    MeasurementsChartUrlRequest.get({
+      access_token,
+      device_id,
+      metric_id,
+      location_id,
+      tags,
+      timestamp_gte,
+      timestamp_lte,
+      point_count,
     }).then((response) => response.json())
 );
 

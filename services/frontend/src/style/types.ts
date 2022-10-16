@@ -13,6 +13,7 @@ export interface ThemeType {
     placeholder: {
       light: string;
     };
+    chartLines: string[];
   };
   dimensions: {
     sidebar: {

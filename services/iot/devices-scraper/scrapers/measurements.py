@@ -142,12 +142,12 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
                 message.message, Decimal
             ):
                 value_type = "float"
-                value = float(message.message)
+                value = Decimal(message.message)
             if isinstance(message.message, str) and re.search(
                 "^[-+]?\d*.\d*$", message.message
             ):
                 value_type = "float"
-                value = float(message.message)
+                value = Decimal(message.message)
             if isinstance(message.message, bool):
                 value_type = "boolean"
                 value = bool(message.message)
@@ -158,40 +158,75 @@ class MeasurementWebsocketMessageHandler(WebsocketMessageHandler):  # type: igno
                 value_type = "boolean"
                 message.message = message.message.lower() == "true"
 
+            if isinstance(value, Decimal):
+                if metric.name in {"temperature", "humidity", "percentage"}:
+                    value = round(value, 1)
+
             try:
-                measurement = await self.iot_client.measurements.create_measurement(
-                    timestamp=timestamp,
+                latest = await self.iot_client.measurements.get_latest_measurements(
+                    location_id=location.id,
                     metric_id=metric.id,
                     device_id=device.id,
-                    location_id=location.id,
                     tags=message.tags,
-                    value_type=value_type,
-                    value=value,
-                )
-                self.logger.info(
-                    "{:<18} | {:<12} | {:<32} | {}{}".format(
-                        location.name,
-                        metric.name,
-                        ", ".join(measurement.tags),
-                        measurement.value,
-                        metric.unit or "",
-                    )
                 )
             except Exception as error:
-                if isinstance(error, HTTPException) and error.status_code in {401, 403}:
-                    self.logger.error("Auth failed trying to re log in.")
-                    await login(app=self.app)
-                    await self.__call__(raw_message=raw_message)
-                    return
-
-                self.logger.error("Failed to create measurment for message:")
+                self.logger.error("Failed to get latest from message:")
                 self.logger.error(f"\t{message}")
-                self.logger.error(
-                    f"{error.status_code}: {error.detail}"
-                    if isinstance(error, HTTPException)
-                    else str(error)
-                )
+                self.logger.error(str(error))
                 return
+
+            if len(latest) > 1:
+                self.logger.error(
+                    "Latest message endpoint returned multiple messages, using first one"
+                )
+
+            self.logger.info(
+                "{:<18} | {:<12} | {:<32} | {:<8} | {}{} -> {}{} {}".format(
+                    location.name,
+                    metric.name,
+                    ", ".join(message.tags),
+                    value_type,
+                    latest[0].value if latest else "-",
+                    metric.unit or "",
+                    value,
+                    metric.unit or "",
+                    "" if not latest or latest[0].value != value else "(unchanged)",
+                )
+            )
+
+            if not latest or latest[0].value != value:
+                try:
+                    await self.iot_client.measurements.create_measurement(
+                        timestamp=timestamp,
+                        metric_id=metric.id,
+                        device_id=device.id,
+                        location_id=location.id,
+                        tags=message.tags,
+                        value_type=value_type,
+                        value=value,
+                    )
+                except Exception as error:
+                    if isinstance(error, HTTPException) and error.status_code in {
+                        401,
+                        403,
+                    }:
+                        self.logger.error("Auth failed trying to re log in.")
+                        await login(app=self.app)
+                        await self.__call__(raw_message=raw_message)
+                        return
+
+                    self.logger.error("Failed to create measurment for message:")
+                    self.logger.error(f"\t{message}")
+                    self.logger.error(
+                        f"{error.status_code}: {error.detail}"
+                        if isinstance(error, HTTPException)
+                        else str(error)
+                    )
+                    return
+            else:
+                self.logger.warning(
+                    "Latest message has same value as new message, skipping new message"
+                )
 
         try:
             device = await self.iot_client.devices.update_device(
