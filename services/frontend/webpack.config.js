@@ -58,7 +58,7 @@ module.exports = ({target, mode, inputFolder = 'src', outputFolder = 'build'}) =
                 }
             },
         },
-        cache: mode === 'development',
+        cache: mode === 'development' ? { type: 'filesystem' } : false,
         devtool: mode === 'development' ? 'source-map' : undefined,
             plugins: [
             ...(

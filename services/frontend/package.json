@@ -6,12 +6,14 @@
   "scripts": {
     "build:client:dev": "NODE_ENV=development webpack --config webpack.config.js --env target=client --env mode=development",
     "build:server:dev": "NODE_ENV=development webpack --config webpack.config.js --env target=server --env mode=development",
+    "watch:client:dev": "NODE_ENV=development webpack --watch --config webpack.config.js --env target=client --env mode=development",
+    "watch:server:dev": "NODE_ENV=development webpack --watch --config webpack.config.js --env target=server --env mode=development",
     "build:dev": "npm run build:client:dev && npm run build:server:dev",
     "build:client:prod": "NODE_ENV=production webpack --config webpack.config.js --env target=client --env mode=production",
     "build:server:prod": "NODE_ENV=production webpack --config webpack.config.js --env target=server --env mode=production",
     "build:prod": "npm run build:client:prod && npm run build:server:prod",
     "start:server": "node build/server/main.js",
-    "start:dev": "nodemon --watch src --ext ts,tsx,js,jsx,json --exec 'npm run build:dev && npm run start:server'"
+    "start:dev": "concurrently --names 'client,server' 'npm run watch:client:dev' 'npm run watch:server:dev'"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +35,7 @@
     "babel-preset-react-app": "^10.0.1",
     "clean-webpack-plugin": "^4.0.0",
     "compression-webpack-plugin": "^9.2.0",
+    "concurrently": "^7.4.0",
     "copy-webpack-plugin": "^10.2.0",
     "cross-spawn": "^7.0.3",
     "html-webpack-plugin": "^5.5.0",
