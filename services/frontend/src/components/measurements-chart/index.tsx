@@ -23,6 +23,8 @@ import {
   LocationHeaderElement,
   DateHeaderElement,
   MetricELement,
+  LocationLabelElement,
+  LocationColourElement,
 } from './elements';
 import { MeasurementChartPropsType, NearestPointsType } from './types';
 import { Input } from '../input';
@@ -63,9 +65,14 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
     () =>
       Object.values(locations || {}).map((location: LocationType) => ({
         value: location.id,
-        label: location.name,
+        label: (
+          <LocationLabelElement>
+            <LocationColourElement style={{ background: theme.colours.chartLines[location.id] }} />
+            <div>{location.name}</div>
+          </LocationLabelElement>
+        ),
       })),
-    [locations]
+    [locations, theme]
   );
 
   const selectedLocations = useMemo(
@@ -453,7 +460,9 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                       x={(data) => dateScale(getDate(data))}
                       y={(data) => metricsScales[line.metric_id](getValue(data))}
                       curve={curveNatural}
-                      stroke={theme.colours.chartLines[line.index]}
+                      stroke={
+                        theme.colours.chartLines[line.location_id] || theme.colours.foreground
+                      }
                       strokeWidth={2}
                       strokeOpacity={1}
                       defined={(data) => getValue(data) != null}
@@ -514,7 +523,9 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                       stroke={theme.colours.background}
                       strokeWidth={3}
                       fill={
-                        theme.colours.chartLines[measurementsChart?.lines[nearestPoint.line].index]
+                        theme.colours.chartLines[
+                          measurementsChart?.lines[nearestPoint.line].location_id
+                        ] || theme.colours.foreground
                       }
                     />
                   );
@@ -568,7 +579,10 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                   <React.Fragment key={key}>
                     {location?.id != previousLocation?.id && (
                       <LocationHeaderElement>
-                        {location?.name?.replace('-', '') || line?.location_id}
+                        <LocationColourElement
+                          style={{ background: theme.colours.chartLines[location.id] }}
+                        />
+                        {location?.name?.replace('-', ' ') || line?.location_id}
                       </LocationHeaderElement>
                     )}
                     <MetricELement>

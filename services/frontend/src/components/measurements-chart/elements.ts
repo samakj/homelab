@@ -54,6 +54,8 @@ export const MainTooltip = styled.div`
 `;
 
 export const LocationHeaderElement = styled.div`
+  display: flex;
+  align-items: center;
   grid-column: span 2;
   font-weight: bold;
   text-transform: capitalize;
@@ -61,4 +63,15 @@ export const LocationHeaderElement = styled.div`
 
 export const MetricELement = styled.div`
   padding-left: 0.25rem;
+`;
+
+export const LocationLabelElement = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const LocationColourElement = styled.div`
+  height: 0.5rem;
+  width: 0.5rem;
+  margin-right: 0.25rem;
 `;
