@@ -13,7 +13,7 @@
     "build:server:prod": "NODE_ENV=production webpack --config webpack.config.js --env target=server --env mode=production",
     "build:prod": "npm run build:client:prod && npm run build:server:prod",
     "start:server": "node build/server/main.js",
-    "start:dev": "concurrently --names 'client,server' 'npm run watch:client:dev' 'npm run watch:server:dev'"
+    "start:dev": "concurrently --names 'client,server,http  ' 'npm run watch:client:dev' 'npm run watch:server:dev' 'nodemon --watch build/server --exec \"npm run start:server\"'"
   },
   "author": "",
   "license": "ISC",
@@ -35,7 +35,6 @@
     "babel-preset-react-app": "^10.0.1",
     "clean-webpack-plugin": "^4.0.0",
     "compression-webpack-plugin": "^9.2.0",
-    "concurrently": "^7.4.0",
     "copy-webpack-plugin": "^10.2.0",
     "cross-spawn": "^7.0.3",
     "html-webpack-plugin": "^5.5.0",
