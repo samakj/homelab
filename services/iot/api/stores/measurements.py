@@ -27,7 +27,7 @@ LineValueType = Union[Decimal, float, int]
 
 class ChartLinePoint(BaseModel):
     timestamp: datetime
-    value: LineValueType
+    value: Optional[LineValueType]
 
 
 class ChartLine(BaseModel):
@@ -266,6 +266,10 @@ class MeasurementsStore:
 
         if point_count is not None:
             for key, line in chart.lines.items():
+                if len(line.points) == 1:
+                    continue
+                if len(line.points) <= point_count:
+                    continue
                 if line.timestamp_max is None or line.timestamp_min is None:
                     continue
 
