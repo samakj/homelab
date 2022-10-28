@@ -24,6 +24,8 @@ export interface MeasurementChartPropsType {
   setFrom?: (date?: Date) => void;
   to?: Date;
   setTo?: (date?: Date) => void;
+  autoReload?: boolean;
+  setAutoReload?: (autoReload?: boolean) => void;
   measurementsChart?: MeasurementsChartType;
   locations?: LocationsStateType;
   devices?: DevicesStateType;

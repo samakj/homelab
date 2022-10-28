@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { scopesMap } from '../configs/scopes';
 import { Authorise, useAuthorisation } from '../routing/authorise';
@@ -11,7 +11,9 @@ import { MeasurementsChart as MeasurementsChartComponent } from '../components/m
 import { getLocations } from '../store/slices/locations/thunks';
 import { getDevices } from '../store/slices/devices/thunks';
 import { getMetrics } from '../store/slices/metrics/thunks';
+import { MINUTE_IN_MS } from '../utils';
 
+const AUTO_RELOAD_PERIOD = MINUTE_IN_MS;
 const _MeasurementsChart: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   const { access_token } = useAuthorisation();
@@ -38,6 +40,7 @@ const _MeasurementsChart: React.FunctionComponent = () => {
     // @ts-ignore: Check beforehand isnt picked up by ts
     searchParams.get('pointCount') ? parseInt(searchParams.get('pointCount')) : 50
   );
+  const [autoReload, setAutoReload] = useState<boolean | undefined>(false);
 
   useEffect(() => {
     if (access_token) {
@@ -47,7 +50,7 @@ const _MeasurementsChart: React.FunctionComponent = () => {
     }
   }, [dispatch, access_token]);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     if (access_token) {
       dispatch(
         getMeasurementsChart({
@@ -62,7 +65,10 @@ const _MeasurementsChart: React.FunctionComponent = () => {
         })
       );
     }
+  }, [dispatch, access_token, locationIds, metricIds, deviceIds, tags, from, to, pointCount]);
 
+  useEffect(() => {
+    fetchData();
     const newParams: Record<string, string | string[]> = {};
     if (locationIds.size) newParams.locationId = locationIds.map((id) => id.toString()).toArray();
     if (metricIds.size) newParams.metricId = metricIds.map((id) => id.toString()).toArray();
@@ -72,18 +78,13 @@ const _MeasurementsChart: React.FunctionComponent = () => {
     if (to != null) newParams.to = to.toISOString().slice(0, 16);
     newParams.pointCount = pointCount.toString();
     setSearchParams(newParams);
-  }, [
-    dispatch,
-    access_token,
-    locationIds,
-    metricIds,
-    deviceIds,
-    tags,
-    from,
-    to,
-    pointCount,
-    setSearchParams,
-  ]);
+  }, [fetchData, locationIds, metricIds, deviceIds, tags, from, to, pointCount, setSearchParams]);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setTimeout>;
+    if (autoReload) interval = setInterval(() => fetchData(), AUTO_RELOAD_PERIOD);
+    return () => clearInterval(interval);
+  }, [fetchData, autoReload]);
 
   const measurementsChart = useSelector((store) => store.measurements.chart);
   const locations = useSelector((store) => store.locations.locations);
@@ -102,6 +103,8 @@ const _MeasurementsChart: React.FunctionComponent = () => {
       setFrom={setFrom}
       to={to}
       setTo={setTo}
+      autoReload={autoReload}
+      setAutoReload={setAutoReload}
       measurementsChart={measurementsChart}
       locations={locations}
       devices={devices}

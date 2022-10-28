@@ -38,6 +38,7 @@ import { curveMonotoneX } from '@visx/curve';
 import { useTheme } from 'styled-components';
 import { DAY_IN_MS, toLocaleISOString } from '../../utils';
 import { DateLike } from '../../types';
+import { Checkbox } from '../checkbox';
 
 export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsType> = ({
   locationIds,
@@ -52,6 +53,8 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
   setFrom,
   to,
   setTo,
+  autoReload,
+  setAutoReload,
   measurementsChart,
   locations,
   devices,
@@ -427,6 +430,13 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
               onChange={(event) =>
                 setTo(event.currentTarget.value ? new Date(event.currentTarget.value) : undefined)
               }
+            />
+          )}
+          {setAutoReload && (
+            <Checkbox
+              label="Auto Reload"
+              checked={autoReload}
+              onChange={() => setAutoReload(!autoReload)}
             />
           )}
         </FiltersContainerElement>
