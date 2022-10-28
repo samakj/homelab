@@ -34,7 +34,7 @@ import { AxisBottom } from '@visx/axis';
 import { LinePath, Line } from '@visx/shape';
 import { Group } from '@visx/group';
 import { RectClipPath } from '@visx/clip-path';
-import { curveNatural } from '@visx/curve';
+import { curveMonotoneX } from '@visx/curve';
 import { useTheme } from 'styled-components';
 import { DAY_IN_MS, toLocaleISOString } from '../../utils';
 import { DateLike } from '../../types';
@@ -459,7 +459,7 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                       //   curve={curveBasis}
                       x={(data) => dateScale(getDate(data))}
                       y={(data) => metricsScales[line.metric_id](getValue(data))}
-                      curve={curveNatural}
+                      curve={curveMonotoneX}
                       stroke={
                         theme.colours.chartLines[line.location_id] || theme.colours.foreground
                       }
@@ -513,21 +513,23 @@ export const MeasurementsChart: React.FunctionComponent<MeasurementChartPropsTyp
                 {Object.values(nearestPoints).map((nearest) => {
                   const nearestPoint = nearest.below?.value ? nearest.below : nearest.above;
                   return (
-                    <circle
-                      key={nearestPoint.line}
-                      r={5}
-                      cx={dateScale(new Date(nearestPoint.timestamp))}
-                      cy={metricsScales[measurementsChart?.lines[nearestPoint.line].metric_id](
-                        nearestPoint.value
-                      )}
-                      stroke={theme.colours.background}
-                      strokeWidth={3}
-                      fill={
-                        theme.colours.chartLines[
-                          measurementsChart?.lines[nearestPoint.line].location_id
-                        ] || theme.colours.foreground
-                      }
-                    />
+                    nearestPoint && (
+                      <circle
+                        key={nearestPoint.line}
+                        r={5}
+                        cx={dateScale(new Date(nearestPoint.timestamp))}
+                        cy={metricsScales[measurementsChart?.lines[nearestPoint.line].metric_id](
+                          nearestPoint.value
+                        )}
+                        stroke={theme.colours.background}
+                        strokeWidth={3}
+                        fill={
+                          theme.colours.chartLines[
+                            measurementsChart?.lines[nearestPoint.line].location_id
+                          ] || theme.colours.foreground
+                        }
+                      />
+                    )
                   );
                 })}
               </Group>

@@ -36,8 +36,6 @@ const generateLineColours = (count: number, luminanceCount: number): string[] =>
   const hueStep = hueRanges.reduce((acc, range) => acc + range[1] - range[0], 0) / hueCount;
   const colours: string[] = [];
 
-  console.log(hueStep);
-
   for (let luminanceIndex = 0; luminanceIndex < luminanceCount; luminanceIndex += 1) {
     for (let hueIndex = 0; hueIndex < hueCount; hueIndex += 1) {
       let hue = hueRanges[0][0];
