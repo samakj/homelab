@@ -35,3 +35,4 @@ class CPU(BaseModel):
     frequency: int
     cores: int
     cache: CPUCache
+    utilisation: float

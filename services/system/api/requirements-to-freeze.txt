@@ -8,6 +8,7 @@ flake8
 httpx
 mypy
 passlib
+psutil
 py-cpuinfo
 pyjwt
 uvicorn[standard]
