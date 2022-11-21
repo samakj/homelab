@@ -52,6 +52,7 @@ postgres_service_folder = services_folder / "postgres"
 redis_service_folder = services_folder / "redis"
 utilities_service_folder = services_folder / "utilities"
 weather_service_folder = services_folder / "weather"
+system_service_folder = services_folder / "system"
 
 # Shared
 shared_folder = root_folder / "shared"

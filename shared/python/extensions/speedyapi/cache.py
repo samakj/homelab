@@ -101,9 +101,7 @@ class Cache:
 
         return value
 
-    async def set(
-        self, key: str, value: Optional[Any] = None, expiry: Optional[int] = None
-    ) -> Any:
+    async def set(self, key: str, value: Optional[Any] = None, expiry: Optional[int] = None) -> Any:
         key = self.alias_key(key=key)
         if self.client is not None:
             if value is not None:
@@ -119,7 +117,10 @@ class Cache:
     async def clear(self, key: str) -> None:
         key = self.alias_key(key=key)
         if self.client is not None:
-            await self.client.delete(key)
+            try:
+                await self.client.delete(key)
+            except Exception as error:
+                self.logger.error(f"Errored when setting '{key}' in cache: {error}")
 
     async def clear_pattern(
         self, pattern: str, condition: Optional[Callable[[Any], bool]] = None
@@ -127,11 +128,7 @@ class Cache:
         key = self.alias_key(key=pattern)
         if self.client is not None:
             for key in await self.client.keys(pattern):
-                clear = (
-                    condition(await self.get(key=key))
-                    if condition is not None
-                    else True
-                )
+                clear = condition(await self.get(key=key)) if condition is not None else True
                 if clear:
                     await self.clear(key=key)
 
@@ -202,19 +199,9 @@ class Cache:
 
             @wraps(func)
             async def wrapper(*args, **kwargs):
-                request = (
-                    kwargs.get("request")
-                    if has_request_param
-                    else kwargs.pop("request")
-                )
-                response = (
-                    kwargs.get("response")
-                    if has_request_param
-                    else kwargs.pop("response")
-                )
-                user_credentials = kwargs.get(
-                    "user_credentials", kwargs.get("permissions")
-                )
+                request = kwargs.get("request") if has_request_param else kwargs.pop("request")
+                response = kwargs.get("response") if has_request_param else kwargs.pop("response")
+                user_credentials = kwargs.get("user_credentials", kwargs.get("permissions"))
                 if not request:
                     self.logger.info("no-store request not cached")
                     return await func(*args, **kwargs)

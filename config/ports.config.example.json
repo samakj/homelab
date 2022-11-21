@@ -21,6 +21,7 @@
         "nginx":     0,
         "devices":   0,
         "utilities": 0,
-        "weather":   0
+        "weather":   0,
+        "system":    0
     }
 }

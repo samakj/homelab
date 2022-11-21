@@ -7,6 +7,7 @@ from services.postgres import postgres, build as build_postgres
 from services.redis import redis, build as build_redis
 from services.utilities import utilities_api, build as build_utilities
 from services.weather import weather_api, build as build_weather
+from services.system import system_api, build as build_system
 from services.frontend import frontend, build as build_frontend
 
 
@@ -23,6 +24,7 @@ services.add_command(cmd=postgres)
 services.add_command(cmd=redis)
 services.add_command(cmd=utilities_api)
 services.add_command(cmd=weather_api)
+services.add_command(cmd=system_api)
 
 
 @services.command()
@@ -36,3 +38,4 @@ def build(ctx: click.Context) -> None:
     build_redis.invoke(ctx=ctx)
     build_utilities.invoke(ctx=ctx)
     build_weather.invoke(ctx=ctx)
+    build_system.invoke(ctx=ctx)

@@ -19,6 +19,7 @@
         "utilities":     "apis-utilities",
         "weather":       "apis-weather",
         "portainer":     "apis-portainer",
-        "certbot":       "apis-certbot"
+        "certbot":       "apis-certbot",
+        "system":        "apis-system"
     }
 }

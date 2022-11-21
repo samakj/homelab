@@ -1,0 +1,13 @@
+aioredis
+asyncio
+asyncpg
+black
+click
+fastapi
+flake8
+httpx
+mypy
+passlib
+py-cpuinfo
+pyjwt
+uvicorn[standard]

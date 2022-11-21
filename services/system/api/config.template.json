@@ -1,0 +1,20 @@
+{
+    "secret": "${auth.secret}",
+    "algorithm": "${auth.algorithm}",
+    "db": {
+        "host": "${containers.apis.postgres}",
+        "port": "${ports.postgres}",
+        "name": "${postgres.authorisation.name}",
+        "user": "${postgres.authorisation.name}",
+        "password": "${postgres.authorisation.password}",
+        "tables": {"users": "${postgres.authorisation.tables.users}", "sessions": "${postgres.authorisation.tables.sessions}"}
+    },
+    "cache": {
+        "host": "${containers.apis.redis}",
+        "port": "${ports.redis}",
+        "alias": {
+            "${containers.apis.authorisation}:${ports.apis.authorisation}": "${containers.apis.authorisation}",
+            "${subdomains.apis.authorisation}.${hosts.apis}": "${containers.apis.authorisation}"
+        }
+    }
+}
