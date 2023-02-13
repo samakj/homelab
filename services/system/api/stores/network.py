@@ -1,4 +1,5 @@
 import asyncio
+import json
 from asyncio import Task
 from typing import Any, Optional
 from psutil import net_io_counters, net_if_addrs, net_if_stats
@@ -10,6 +11,7 @@ from models.network import (
     Network,
     NetworkRates,
     NetworkBytes,
+    NetworkCard,
     NetworkPackets,
     NetworkErrors,
     NetworkDrops,
@@ -73,6 +75,24 @@ class NetworkStore:
 
     def get_networks(self) -> list[Network]:
         return list(self.networks.values())
+
+    async def get_network_cards(self) -> list[NetworkCard]:
+        process = await asyncio.create_subprocess_shell(
+            "lshw -class network -json",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        output = ""
+
+        stdout = await process.stdout.readline()
+        while stdout:
+            output += stdout.decode()
+            stdout = await process.stdout.readline()
+
+        parsed_output = json.loads(output)
+
+        return [NetworkCard.parse_obj(nic) for nic in parsed_output]
 
     async def network_poller(self) -> None:
         while True:

@@ -3,6 +3,7 @@ from config import config
 from routes.cpu import CPU_V0_ROUTER
 from routes.gpu import GPU_V0_ROUTER
 from routes.network import NETWORK_V0_ROUTER
+from routes.network import NETWORK_CARD_V0_ROUTER
 from routes.disk import DISK_V0_ROUTER
 from routes.memory import MEMORY_V0_ROUTER
 from shared.python.extensions.speedyapi import SpeedyAPI
@@ -20,6 +21,7 @@ app.cache = cache
 app.include_router(CPU_V0_ROUTER)
 app.include_router(GPU_V0_ROUTER)
 app.include_router(NETWORK_V0_ROUTER)
+app.include_router(NETWORK_CARD_V0_ROUTER)
 app.include_router(MEMORY_V0_ROUTER)
 app.include_router(DISK_V0_ROUTER)
 
