@@ -1,0 +1,31 @@
+/** @format */
+
+@import '../../common/styles/styles.module.scss';
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 2rem;
+    color: inherit;
+    text-decoration: inherit;
+    text-transform: uppercase;
+    transition: 300ms;
+    color: $level-2-text;
+    font-weight: bold;
+    font-size: 0.75rem;
+
+    &.inactive {
+    }
+
+    &.active,
+    &:hover {
+      color: $level-1-text;
+    }
+  }
+}

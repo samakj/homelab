@@ -1,0 +1,30 @@
+/** @format */
+
+.sourceGridCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    text-align: center;
+  }
+
+  .value {
+    font-size: 1.5rem;
+  }
+
+  .colourGrid {
+    display: grid;
+    height: 2.5rem;
+    width: 2.5rem;
+
+    .pixel {
+      position: relative;
+
+      &::backdrop {
+        background-color: white;
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+/** @format */
+@import '../../../common/styles/styles.module.scss';
+
+.gridCard {
+  grid-column: span 1;
+  grid-row: span 1;
+  margin: 0.25rem;
+  border: 1px solid $level-1-border;
+  background-color: $level-1-background;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  transition: border-color 300ms;
+
+  &:hover {
+    border-color: $level-2-border;
+  }
+
+  @for $i from 1 through 8 {
+    &.rows-#{$i} {
+      grid-row: span $i;
+    }
+    &.columns-#{$i} {
+      grid-column: span $i;
+    }
+  }
+}
+
+.linkGridCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.createGridCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .icon {
+    font-size: 2rem;
+    line-height: 1.125rem;
+  }
+
+  .label {
+    line-height: 1.5rem;
+  }
+}

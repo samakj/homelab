@@ -1,0 +1,125 @@
+/** @format */
+
+@use '../../styles/colours.module';
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid colours.$grey-20;
+  background: colours.$background;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: colours.$foreground;
+}
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: 100dvw;
+  opacity: 0.75;
+  background: colours.$background;
+  background: colours.$background;
+}
+
+.title {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.colour {
+  display: grid;
+  gap: 0.125rem;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-template-areas: 'label value' 'perc perc';
+  margin-top: 0.5rem;
+
+  .label {
+    grid-area: label;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: bold;
+  }
+  .value {
+    grid-area: value;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    text-align: right;
+  }
+
+  .bar {
+    grid-area: perc;
+    width: 100%;
+
+    input[type='range'] {
+      appearance: none;
+      width: 100%;
+      margin: 0;
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        height: 1rem;
+        width: 0.5rem;
+        background: colours.$grey-90;
+        cursor: pointer;
+        margin-top: -0.25rem;
+        border-radius: 0;
+      }
+
+      &::-webkit-slider-runnable-track {
+        appearance: none;
+        width: 100%;
+        height: 0.5rem;
+        margin-top: -0.25rem;
+        cursor: pointer;
+        background: colours.$grey-20;
+        border-radius: 0;
+        border-width: 0;
+      }
+    }
+  }
+}
+
+.colourBox {
+  border: 1px solid colours.$grey-20;
+  height: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  input[type='color'] {
+    display: block;
+    appearance: none;
+    border-width: 0;
+    padding: 0;
+    height: 1rem;
+    width: 100%;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    &::-webkit-color-swatch {
+      border: none;
+      height: 1rem;
+      width: 100%;
+    }
+  }
+
+  button {
+    appearance: none;
+    background-color: colours.$background;
+    color: colours.$foreground;
+    border-width: 0;
+    line-height: 1rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 0 0.25rem;
+    margin: 0;
+  }
+}

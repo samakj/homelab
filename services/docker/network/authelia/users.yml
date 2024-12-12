@@ -1,0 +1,8 @@
+users:
+  root:
+    displayname: "Sam"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$z+B95hQNVc5I8WBxiEck5w$tDeQn/uIkTOX+zYeWks0FrsxhJL+S7x8+z7Z1Hwdf1I"
+    email: samakj@live.co.uk
+    groups:
+      - admins
+      - dev

@@ -1,0 +1,18 @@
+services:
+  {{ hosts.iot.api.container }}:
+    container_name: {{ hosts.iot.api.container }}
+    build: 
+      context: {{ root_dir }}/iot/api
+      dockerfile: built.secret.Dockerfile
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - {{ root_dir }}/iot/api:/api
+    ports:
+      - {{ hosts.iot.api.port }}:{{ hosts.iot.api.port }}
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

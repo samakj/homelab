@@ -1,0 +1,7 @@
+{
+  "router": {
+    "auth": "{{ router.auth }}",
+    "ip": "{{ router.ip }}"
+  },
+  "port": {{ hosts.iot.scraper.port }}
+}

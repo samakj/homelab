@@ -1,0 +1,56 @@
+/** @format */
+
+.terminalCard {
+  overflow: hidden;
+  padding: 0.5rem;
+
+  .terminal {
+    font-size: 0.75rem;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 0.5rem;
+
+    .terminalLine {
+      white-space: nowrap;
+      font-family: monospace;
+      display: grid;
+      grid-template-columns: 11rem 2.5rem 1fr;
+      gap: 0.25rem;
+      margin: 0.125rem 0;
+
+      &.debug {
+        color: cyan;
+      }
+      &.info {
+        color: white;
+      }
+      &.warn {
+        color: yellow;
+      }
+      &.error {
+        color: red;
+      }
+    }
+  }
+}
+
+.metricCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  .value {
+    font-size: 2rem;
+  }
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}

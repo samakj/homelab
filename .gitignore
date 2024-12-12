@@ -1,0 +1,22 @@
+*.secret.*
+
+# Authelia
+authelia/data
+
+# IDE
+.vscode/
+.pio/
+
+# Javascript
+node_modules/
+build/
+*.tsbuildinfo
+
+# Platformio
+platformio.ini
+
+# Postgres
+iot/db/data
+
+# Protainer
+portainer/data

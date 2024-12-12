@@ -1,0 +1,87 @@
+server:
+  # prettier-ignore
+  address: 0.0.0.0:{{ hosts.network.authelia.port }}
+
+log:
+  level: debug
+
+theme: dark
+
+identity_validation:
+  reset_password:
+    # prettier-ignore
+    jwt_secret: {{ authelia.jwt_secret }}
+
+authentication_backend:
+  file:
+    path: /config/users.yml
+    password:
+      algorithm: argon2
+      argon2:
+        variant: argon2id
+        iterations: 1
+        memory: 2097152
+        parallelism: 4
+        key_length: 32
+        salt_length: 16
+
+access_control:
+  default_policy: one_factor
+
+session:
+  # prettier-ignore
+  secret: {{ authelia.session_secret }}
+  cookies:
+    - domain: {{ hosts.root_hostname }}
+      authelia_url: https://{{ hosts.network.authelia.hostname }}.{{ hosts.root_hostname }}
+      default_redirection_url: https://{{ hosts.root_hostname }}
+      name: authelia_session
+      expiration: 3600
+      inactivity: 300
+
+regulation:
+  max_retries: 3
+  find_time: 120
+  ban_time: 300
+
+storage:
+  # prettier-ignore
+  encryption_key: {{ authelia.storage_secret }}
+  local:
+    path: /data/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /data/notification.txt
+# identity_providers:
+#   oidc:
+#     ## The other portions of the mandatory OpenID Connect 1.0 configuration go here.
+#     ## See: https://www.authelia.com/c/oidc
+#     clients:
+#       - client_id: "proxmox"
+#         client_name: "Proxmox"
+#         client_secret: "$pbkdf2-sha512$310000$RE0aZ9pnyeSoeA0pe.v35Q$Txw/HsWW912mUdhfbcWuwx9RSwtaYxBkJ/y2FdV4Mi3vqcaXh4DTSuPfa6yfw4bp72EOKcYR/dG5vlxhSxoTwA"
+#         public: false
+#         authorization_policy: "one_factor"
+#         require_pkce: true
+#         pkce_challenge_method: "S256"
+#         redirect_uris:
+#           - "https://proxmox.homelab.lan"
+#         scopes:
+#           - "openid"
+#           - "profile"
+#           - "email"
+#         userinfo_signed_response_alg: "none"
+#       - client_id: "portainer"
+#         client_name: "Portainer"
+#         client_secret: "$pbkdf2-sha512$310000$npu8kJoxwhTY9DsO6P8FFA$zAlfUkClJT3ETmzd0i387rxWX7lb9zmEpWmkrUw7KgyHbgdtT4OzSC5BDPqyCl3Vw.gztyAqq1FzOPGdhyynPQ"
+#         public: false
+#         authorization_policy: "two_factor"
+#         redirect_uris:
+#           - "https://portainer.homelab.lan"
+#         scopes:
+#           - "openid"
+#           - "profile"
+#           - "groups"
+#           - "email"
+#         userinfo_signed_response_alg: "none"
