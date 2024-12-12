@@ -1,0 +1,50 @@
+/** @format */
+
+@import '../../common/styles/styles.module.scss';
+
+.pageStructure {
+  display: grid;
+  grid-template-areas: 'header header' 'sidebar main';
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+.header {
+  grid-area: header;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.main {
+  grid-area: main;
+  overflow: auto;
+}
+
+.pageGrid {
+  display: grid;
+  margin: auto;
+  grid-template-rows: repeat(auto-fill, 7.5rem);
+  grid-template-columns: repeat(16, 7.5rem);
+  grid-auto-flow: row dense;
+  width: fit-content;
+  min-height: 100%;
+
+  @media screen and (max-width: 120rem) {
+    grid-template-columns: repeat(12, minmax(6rem, 7.5rem));
+    grid-template-rows: repeat(auto-fill, 6rem);
+  }
+
+  @media screen and (max-width: 72rem) {
+    grid-template-columns: repeat(8, minmax(5.5rem, 6rem));
+    grid-template-rows: repeat(auto-fill, 5.5rem);
+  }
+
+  @media screen and (max-width: 45rem) {
+    grid-template-columns: repeat(4, minmax(5rem, 5.5rem));
+    grid-template-rows: repeat(auto-fill, 5rem);
+  }
+}

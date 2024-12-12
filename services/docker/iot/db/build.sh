@@ -1,0 +1,1 @@
+python "${PWD%/homelab*}/homelab/scripts/build_secrets.py" docker-compose.yml docker-compose.secret.yml 

@@ -1,0 +1,158 @@
+entrypoints:
+  postgres:
+    adress: ":5432"
+
+http:
+  #----
+
+  routers:
+    adguard:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`adguard.homelab.lan`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: adguard
+    authelia:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`auth.homelab.lan`)"
+      middlewares:
+        - https-redirectscheme
+      tls: {}
+      service: authelia
+    iot_db:
+      entryPoints:
+        - "postgres"
+      rule: "Host(`db.iot.homelab.lan`)"
+      tls: {}
+      service: iot_db
+    lumbridge:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`lumbridge.homelab.lan`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: proxmox
+    opnsense:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`opnsense.homelab.lan`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: opnsense
+    portainer:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`portainer.homelab.lan`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: portainer
+    proxmox:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`proxmox.homelab.lan`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: proxmox
+    traefik:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`traefik.homelab.lan`)"
+      middlewares:
+        - https-redirectscheme
+        - secured
+      tls: {}
+      service: api@internal
+
+  #----
+
+  services:
+    adguard:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.1:3000"
+        passHostHeader: true
+    authelia:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.97:9090"
+        passHostHeader: true
+    iot_db:
+      loadBalancer:
+        servers:
+          - url: "psql://postgres:9999"
+        passHostHeader: true
+    opnsense:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.1"
+        passHostHeader: true
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.100"
+        passHostHeader: true
+    portainer:
+      loadBalancer:
+        servers:
+          - url: "https://portainer:9443"
+        passHostHeader: true
+
+  #----
+
+  middlewares:
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-whitelist:
+      ipAllowList:
+        sourceRange:
+          - "192.168.0.0/16"
+          - "172.16.0.0/12"
+
+    authelia:
+      forwardAuth:
+        address: http://192.168.1.97:9090/api/verify?rd=https://auth.homelab.lan
+        trustForwardHeader: true
+        authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+
+    secured:
+      chain:
+        middlewares:
+          - https-redirectscheme
+          - authelia
+          - default-whitelist
+          - default-headers

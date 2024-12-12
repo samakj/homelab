@@ -1,0 +1,84 @@
+/** @format */
+@import '../../common/styles/styles.module.scss';
+
+.select {
+  display: inline-block;
+
+  .control {
+    min-height: unset;
+    background-color: transparent;
+    border: 1px solid $level-1-border;
+    transition: border-color 300ms;
+    padding: 0.5rem 0 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    width: 10rem;
+    outline: none;
+    box-shadow: none;
+
+    &:hover {
+      border-color: $level-2-border;
+    }
+
+    &:focus-within {
+      border-color: $foreground;
+    }
+
+    > :not(.indicatorsContainer) {
+      padding: 0;
+    }
+  }
+
+  .indicatorsContainer {
+    padding: 0 0.5rem;
+
+    > :not(.indicatorSeparator) {
+      padding: 0;
+    }
+
+    svg {
+      height: 1rem;
+      width: 1rem;
+    }
+  }
+
+  .indicatorSeparator {
+    display: none;
+  }
+
+  .input {
+    margin: 0;
+    padding: 0;
+    color: $level-1-text;
+  }
+
+  .menu {
+    background-color: $level-1-background;
+    border: 1px solid $level-1-border;
+    border-radius: 0.5rem;
+  }
+
+  .menuList {
+    scrollbar-color: $level-3-background $level-1-background;
+    scrollbar-width: thin;
+  }
+
+  .option {
+    color: $level-1-text;
+    background: transparent;
+    transition: background-color 300ms;
+
+    &:hover {
+      background-color: $level-2-background;
+    }
+
+    &.selected {
+      background-color: $foreground;
+      color: $background;
+    }
+  }
+
+  .singleValue {
+    color: $level-1-text;
+    margin: 0;
+  }
+}
