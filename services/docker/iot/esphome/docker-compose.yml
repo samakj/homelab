@@ -1,0 +1,10 @@
+services:
+  {{ hosts.iot.esphome.container }}:
+    container_name: {{ hosts.iot.esphome.container }}
+    image: esphome/esphome
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    privileged: true
+    network_mode: host

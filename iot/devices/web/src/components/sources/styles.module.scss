@@ -1,0 +1,90 @@
+/** @format */
+
+@use '../../styles/colours.module';
+@use '../../styles/sizes.module';
+
+.sources {
+  grid-area: sources;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media screen and (max-width: sizes.$small-screen) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+.source {
+  height: 8rem;
+  width: 8rem;
+  border-radius: 0.5rem;
+  background-color: colours.$grey-10;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  @media screen and (max-width: sizes.$small-screen) {
+    margin-bottom: 0;
+  }
+
+  .label {
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
+  .value {
+    font-size: 1.875rem;
+    text-align: right;
+  }
+}
+
+.colour {
+  display: grid;
+  gap: 0.125rem;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-template-areas: 'label value' 'perc perc';
+
+  .label {
+    grid-area: label;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
+  .value {
+    grid-area: value;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    text-align: right;
+  }
+
+  .bar {
+    grid-area: perc;
+    background-color: colours.$grey-20;
+    height: 0.25rem;
+    width: 100%;
+
+    .fill {
+      background-color: colours.$grey-90;
+      height: 0.25rem;
+    }
+  }
+}
+
+.irSender,
+.wifi {
+  justify-content: center;
+  svg {
+    height: 2rem;
+    fill: colours.$foreground;
+  }
+}
+
+.ntp .value {
+  font-size: 1.75rem;
+}
