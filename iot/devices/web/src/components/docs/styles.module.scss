@@ -1,0 +1,16 @@
+/** @format */
+
+@use '../../styles/colours.module';
+@use '../../styles/sizes.module';
+
+.docs {
+  position: relative;
+  grid-area: logs-terminal;
+  border: 1px solid colours.$grey-20;
+  border-radius: 0.5rem;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: white;
+  color: black;
+}

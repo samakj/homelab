@@ -1,0 +1,11 @@
+/** @format */
+
+.header {
+  display: grid;
+  grid-template-columns: 12.5rem 1fr 12.5rem;
+
+  .logo {
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+  }
+}

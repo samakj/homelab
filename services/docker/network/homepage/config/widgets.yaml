@@ -1,0 +1,18 @@
+- resources:
+    cpu: true
+    cputemp: true
+    memory: true
+    expanded: true
+    disk: /
+    refresh: 5000
+    units: metric
+
+- openmeteo:
+    label: Cousldon
+    latitude: 51.3242315
+    longitude: -0.1350925
+    timezone: Europe/London
+    units: metric
+    cache: 5
+    format:
+      maximumFractionDigits: 1

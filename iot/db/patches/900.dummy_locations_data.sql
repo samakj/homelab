@@ -1,0 +1,15 @@
+INSERT INTO locations (name, tags) VALUES
+    ('front garden', ARRAY['outside']),
+    ('shed', ARRAY['outside']),
+    ('porch', ARRAY['outside']),
+    ('hallway', ARRAY['inside']),
+    ('master bedroom', ARRAY['inside']),
+    ('living room', ARRAY['inside']),
+    ('dining room', ARRAY['inside']),
+    ('cupboard', ARRAY['inside']),
+    ('toilet', ARRAY['inside']),
+    ('second bedroom', ARRAY['inside']),
+    ('kitchen', ARRAY['inside']),
+    ('lean-to', ARRAY['outside']),
+    ('patio', ARRAY['outside']),
+    ('back garden', ARRAY['outside']);

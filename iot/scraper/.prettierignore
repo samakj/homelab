@@ -1,0 +1,14 @@
+# Ignore artifacts:
+build/**
+coverage/**
+node_modules/**
+
+# Ignore files that should not be formatted:
+*.svg
+*.md
+*.txt
+*.yml
+*.yaml
+*.json
+*.prettierrc
+*.prettierignore

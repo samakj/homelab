@@ -1,0 +1,20 @@
+services:
+  {{ hosts.iot.db.container }}:
+    image: postgres:latest
+    container_name: {{ hosts.iot.db.container }}
+    environment:
+      - POSTGRES_USER={{ iot_db.username }}
+      - POSTGRES_PASSWORD={{ iot_db.password }}
+      - PGPORT={{ hosts.iot.db.port }}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - {{ root_dir }}/iot/db/data:/var/lib/postgresql/data
+      - {{ root_dir }}/iot/db/patches:/docker-entrypoint-initdb.d
+    expose:
+      - {{ hosts.iot.db.port }}
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

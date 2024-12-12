@@ -1,0 +1,56 @@
+/** @format */
+
+@import '../../common/styles/styles.module.scss';
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.thead {
+  border-bottom: 1px solid $level-1-border;
+}
+
+.tbody {
+}
+
+.tr {
+  transition: backround-color 300ms;
+
+  &:hover {
+    background-color: $level-2-background;
+  }
+}
+
+.th,
+.td {
+  padding: 0.25rem;
+
+  &:first-child {
+    padding-left: 0.75rem;
+  }
+
+  &:last-child {
+    padding-right: 0.75rem;
+  }
+
+  &.left {
+    text-align: left;
+  }
+  &.center {
+    text-align: center;
+  }
+  &.right {
+    text-align: right;
+  }
+}
+
+.th {
+  color: $level-2-text;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+.td {
+  font-size: 0.875rem;
+}

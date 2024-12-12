@@ -1,0 +1,13 @@
+{
+  "postgres": {
+    "username": "{{ iot_db.username }}",
+    "password": "{{ iot_db.password }}",
+    "host": "{{ hosts.iot.db.ip }}",
+    "port": {{ hosts.iot.db.port }}
+  },
+  "router": {
+    "auth": "{{ router.auth }}",
+    "ip": "{{ router.ip }}"
+  },
+  "port": {{ hosts.iot.db.port }}
+}

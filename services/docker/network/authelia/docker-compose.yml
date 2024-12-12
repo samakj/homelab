@@ -1,0 +1,22 @@
+services:
+  {{ hosts.network.authelia.container }}:
+    image: authelia/authelia:latest
+    container_name: {{ hosts.network.authelia.container }}
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./configuration.secret.yml:/config/configuration.yml:ro
+      - ./users.yml:/config/users.yml:ro
+      - ./data:/data
+    networks:
+      - proxy
+    ports:
+      - {{ hosts.network.authelia.port }}:{{ hosts.network.authelia.port }}
+    environment:
+      - TZ=Europe/London
+    healthcheck:
+      disable: true
+      
+networks:
+  proxy:
+    external: true

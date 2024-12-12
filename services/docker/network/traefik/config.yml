@@ -1,0 +1,222 @@
+http:
+  routers:
+    home_assistant:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.home_assistant.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - https-redirectscheme
+        - secured
+      tls: {}
+      service: home_assistant
+
+    # iot_api:
+    #   entryPoints:
+    #     - "http"
+    #     - "https"
+    #   rule: "Host(`{{ hosts.iot.api.hostname }}.{{ hosts.root_hostname }}`)"
+    #   middlewares:
+    #     - https-redirectscheme
+    #     - secured
+    #   tls: {}
+    #   service: iot_api
+    # iot_web:
+    #   entryPoints:
+    #     - "http"
+    #     - "https"
+    #   rule: "Host(`{{ hosts.iot.web.hostname }}.{{ hosts.root_hostname }}`)"
+    #   middlewares:
+    #     - https-redirectscheme
+    #     - secured
+    #   tls: {}
+    #   service: iot_web
+    # iot_portainer:
+    #   entryPoints:
+    #     - "http"
+    #     - "https"
+    #   rule: "Host(`{{ hosts.iot.portainer.hostname }}.{{ hosts.root_hostname }}`)"
+    #   middlewares:
+    #     - https-redirectscheme
+    #     - secured
+    #   tls: {}
+    #   service: iot_portainer
+
+    # network_authelia:
+    #   entryPoints:
+    #     - "http"
+    #     - "https"
+    #   rule: "Host(`{{ hosts.network.authelia.hostname }}.{{ hosts.root_hostname }}`)"
+    #   middlewares:
+    #     - https-redirectscheme
+    #   tls: {}
+    #   service: network_authelia
+    network_homepage:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.root_hostname }}`)"
+      middlewares:
+        - https-redirectscheme
+        - secured
+      tls: {}
+      service: network_homepage
+    network_traefik:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.network.traefik.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - https-redirectscheme
+        - secured
+      tls: {}
+      service: api@internal
+    network_portainer:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.network.portainer.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: network_portainer
+
+    misc_docs:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.misc.docs.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: misc_docs
+
+    oak:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.oak.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: proxmox
+    proxmox:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`proxmox.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: proxmox
+
+    truenas:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`{{ hosts.truenas.hostname }}.{{ hosts.root_hostname }}`)"
+      middlewares:
+        - secured
+        - https-redirectscheme
+      tls: {}
+      service: truenas
+
+  services:
+    home_assistant:
+      loadBalancer:
+        servers:
+          - url: "http://{{ hosts.home_assistant.ip }}:{{ hosts.home_assistant.port }}"
+        passHostHeader: true
+
+    # iot_api:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "https://{{ hosts.iot.api.ip }}:{{ hosts.iot.api.port }}"
+    #     passHostHeader: true
+    # iot_web:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "https://{{ hosts.iot.web.ip }}:{{ hosts.iot.web.port }}"
+    #     passHostHeader: true
+    # iot_portainer:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "https://{{ hosts.iot.portainer.ip }}:{{ hosts.iot.portainer.port }}"
+    #     passHostHeader: true
+
+    # network_authelia:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "http://{{ hosts.network.authelia.ip }}:{{ hosts.network.authelia.port }}"
+    #     passHostHeader: true
+    network_homepage:
+      loadBalancer:
+        servers:
+          - url: "http://{{ hosts.network.homepage.ip }}:{{ hosts.network.homepage.port }}"
+        passHostHeader: true
+    network_portainer:
+      loadBalancer:
+        servers:
+          - url: "https://{{ hosts.network.portainer.container }}:{{ hosts.network.portainer.port }}"
+        passHostHeader: true
+
+    misc_docs:
+      loadBalancer:
+        servers:
+          - url: "https://{{ hosts.misc.docs.container }}:{{ hosts.misc.docs.port }}"
+        passHostHeader: true
+
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://{{ hosts.oak.ip }}:{{ hosts.oak.port }}"
+        passHostHeader: true
+
+    truenas:
+      loadBalancer:
+        servers:
+          - url: "https://{{ hosts.truenas.ip }}"
+        passHostHeader: true
+
+  middlewares:
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-whitelist:
+      ipAllowList:
+        sourceRange:
+          - "192.168.0.0/16"
+          - "172.16.0.0/12"
+
+    # authelia:
+    #   forwardAuth:
+    #     address: http://{{ hosts.network.authelia.ip }}:{{ hosts.network.authelia.port }}/api/verify?rd=https://{{ hosts.network.authelia.hostname }}.{{ hosts.root_hostname }}
+    #     trustForwardHeader: true
+    #     authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+
+    secured:
+      chain:
+        middlewares:
+          - https-redirectscheme
+          # - authelia
+          - default-whitelist
+          - default-headers

@@ -1,0 +1,44 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "npm run build:config; tspc -p tsconfig.json",
+    "build:config": "python3.12 \"${PWD%/homelab*}/homelab/scripts/build_secrets.py\" src/config.json src/config.secret.json",
+    "watch": "npm run build:config; tspc -w -p tsconfig.json",
+    "dev": "npm run build:config; rm -rf build && concurrently -k -n tsp,ndm \"tspc -w -p tsconfig.json\" \"npm run dev:api\"",
+    "dev:api": "npm run build:config; nodemon build/index.js --delay 1",
+    "dev:scraper": "npm run build:config; nodemon build/scraper.js --delay 2",
+    "start": "node build/index.js",
+    "fix:prettier": "prettier $npm_config_local_prefix/src --config $npm_config_local_prefix/.prettierrc --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/postgres": "^5.2.2",
+    "axios": "^1.7.7",
+    "chalk": "^4.1.2",
+    "fastify": "^4.28.0",
+    "fastify-plugin": "^4.5.1",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^4.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^20.14.8",
+    "@types/pg": "^8.11.6",
+    "concurrently": "^8.2.2",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "json-schema": "^0.4.0",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "ts-patch": "^3.2.1",
+    "typescript": "^5.5.2",
+    "typescript-transform-paths": "^3.4.7"
+  }
+}

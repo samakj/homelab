@@ -1,0 +1,36 @@
+/** @format */
+
+@use '../../styles/sizes.module.scss';
+@use '../../styles/colours.module.scss';
+
+.pageGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: 'sources logs-terminal';
+  height: 100dvh;
+  width: 100dvw;
+  padding: 1rem;
+  gap: 1rem;
+  box-sizing: border-box;
+  background-color: colours.$background;
+  color: colours.$foreground;
+
+  @media screen and (max-width: sizes.$small-screen) {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: auto;
+    grid-template-areas: 'sources' 'logs-terminal';
+  }
+
+  @media screen and (max-width: 71rem) {
+    min-height: 32.5rem;
+  }
+
+  @media screen and (max-width: 41rem) {
+    min-height: 55rem;
+  }
+
+  @media screen and (max-width: 31rem) {
+    min-height: 67.5rem;
+  }
+}

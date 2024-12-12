@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "iot/devices"
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "*.yaml": "home-assistant"
+    }
+  }
+}

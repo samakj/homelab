@@ -1,0 +1,25 @@
+/** @format */
+@import '../../common/styles/styles.module.scss';
+
+.input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid $level-1-border;
+  transition: border-color 300ms;
+  background-color: transparent;
+  color: $level-1-text;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  width: 10rem;
+  text-align: inherit;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: $level-2-border;
+  }
+
+  &:focus {
+    border-color: $foreground;
+    outline: none;
+  }
+}

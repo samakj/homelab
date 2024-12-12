@@ -1,0 +1,17 @@
+services:
+  {{ hosts.iot.portainer.container }}:
+    image: portainer/portainer-ce:latest
+    container_name: {{ hosts.iot.portainer.container }}
+    ports:
+      - {{ hosts.iot.portainer.port }}:9443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

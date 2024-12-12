@@ -1,0 +1,60 @@
+/** @format */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+$background: black;
+
+$level-1-background: #080808;
+$level-2-background: #111;
+$level-3-background: #222;
+
+$level-1-border: #222;
+$level-2-border: #333;
+
+$level-1-text: white;
+$level-2-text: #bbb;
+
+$foreground: white;
+
+body {
+  margin: 0;
+  background-color: $background;
+  color: $level-1-text;
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+* {
+  /* width */
+  &::-webkit-scrollbar {
+    width: 0.25rem;
+    height: 0.25rem;
+    background-color: transparent;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: $level-1-background;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    border-radius: 1rem;
+
+    &:horizontal {
+      margin: 0 0.125rem;
+    }
+
+    &:vertical {
+      margin: 0.125rem 0;
+    }
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background-color: $level-1-text;
+    border-radius: 1rem;
+  }
+}

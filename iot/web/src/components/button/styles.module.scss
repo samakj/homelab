@@ -1,0 +1,21 @@
+/** @format */
+@import '../../common/styles/styles.module.scss';
+
+.button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid $level-1-border;
+  transition:
+    border-color 300ms,
+    background-color 300ms;
+  background-color: transparent;
+  color: $level-1-text;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $level-2-border;
+    background-color: $level-3-background;
+  }
+}

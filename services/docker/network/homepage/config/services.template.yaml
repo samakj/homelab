@@ -1,0 +1,64 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/widgets
+
+- Network:
+    - Pihole:
+        href: http://pi.hole
+        name: Pihole
+        widget:
+          type: pihole
+          url: http://pi.hole
+          version: 5
+          # prettier-ignore
+          key: {{ pihole.password }}
+
+    - Traefik:
+        href: https://{{ hosts.network.traefik.hostname }}.{{ hosts.root_hostname }}
+        name: Traefik
+        widget:
+          type: traefik
+          url: https://{{ hosts.network.traefik.hostname }}.{{ hosts.root_hostname }}
+          # prettier-ignore
+          username: {{ traefik.username }}
+          # prettier-ignore
+          password: {{ traefik.password }}
+
+    - Proxmox:
+        href: https://proxmox.{{ hosts.root_hostname }}
+        name: Proxmox
+        widget:
+          type: proxmox
+          url: https://proxmox.{{ hosts.root_hostname }}
+          # prettier-ignore
+          username: {{ proxmox.username }}
+          # prettier-ignore
+          password: {{ proxmox.password }}
+          node: oak
+
+    - TrueNAS:
+        href: https://{{ hosts.truenas.hostname }}.{{ hosts.root_hostname }}
+        name: TrueNAS
+        widget:
+          type: proxmox
+          url: https://{{ hosts.truenas.hostname }}.{{ hosts.root_hostname }}
+          # prettier-ignore
+          key: {{ truenas.key }}
+          nasType: scale
+
+    - Portainer:
+        href: https://{{ hosts.network.portainer.hostname }}.{{ hosts.root_hostname }}
+        name: Portainer
+        widget:
+          type: portainer
+          url: https://{{ hosts.network.portainer.hostname }}.{{ hosts.root_hostname }}
+          env: 2
+          # prettier-ignore
+          key: {{ portainer.key }}
+
+    - ESPHome:
+        href: http://{{ hosts.iot.esphome.ip }}:{{ hosts.iot.esphome.port }}
+        name: ESPHome
+        widget:
+          type: esphome
+          url: http://{{ hosts.iot.esphome.ip }}:{{ hosts.iot.esphome.port }}
