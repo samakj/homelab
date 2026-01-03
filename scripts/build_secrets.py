@@ -16,6 +16,7 @@ except:
 
 secrets_files = [
     "authelia",
+    "cloudflare",
     "hosts",
     "iot_db",
     "ota",

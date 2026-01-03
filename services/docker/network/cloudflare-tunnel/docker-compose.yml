@@ -1,0 +1,14 @@
+services:
+  {{ hosts.network.cloudflaretunnel.container }}:
+    image: cloudflare/cloudflared:2025.11.1
+    container_name: {{ hosts.network.cloudflaretunnel.container }}
+    environment:
+      TUNNEL_TOKEN: {{ cloudflare.tunnel.token }}
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
