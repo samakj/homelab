@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  {{ hosts.misc.whatsapp.container }}:
+    image: avoylenko/wwebjs-api:latest
+    container_name: {{ hosts.misc.whatsapp.container }}
+    restart: always
+    ports:
+      - {{ hosts.misc.whatsapp.port }}:{{ hosts.misc.whatsapp.port }}
+    env_file: .env.secret
+    volumes:
+      - ./sessions:/usr/src/app/sessions
+
+networks:
+  proxy:
+    external: true
